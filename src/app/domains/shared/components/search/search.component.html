@@ -1,0 +1,18 @@
+<div class="w-full md:w-96 flex space-x-2">
+  <div class="relative flex-grow">
+    <!-- 1. Vinculamos el input a nuestro searchControl -->
+    <!-- 2. Añadimos el evento (keyup.enter) -->
+    <input
+      [formControl]="searchControl"
+      (keyup.enter)="triggerSearch()"
+      type="search"
+      class="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50"
+      placeholder="Buscar por título..." />
+  </div>
+  <!-- 3. Añadimos un botón con el evento (click) -->
+  <button
+    (click)="triggerSearch()"
+    class="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+    Buscar
+  </button>
+</div>

@@ -1,0 +1,28 @@
+<!-- 1. Añadimos el componente de búsqueda aquí arriba -->
+<div class="w-full flex justify-center p-4">
+   <!-- <app-search></app-search> -->
+</div>
+
+<div class="flex mt-5 flex-col md:flex-row md:space-x-4">
+  <div class="w-full mb-4 md:w-56">
+    <ul class="text-center md:text-left">
+      <li>
+        <a routerLink="/">Todos</a>
+      </li>
+      @for (category of categories(); track category.id) {
+        <li>
+          <a routerLink="/" [queryParams]="{category_id: category.id}">{{ category.name }}</a>
+        </li>
+      }
+    </ul>
+  </div>
+  <div class="grid grid-cols-2 gap-8 w-full md:grid-cols-4">
+    <!-- 2. Cambiamos el bucle para usar el observable con el pipe async -->
+    @for (product of (products$ | async); track product.id) {
+      <app-product
+        [product]="product"
+        (addToCart)="addToCart($event)" />
+    }
+  </div>
+</div>
+
