@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Product } from '../models/product.model';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import {environment} from "../../../../environments/environmen";
 
 @Injectable({
   providedIn: 'root'
@@ -9,10 +10,16 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 export class ProductService {
 
   private http = inject(HttpClient);
+  //private apiUrl = environment.apiUrl; // Usa la variable
+  private apiUrl = `${environment.apiUrl}/api/products`;
+
   //private apiUrl = 'https://api.escuelajs.co/api/v1/products';
   // private apiUrl = 'http://localhost:8080/api/products';
   //private apiUrl = 'https://reactive-api-acma.onrender.com/api/products';
-  private apiUrl = 'https://ko4wgwo0c8gkkkw888808okk.systemash.com/api/products';
+ // private apiUrl = 'https://ko4wgwo0c8gkkkw888808okk.systemash.com/api/products';
+
+  //private apiUrl = this.apiUrl.;
+
 
   // 1. Un "Subject" que guardará la lista actual de productos. Es nuestro estado central.
   private products = new BehaviorSubject<Product[]>([]);
