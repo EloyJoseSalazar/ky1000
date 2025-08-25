@@ -3,11 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
+import { GestionImagenesProductoComponent } from '@shared/gestion-imagenes-producto/gestion-imagenes-producto.component';
 
 @Component({
     selector: 'app-product-detail',
-    imports: [CommonModule],
+  standalone: true, // <-- PASO 1: AÑADIR ESTO
+    imports: [CommonModule,GestionImagenesProductoComponent],
     templateUrl: './product-detail.component.html'
+
 })
 export default class ProductDetailComponent {
 
@@ -40,6 +43,7 @@ export default class ProductDetailComponent {
     if (product) {
       this.cartService.addToCart(product);
     }
+
   }
 
 

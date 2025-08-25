@@ -53,4 +53,10 @@ export class ProductService {
   getOne(id: string) {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
+
+  subirImagenes(productoId: number | string, formData: FormData): Observable<any> {
+    // La URL será algo como: /api/productos/123/imagenes
+    return this.http.post(`${this.apiUrl}/${productoId}/imagenes`, formData);
+  }
+
 }

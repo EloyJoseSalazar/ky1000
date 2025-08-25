@@ -38,4 +38,33 @@
         Agregar al Carrito
       </button>
     </div>
+
+  <!--
+  Usa un *ngIf para asegurarte de que el producto se ha cargado
+  antes de mostrar cualquier información o el componente de imágenes.
+-->
+  <div *ngIf="product() as product; else loading">
+
+    <!-- Aquí va el resto de tu HTML para mostrar el producto -->
+    <h2>{{ product.title }}</h2>
+    <p>{{ product.description }}</p>
+    <p>Precio: {{ product.price | currency }}</p>
+
+    <!-- ... más detalles, imágenes, etc. ... -->
+
+    <hr>
+
+    <!--
+      AQUÍ VA TU COMPONENTE DE IMÁGENES
+      Ahora pasamos el ID del producto real que se ha cargado.
+    -->
+    <app-gestion-imagenes-producto [productoId]="product.id"></app-gestion-imagenes-producto>
+
+  </div>
+
+  <!-- Un simple mensaje de carga mientras se obtienen los datos -->
+  <ng-template #loading>
+    <p>Cargando producto...</p>
+  </ng-template>
+
   </div>
