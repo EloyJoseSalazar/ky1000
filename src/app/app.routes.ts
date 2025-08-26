@@ -18,7 +18,27 @@ export const routes: Routes = [
             {
                 path: 'product/:id',
                 loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component')
-            }
+            },
+
+          // --- INICIO DE LAS NUEVAS RUTAS DE ADMINISTRACIÓN ---
+          {
+            path: 'ingresa', // Ruta base para la sección de administración
+            children: [
+              // Por ahora redirigimos a la creación, en el futuro aquí puede ir un listado de productos
+              { path: '', redirectTo: 'producto/nuevo', pathMatch: 'full' },
+              {
+                path: 'producto/nuevo', // Ruta para crear un nuevo producto
+                loadComponent: () => import('./pages/gestion-productos/gestion-productos.component')
+              },
+
+
+              {
+                path: 'producto/:id', // Ruta para editar un producto existente
+                loadComponent: () => import('./pages/gestion-productos/gestion-productos.component')
+              }
+            ]
+          },
+
         ]
     },
     {

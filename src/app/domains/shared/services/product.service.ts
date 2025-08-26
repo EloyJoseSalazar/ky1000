@@ -58,5 +58,22 @@ export class ProductService {
     // La URL será algo como: /api/productos/123/imagenes
     return this.http.post(`${this.apiUrl}/${productoId}/imagenes`, formData);
   }
+// -----------------> 25 08 2025
+  // ... tus otros métodos como getOne(), etc. ...
+
+  // CREAR un nuevo producto
+  create(productData: Omit<Product, 'id'>): Observable<Product> {
+    return this.http.post<Product>(this.apiUrl, productData);
+  }
+
+  // ACTUALIZAR un producto existente
+  update(id: string, productData: Partial<Product>): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, productData);
+  }
+
+  // ELIMINAR un producto
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 
 }
