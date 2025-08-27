@@ -6,55 +6,19 @@
 
     <!-- Columna Izquierda: Imágenes -->
     <div class="flex flex-col">
-      <h2 class="text-xl font-semibold mb-4">Imágenes</h2>
-
-      <!-- Contenedor de la imagen principal -->
-      <div class="mb-4 border rounded-lg overflow-hidden h-80 flex items-center justify-center bg-gray-100">
-        @if (mainImage()) {
-          <img [src]="mainImage()" alt="Imagen principal del producto" class="w-full h-full object-cover">
-        } @else {
-          <span class="text-gray-400">Sin imagen principal</span>
-        }
-      </div>
-
-      <!-- Contenedor de las miniaturas -->
-      <div class="grid grid-cols-6 gap-2">
-        @for(image of product()?.images; track image) {
-          <div
-            (click)="changeMainImage(image)"
-            class="h-16 border-2 rounded-md cursor-pointer overflow-hidden"
-            [class.border-blue-500]="image === mainImage()">
-            <img [src]="image" alt="Miniatura" class="w-full h-full object-cover">
-          </div>
-        }
-      </div>
-
-      <!-- Componente de subida de imágenes (solo en modo edición) -->
-      @if (isEditMode && currentProductId) {
-        <div class="mt-6">
-          <h3 class="font-semibold mb-2">Añadir nuevas imágenes</h3>
-          <app-gestion-imagenes-producto [productoId]="currentProductId"></app-gestion-imagenes-producto>
-        </div>
-      } @else {
-        <div class="mt-6 p-4 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-md">
-          Guarda el producto primero para poder añadir imágenes.
-        </div>
-      }
-    </div>
-
-    <!-- Columna Derecha: Formulario de Datos -->
-    <div class="flex flex-col space-y-4">
       <h2 class="text-xl font-semibold mb-2">Detalles del Producto</h2>
+
+
+      <div>
+        <label for="slug" class="block mb-1 font-medium">SKU / Slug</label>
+        <input type="text" id="slug" formControlName="slug" class="w-full p-2 border rounded-md">
+      </div>
 
       <div>
         <label for="title" class="block mb-1 font-medium">Título</label>
         <input type="text" id="title" formControlName="title" class="w-full p-2 border rounded-md">
       </div>
 
-      <div>
-        <label for="slug" class="block mb-1 font-medium">SKU / Slug</label>
-        <input type="text" id="slug" formControlName="slug" class="w-full p-2 border rounded-md">
-      </div>
 
       <div>
         <label for="price" class="block mb-1 font-medium">Precio</label>
@@ -87,6 +51,82 @@
           </button>
         }
       </div>
+
+      <!-- ... -->
+      <div>
+        <label for="slug" class="block mb-1 font-medium">SKU / Slug</label>
+        <div class="relative">
+          <input type="text" id="slug" formControlName="slug" class="w-full p-2 border rounded-md">
+          <!-- Indicador de búsqueda -->
+          @if (isSearching()) {
+            <span class="absolute right-2 top-2 text-sm text-gray-500">Buscando...</span>
+          }
+        </div>
+      </div>
+
     </div>
+
+    <!-- Columna Derecha: Formulario de Datos -->
+    <div class="flex flex-col space-y-4">
+      <h2 class="text-xl font-semibold mb-4">Imágenes</h2>
+
+      <!-- Contenedor de la imagen principal -->
+      <div class="mb-4 border rounded-lg overflow-hidden h-80 flex items-center justify-center bg-gray-100">
+        @if (mainImage()) {
+          <img [src]="mainImage()" alt="Imagen principal del producto" class="w-full h-full object-cover">
+        } @else {
+          <span class="text-gray-400">Sin imagen principal</span>
+        }
+      </div>
+
+      <!-- Contenedor de las miniaturas -->
+
+      <div class="grid grid-cols-6 gap-2">
+        @for(image of product()?.images; track image) {
+          <div
+            (click)="changeMainImage(image)"
+            class="h-16 border-2 rounded-md cursor-pointer overflow-hidden"
+            [class.border-blue-500]="image === mainImage()">
+            <img [src]="image" alt="Miniatura" class="w-full h-full object-cover">
+          </div>
+        }
+      </div>
+
+      <!-- Componente de subida de imágenes (solo en modo edición) -->
+      @if (isEditMode && currentProductId) {
+        <div class="mt-6">
+          <h3 class="font-semibold mb-2">Añadir nuevas imágenes</h3>
+          <app-gestion-imagenes-producto [productoId]="currentProductId"></app-gestion-imagenes-producto>
+        </div>
+      } @else {
+        <div class="mt-6 p-4 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-md">
+          Guarda el producto primero para poder añadir imágenes.
+        </div>
+      }
+
+    </div>
+
+    !-- Contenedor de las miniaturas -->
+    <div class="grid grid-cols-6 gap-2">
+      @for(image of product()?.images; track image) {
+        <!-- Contenedor relativo para posicionar el botón -->
+        <div class="relative">
+          <div
+            (click)="changeMainImage(image)"
+            class="h-16 border-2 rounded-md cursor-pointer overflow-hidden"
+            [class.border-blue-500]="image === mainImage()">
+            <img [src]="image" alt="Miniatura" class="w-full h-full object-cover">
+          </div>
+          <!-- BOTÓN DE ELIMINAR IMAGEN -->
+          <button
+            (click)="onDeleteImage(image, $event)"
+            type="button"
+            class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-800 text-sm font-bold">
+            &times;
+          </button>
+        </div>
+      }
+    </div>
+
   </form>
 </div>

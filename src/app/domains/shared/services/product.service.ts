@@ -1,8 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Product } from '../models/product.model';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import {BehaviorSubject, catchError, Observable, of, tap} from 'rxjs';
 import {environment} from "../../../../environments/environmen";
+
 
 @Injectable({
   providedIn: 'root'
@@ -74,6 +75,26 @@ export class ProductService {
   // ELIMINAR un producto
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  getBySlug(slug: string): Observable<Product | null> {
+    return this.http.get<Product>(`${this.apiUrl}/slug/${slug}`).pipe(
+      catchError(error => {
+        // Si el error es un 404 (Not Found), devolvemos un 'null' observable
+        // para que el componente sepa que el producto no existe.
+        if (error.status === 404) {
+          return of(null);
+        }
+        // Para otros errores, los relanzamos.
+        throw error;
+      })
+    );
+  }
+
+  deleteImage(productId: number | string, imageUrl: string): Observable<Product> {
+    // El endpoint espera un cuerpo con la URL de la imagen
+    const body = { imageUrl: imageUrl };
+    return this.http.delete<Product>(`${this.apiUrl}/${productId}/imagenes`, { body: body });
   }
 
 }
