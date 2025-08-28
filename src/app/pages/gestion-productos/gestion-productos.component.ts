@@ -126,6 +126,30 @@ export default class GestionProductosComponent implements OnInit, OnDestroy {
 
   onDelete(): void {
     // ... (Tu código onDelete original es correcto)
+    // Paso 1: Debugging. Verifiquemos qué valores tenemos al hacer clic.
+    console.log('Intentando eliminar:', {
+      isEditMode: this.isEditMode,
+      currentProductId: this.currentProductId
+    });
+
+    if (this.isEditMode && this.currentProductId && confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+      // La causa más probable es un tipo de dato. Asegurémonos de que el ID se pasa como string.
+      const idToDelete = this.currentProductId.toString();
+
+      this.productService.delete(idToDelete).subscribe({
+        next: () => {
+          alert('Producto eliminado con éxito');
+          // Reseteamos todo el formulario al estado inicial de creación
+          this.resetToCreateMode();
+          this.router.navigate(['/ingresa']);
+        },
+        error: (err) => {
+          console.error('Error en la eliminación:', err);
+          alert(`Error al eliminar: ${err.message}`);
+        }
+      });
+    }
+
   }
 
   changeMainImage(imageUrl: string): void {

@@ -77,6 +77,7 @@ export class ProductService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
+
   getBySlug(slug: string): Observable<Product | null> {
     return this.http.get<Product>(`${this.apiUrl}/slug/${slug}`).pipe(
       catchError(error => {
