@@ -69,11 +69,13 @@ export default class GestionProductosComponent implements OnInit, OnDestroy {
     });
   }
 
+
   // Se ejecuta cuando el componente es destruido
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
 
   // Configura el formulario para el MODO EDICIÓN
   private setupEditMode(product: Product): void {
@@ -85,6 +87,7 @@ export default class GestionProductosComponent implements OnInit, OnDestroy {
       this.mainImage.set(product.images[0]);
     }
   }
+
 
   // Resetea el formulario al MODO CREACIÓN
   private resetToCreateMode(keepSlug: string | null = null): void {

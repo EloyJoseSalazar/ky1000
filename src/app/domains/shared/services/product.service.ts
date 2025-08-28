@@ -18,7 +18,7 @@ export class ProductService {
   // private apiUrl = 'http://localhost:8080/api/products';
   //private apiUrl = 'https://reactive-api-acma.onrender.com/api/products';
  // private apiUrl = 'https://ko4wgwo0c8gkkkw888808okk.systemash.com/api/products';
-  
+
   // 1. Un "Subject" que guardará la lista actual de productos. Es nuestro estado central.
   private products = new BehaviorSubject<Product[]>([]);
 
