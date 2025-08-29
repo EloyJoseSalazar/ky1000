@@ -23,10 +23,9 @@
       </div>
     </div>
     <div class="mt-5 w-full">
+      <p class="text-gray-900 text-1xl title-font font-thin mb-1">{{ product()?.slug }}</p>
       <h2 class="text-sm title-font text-gray-500 tracking-widest">{{ product()?.category?.name | uppercase }}</h2>
-      <h1 class="text-gray-900 text-3xl title-font font-medium mb-1">
-        {{ product()?.title }}
-      </h1>
+      <h1 class="text-gray-900 text-3xl title-font font-medium mb-1">{{ product()?.title }}</h1>
       <p class="leading-relaxed">
         {{ product()?.description }}
       </p>
@@ -46,20 +45,21 @@
   <div *ngIf="product() as product; else loading">
 
     <!-- Aquí va el resto de tu HTML para mostrar el producto -->
-    <h2>{{ product.title }}</h2>
+    <!--
+     <h2>{{ product.title }}</h2>
     <p>{{ product.description }}</p>
     <p>Precio: {{ product.price | currency }}</p>
 
-    <!-- ... más detalles, imágenes, etc. ... -->
+
 
     <hr>
 
-    <!--
+
       AQUÍ VA TU COMPONENTE DE IMÁGENES
       Ahora pasamos el ID del producto real que se ha cargado.
-    -->
-    <app-gestion-imagenes-producto [productoId]="product.id"></app-gestion-imagenes-producto>
 
+    <app-gestion-imagenes-producto [productoId]="product.id"></app-gestion-imagenes-producto>
+    -->
   </div>
 
   <!-- Un simple mensaje de carga mientras se obtienen los datos -->
