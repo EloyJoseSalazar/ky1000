@@ -19,6 +19,7 @@
         />
 
         <!-- Flechas de Navegación: solo se muestran si hay más de 1 imagen -->
+
         @if (product.images.length > 1) {
           <!-- Flecha Izquierda -->
           <button (click)="prevImage()" class="absolute top-1/2 left-4 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-2 transition-colors">
@@ -36,6 +37,7 @@
       </div>
 
       <!-- Contenedor de Miniaturas -->
+
       <div class="grid grid-cols-5 gap-2 mt-4">
         @for (img of product.images; track img; let i = $index) {
           <div
@@ -50,6 +52,7 @@
     </div>
 
     <!-- Columna Derecha: Detalles del Producto -->
+
     <div class="flex flex-col">
       <p class="text-gray-500 text-sm font-thin mb-1">{{ product.slug }}</p>
       <h2 class="text-sm title-font text-gray-500 tracking-widest">{{ product.category?.name | uppercase }}</h2>
@@ -70,7 +73,9 @@
 
 } @else {
   <!-- Mensaje de carga mientras se obtienen los datos del producto -->
+  
   <div class="text-center py-20">
     <p>Cargando producto...</p>
-  </div>
+  </div>1
+
 }
