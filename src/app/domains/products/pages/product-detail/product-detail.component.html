@@ -1,35 +1,28 @@
-
-
-<!-- Usamos @if para mostrar el contenido solo cuando el producto se haya cargado -->
 @if (product(); as product) {
-
-  <!-- Layout principal: 1 columna en móvil, 2 columnas en pantallas grandes (lg) -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+  <div class="grid grid-cols-1 md:grid-cols-2 md:gap-12">
 
     <!-- Columna Izquierda: Galería de Imágenes -->
     <div class="flex flex-col">
-
-      <!-- Contenedor de Imagen Principal: Añadimos 'relative' para posicionar las flechas -->
+      <!-- Contenedor de Imagen Principal (con flechas) -->
       <div class="relative w-full aspect-square border rounded-lg overflow-hidden bg-gray-100">
         <!-- Imagen Principal -->
         <img
+          alt="{{ product.title }}"
+          class="w-full h-full object-cover transition-opacity duration-300"
           [src]="cover()"
-          [alt]="product.title"
-          class="w-full h-full object-cover transition-transform duration-300 ease-in-out"
         />
 
-        <!-- Flechas de Navegación: solo se muestran si hay más de 1 imagen -->
-
+        <!-- Controles de Desplazamiento (solo si hay más de 1 imagen) -->
         @if (product.images.length > 1) {
-          <!-- Flecha Izquierda -->
-          <button (click)="prevImage()" class="absolute top-1/2 left-4 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-2 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-800">
+          <!-- Botón Anterior -->
+          <button (click)="prevImage()" class="absolute top-1/2 left-2 -translate-y-1/2 bg-white/70 rounded-full p-2 hover:bg-white shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
-          <!-- Flecha Derecha -->
-          <button (click)="nextImage()" class="absolute top-1/2 right-4 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-2 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-gray-800">
+          <!-- Botón Siguiente -->
+          <button (click)="nextImage()" class="absolute top-1/2 right-2 -translate-y-1/2 bg-white/70 rounded-full p-2 hover:bg-white shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
           </button>
@@ -37,45 +30,44 @@
       </div>
 
       <!-- Contenedor de Miniaturas -->
-
       <div class="grid grid-cols-5 gap-2 mt-4">
         @for (img of product.images; track img; let i = $index) {
           <div
+            class="aspect-square border-2 rounded-md cursor-pointer overflow-hidden"
             (click)="changeCover(img, i)"
-            class="aspect-square border-2 rounded-md cursor-pointer overflow-hidden transition-all"
-            [class.border-red-500]="img === cover()"
-            [class.border-transparent]="img !== cover()">
-            <img [src]="img" [alt]="'Miniatura ' + (i + 1)" class="w-full h-full object-cover">
+            [class.border-red-500]="i === currentIndex()"> <!-- Usamos el índice para resaltar -->
+            <img
+              alt="Miniatura {{ i + 1 }}"
+              class="w-full h-full object-cover"
+              [src]="img"
+            />
           </div>
         }
       </div>
     </div>
 
     <!-- Columna Derecha: Detalles del Producto -->
-
-    <div class="flex flex-col">
+    <div class="mt-6 md:mt-0">
       <p class="text-gray-500 text-sm font-thin mb-1">{{ product.slug }}</p>
       <h2 class="text-sm title-font text-gray-500 tracking-widest">{{ product.category?.name | uppercase }}</h2>
-      <h1 class="text-gray-900 text-3xl title-font font-medium mb-2">{{ product.title }}</h1>
-      <p class="leading-relaxed text-gray-700">
-        {{ product.description }}
-      </p>
-      <p class="title-font font-medium text-3xl text-gray-900 mt-6">{{ product.price | currency:'$':'symbol':'1.2-2' }}</p>
+      <h1 class="text-gray-900 text-3xl title-font font-medium mb-1">{{ product.title }}</h1>
 
       <button
         (click)="addToCart()"
-        class="flex items-center justify-center mt-6 text-white bg-red-500 border-0 py-3 px-8 focus:outline-none hover:bg-red-600 rounded text-lg">
+        class="flex mt-6 text-white bg-red-500 border-0 py-3 px-8 focus:outline-none hover:bg-red-600 rounded text-lg">
         Agregar al Carrito
       </button>
+
+      <p class="title-font font-medium text-3xl text-gray-900 mt-5">{{ product.price | currency:'$':'symbol':'1.2-2' }}</p>
+
+      <p class="leading-relaxed mt-4">{{ product.description }}</p>
+
+
+
     </div>
 
   </div>
-
 } @else {
-  <!-- Mensaje de carga mientras se obtienen los datos del producto -->
-  
-  <div class="text-center py-20">
-    <p>Cargando producto...</p>
-  </div>1
-
+  <!-- Mensaje de carga mientras se obtienen los datos -->
+  <p>Cargando producto...</p>
 }
