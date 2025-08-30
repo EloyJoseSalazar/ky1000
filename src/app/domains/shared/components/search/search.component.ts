@@ -1,29 +1,36 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-// --- CORRECCIÓN DE RUTA AQUÍ ---
-// Subimos tres niveles (../../../) para llegar a 'src/app' y luego bajamos.
-import { ProductService } from '@shared/services/product.service';
+import { Router } from '@angular/router'; // <-- Importar Router
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './search.component.html',
+  imports: [],
+  template: `
+    <form (submit)="onSearch($event)" class="relative">
+      <input
+        #searchInput
+        type="search"
+        placeholder="Buscar productos..."
+        class="w-full md:w-64 p-2 pl-4 pr-10 border rounded-full focus:outline-none focus:ring-2 focus:ring-red-300"
+      >
+      <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500"><path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+      </button>
+    </form>
+  `
 })
 export class SearchComponent {
-  searchControl = new FormControl('');
-  // Ahora TypeScript sabe que 'productService' es de tipo ProductService
-  private productService = inject(ProductService);
+  private router = inject(Router);
 
-  triggerSearch() {
-    const searchTerm = this.searchControl.value || '';
-    if (searchTerm) {
-      // Los errores de 'unknown' desaparecen porque el servicio ya es conocido
-      this.productService.searchByTitle(searchTerm).subscribe();
-    } else {
-      this.productService.getProducts().subscribe();
-    }
+  onSearch(event: Event) {
+    event.preventDefault(); // Evita que la página se recargue
+    const inputElement = (event.target as HTMLFormElement).querySelector('input');
+    const searchTerm = inputElement?.value || '';
+
+    // --- LA LÓGICA CLAVE ---
+    // Navegamos a la página principal, pasando el término de búsqueda como query param
+    this.router.navigate(['/'], {
+      queryParams: { q: searchTerm }
+    });
   }
 }
-

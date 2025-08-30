@@ -28,16 +28,24 @@ export class ProductService {
   constructor() { }
 
   // 3. Método para la carga inicial y el filtro por categoría
-  getProducts(category_id?: string) {
-    const url = new URL(this.apiUrl);
-    if (category_id) {
-      url.searchParams.set('categoryId', category_id);
+  // --- MÉTODO getProducts MODIFICADO ---
+  getProducts(categoryId?: string, query?: string): Observable<Product[]> {
+    // Usamos HttpParams para construir la URL de forma segura
+    let params = new HttpParams();
+    if (categoryId) {
+      params = params.set('categoryId', categoryId);
     }
-    return this.http.get<Product[]>(url.toString()).pipe(
-      // Cuando se obtienen los productos, se actualiza nuestro "Subject"
+    if (query) {
+      // La clave 'title' debe coincidir con la que espera tu API de Spring Boot
+      params = params.set('title', query);
+    }
+
+    // Hacemos la petición con los parámetros
+    return this.http.get<Product[]>(this.apiUrl, { params }).pipe(
       tap(products => this.products.next(products))
     );
   }
+
 
   // 4. NUEVO MÉTODO: Para buscar por título
   searchByTitle(term: string) {
