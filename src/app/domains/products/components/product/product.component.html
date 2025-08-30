@@ -10,7 +10,7 @@
     - `overflow-hidden`: Oculta cualquier parte de la imagen que se salga.
     - `aspect-square`: ¡LA MAGIA! Fuerza a este div a ser un cuadrado perfecto.
   -->
-  
+
     <div class="relative overflow-hidden aspect-[4/5] md:aspect-square">
     <a [routerLink]="['/product', product.id]">
       <!--
@@ -38,23 +38,21 @@
     <div class="flex-grow">
       <h3 class="text-sm text-gray-500">{{ product.category?.name }}</h3>
       <a [routerLink]="['/product', product.id]">
-        <h2 class="text-md font-semibold text-gray-800 truncate hover:text-red-500">
-          {{ product.title }}
-        </h2>
+         <h2 class="text-md font-semibold text-gray-800 truncate hover:text-red-500"> {{ product.title }} </h2>
 
 
-    <!-- Precio y Botón de Añadir -->
-    <div class="flex justify-between items-center mt-4">
-      <span class="text-lg font-bold text-gray-900">{{ product.price | currency }}</span>
-     <!--
-      <button
-        (click)="onAddToCart()"
-        class="bg-red-500 text-white rounded-full w-9 h-9 flex items-center justify-center hover:bg-red-600 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-      </button>
-      -->
+     <!-- Precio y Botón de Añadir -->
+          <div class="flex justify-between items-center ">
+          <span class="text-lg font-bold text-gray-900">{{ product.price | currency }}</span>
+         <!--
+          <button
+            (click)="onAddToCart()"
+            class="bg-red-500 text-white rounded-full w-9 h-9 flex items-center justify-center hover:bg-red-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </button>
+          -->
     </div>
 
       </a>  <!--  </a> lo movi hasta aqui para para hacer toda la plantilla clickeable -->
