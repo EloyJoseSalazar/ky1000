@@ -28,8 +28,7 @@ export class HeaderComponent implements OnInit { // Implementamos OnInit
   categories = signal<Category[]>([]);
   showCategoriesDropdown = signal(false); // Para controlar el dropdown en PC
 
-  // --- NUEVO: Lógica para la búsqueda móvil ---
-  showMobileSearch = signal(false);
+
 
   ngOnInit() {
     // Cargamos las categorías cuando el componente se inicia
@@ -51,10 +50,7 @@ export class HeaderComponent implements OnInit { // Implementamos OnInit
     this.showCategoriesDropdown.update(prevState => !prevState);
   }
 
-  // --- NUEVO ---
-  toggleMobileSearch() {
-    this.showMobileSearch.update(prevState => !prevState);
-  }
+
 
   // ... (tus otros métodos de carrito) ...
 
