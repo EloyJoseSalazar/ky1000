@@ -1,27 +1,16 @@
-<!-- El header sigue siendo sticky (fijo) -->
-<nav class="sticky top-0 z-50 bg-white shadow-md">
+<nav class="sticky top-0 z-50 bg-white shadow-md relative">
   <div class="w-full max-w-7xl mx-auto px-4">
 
-    <!-- =============================================== -->
-    <!--            VISTA MÓVIL (`block md:hidden`)      -->
-    <!-- =============================================== -->
+    <!-- VISTA MÓVIL (Funciona, no se toca) -->
     <div class="block md:hidden">
-      <!-- Fila Superior: Menú, Logo, Carrito -->
+      <!-- ... (código de la vista móvil sin cambios) ... -->
       <div class="flex items-center justify-between h-16">
-        <!-- Izquierda: Botón Hamburguesa -->
         <div class="flex-shrink-0">
-          <button (click)="toggleMenu()" type="button" class="p-2">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-          </button>
+          <button (click)="toggleMenu()" type="button" class="p-2"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
         </div>
-        <!-- Centro: Logo -->
         <div class="flex-shrink-0">
-          <a routerLink="/" class="flex items-center space-x-2">
-            <img src="/assets/logo3.png" class="h-10" alt="LoVendo"/>
-            <span class="font-bold text-xl">LA TIENDA</span>
-          </a>
+          <a routerLink="/" class="flex items-center space-x-2"><img src="/assets/logo3.png" class="h-10" alt="LoVendo"/><span class="font-bold text-xl">LA TIENDA</span></a>
         </div>
-        <!-- Derecha: Carrito -->
         <div class="flex-shrink-0">
           <button class="p-2 border rounded relative" (click)="toogleSideMenu()">
             <div class="absolute -top-2 -left-2 rounded h-5 w-5 bg-black text-white text-xs">{{ cart().length }}</div>
@@ -29,17 +18,15 @@
           </button>
         </div>
       </div>
-      <!-- Fila Inferior: Búsqueda Fija -->
-      <div class="pb-3">
-        <app-search />
-      </div>
+      <div class="pb-3"><app-search /></div>
     </div>
 
     <!-- =============================================== -->
-    <!--              VISTA PC (`hidden md:flex`)        -->
+    <!--      VISTA PC - RECONSTRUIDA CON CSS GRID       -->
     <!-- =============================================== -->
-    <div class="hidden md:flex items-center justify-between h-20">
-      <!-- Izquierda: Logo y Menú de Navegación -->
+    <div class="hidden md:grid md:grid-cols-[auto_1fr_auto] md:items-center h-20 md:gap-x-6">
+
+      <!-- Columna 1: Logo y Navegación (se ajusta a su contenido) -->
       <div class="flex items-center space-x-6">
         <a routerLink="/" class="flex-shrink-0">
           <img src="/assets/logo3.png" class="h-10" alt="LoVendo"/>
@@ -49,7 +36,7 @@
           <div class="relative">
             <button (click)="toggleCategoriesDropdown()" class="hover:underline flex items-center">Categorías<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></button>
             @if (showCategoriesDropdown()) {
-              <div (mouseleave)="toggleCategoriesDropdown()" class="absolute mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+              <div (mouseleave)="toggleCategoriesDropdown()" class="absolute mt-2 w-48 bg-white rounded-md shadow-lg z-20">
                 <a routerLink="/" (click)="toggleCategoriesDropdown()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Todas</a>
                 @for(category of categories(); track category.id) {
                   <a [routerLink]="['/']" [queryParams]="{category_id: category.id}" (click)="toggleCategoriesDropdown()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ category.name }}</a>
@@ -61,13 +48,13 @@
         </div>
       </div>
 
-      <!-- Centro: Campo de Búsqueda -->
-      <div class="flex-grow px-8">
+      <!-- Columna 2: Campo de Búsqueda (ocupa todo el espacio restante) -->
+      <div class="w-full max-w-md mx-auto">
         <app-search />
       </div>
 
-      <!-- Derecha: Ingresa y Carrito -->
-      <div class="flex items-center space-x-4">
+      <!-- Columna 3: Ingresa y Carrito (se ajusta a su contenido) -->
+      <div class="flex items-center justify-end space-x-4">
         <a routerLink="/ingresa" routerLinkActive="underline" class="hover:underline">Ingresa</a>
         <button class="p-2 border rounded relative" (click)="toogleSideMenu()">
           <div class="absolute -top-2 -left-2 rounded h-5 w-5 bg-black text-white text-xs">{{ cart().length }}</div>
@@ -76,12 +63,13 @@
       </div>
     </div>
 
-    <!-- Menú Desplegable Móvil (sin cambios en su lógica interna) -->
-    <div class="md:hidden" [class.hidden]="!showMenu()">
-      <!-- ... (código del menú desplegable con las categorías) ... -->
-    </div>
+    <!-- Menú Desplegable Móvil (Funciona, no se toca) -->
+    @if (showMenu()) {
+      <div class="md:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t">
+        <!-- ... (código del menú desplegable móvil sin cambios) ... -->
+      </div>
+    }
   </div>
 </nav>
 
 <!-- El Side Menu del Carrito se queda exactamente igual -->
-<!-- ... -->
