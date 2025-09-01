@@ -63,42 +63,76 @@
       </div>
     </div>
 
-    <!-- Menú Desplegable Móvil (Funciona, no se toca) -->
-    @if (showMenu()) {
-      <div class="md:hidden absolute top-full left-0 w-full bg-white shadow-lg border-t">
-        <!-- ... (código del menú desplegable móvil sin cambios) ... -->
-      </div>
-    }
+
   </div>
 
+  <!-- ======================================================= -->
+  <!--            NUEVO: MENÚS OCULTOS (FINAL)                 -->
+  <!-- ======================================================= -->
 
-  <!-- 1. El Fondo Oscuro (Overlay) -->
-  <!-- Aparece solo cuando el menú está abierto y permite cerrar al hacer clic fuera -->
-  @if (!hideSideMenu()) {
-    <div
-      (click)="toogleSideMenu()"
-      class="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300 ease-in-out">
+  <!-- 1. Menú Desplegable Móvil (Corregido) -->
+  @if (showMenu()) {
+    <!-- Overlay para el menú principal móvil -->
+    <div (click)="toggleMenu()" class="fixed inset-0 bg-black bg-opacity-25 z-40 md:hidden"></div>
+
+    <!-- Contenido del menú -->
+    <div class="absolute top-full left-0 w-full bg-white shadow-lg border-t z-40 md:hidden">
+      <ul class="px-4 py-4 space-y-2">
+        <li><a routerLink="/" (click)="toggleMenu()" class="block">Home</a></li>
+        <li><a routerLink="/about" (click)="toggleMenu()" class="block">About</a></li>
+        <li><a routerLink="/Ubicaciones" (click)="toggleMenu()" class="block">Locations</a></li>
+        <li><a routerLink="/ingresa" (click)="toggleMenu()" class="block">Ingresa</a></li>
+        <li class="pt-2 mt-2 border-t"><span class="font-semibold text-gray-500">CATEGORÍAS</span></li>
+        <li><a routerLink="/" (click)="toggleMenu()" class="block pl-2">Todas</a></li>
+        @for(category of categories(); track category.id) {
+          <li><a [routerLink]="['/']" [queryParams]="{category_id: category.id}" (click)="toggleMenu()" class="block pl-2">{{ category.name }}</a></li>
+        }
+      </ul>
     </div>
   }
 
-  <!-- 2. El Contenido del Carrito -->
+
+  <!-- 2. Side Menu del Carrito (Completo y Corregido) -->
+  @if (!hideSideMenu()) {
+    <!-- Overlay para el carrito -->
+    <div (click)="toogleSideMenu()" class="fixed inset-0 bg-black bg-opacity-50 z-50"></div>
+  }
+
   <div
     class="fixed top-0 right-0 z-50 w-80 h-screen p-4 overflow-y-auto transition-transform duration-300 ease-in-out bg-white border-l-4"
     [class.translate-x-0]="!hideSideMenu()"
     [class.translate-x-full]="hideSideMenu()">
 
-    <!-- El contenido de tu carrito que ya tenías, lo he mejorado un poco -->
-    <div class="flex justify-between items-center">
+     <div class="flex justify-between items-center">
       <p class="text-xl font-semibold">Mi Carrito de Compra</p>
       <button (click)="toogleSideMenu()" class="p-1">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
 
-    <div class="pt-4 flex flex-col h-full">
+     <div class="pt-4 flex flex-col h-full">
       <div class="flex-grow">
+        <!-- CÓDIGO DEL @for AHORA INCLUIDO -->
         @for (item of cart(); track item.id) {
-          <!-- ... (código del @for de los items del carrito, se mantiene igual) ... -->
+          <div class="flex flex-col border-b pb-2 mb-2">
+            <div class="flex justify-between items-start">
+              <div class="flex space-x-3 items-center">
+                <img class="w-16 h-16 object-cover rounded" [src]="item.images[0]" [alt]="item.title">
+                <h3 class="font-medium text-sm">{{ item.title }}</h3>
+              </div>
+              <button (click)="removeFromCart(item.id)" class="text-gray-400 hover:text-red-600 p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div class="flex justify-between items-center mt-2">
+              <div class="flex items-center border rounded">
+                <button (click)="decreaseQuantity(item.id)" class="px-3 py-1 text-lg font-semibold">-</button>
+                <span class="px-3 py-1">{{ item.quantity }}</span>
+                <button (click)="increaseQuantity(item.id)" class="px-3 py-1 text-lg font-semibold">+</button>
+              </div>
+              <p class="font-semibold">{{ item.price * item.quantity | currency }}</p>
+            </div>
+          </div>
         } @empty {
           <p class="text-center text-gray-500 mt-10">Tu carrito está vacío.</p>
         }
