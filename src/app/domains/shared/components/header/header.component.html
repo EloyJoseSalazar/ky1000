@@ -1,4 +1,4 @@
-<nav class="sticky top-0 z-50 bg-white shadow-md relative">
+<nav class="sticky top-0 z-40 bg-white shadow-md relative">
   <div class="w-full max-w-7xl mx-auto px-4">
 
     <!-- VISTA MÓVIL (Funciona, no se toca) -->
@@ -70,6 +70,52 @@
       </div>
     }
   </div>
+
+
+  <!-- 1. El Fondo Oscuro (Overlay) -->
+  <!-- Aparece solo cuando el menú está abierto y permite cerrar al hacer clic fuera -->
+  @if (!hideSideMenu()) {
+    <div
+      (click)="toogleSideMenu()"
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300 ease-in-out">
+    </div>
+  }
+
+  <!-- 2. El Contenido del Carrito -->
+  <div
+    class="fixed top-0 right-0 z-50 w-80 h-screen p-4 overflow-y-auto transition-transform duration-300 ease-in-out bg-white border-l-4"
+    [class.translate-x-0]="!hideSideMenu()"
+    [class.translate-x-full]="hideSideMenu()">
+
+    <!-- El contenido de tu carrito que ya tenías, lo he mejorado un poco -->
+    <div class="flex justify-between items-center">
+      <p class="text-xl font-semibold">Mi Carrito de Compra</p>
+      <button (click)="toogleSideMenu()" class="p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <div class="pt-4 flex flex-col h-full">
+      <div class="flex-grow">
+        @for (item of cart(); track item.id) {
+          <!-- ... (código del @for de los items del carrito, se mantiene igual) ... -->
+        } @empty {
+          <p class="text-center text-gray-500 mt-10">Tu carrito está vacío.</p>
+        }
+      </div>
+
+      <div class="border-t pt-4">
+        <div class="flex justify-between items-center">
+          <p class="text-lg font-bold">Total:</p>
+          <p class="text-lg font-bold">{{ total() | currency }}</p>
+        </div>
+        <button class="w-full mt-4 bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800">Proceder al Pago</button>
+      </div>
+    </div>
+  </div>
+
 </nav>
 
 <!-- El Side Menu del Carrito se queda exactamente igual -->
+
+
