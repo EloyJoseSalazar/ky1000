@@ -1,5 +1,3 @@
-<!-- <p>gestion-productos works!</p>  -->
-      <!-- Formulario   -->
 
 <div class="container mx-auto p-4 max-w-6xl"> <!-- Opcional: Aumentamos el ancho máximo para pantallas grandes -->
   <h1 class="text-3xl font-bold mb-6">{{ isEditMode ? 'Editar Producto' : 'Crear Nuevo Producto' }}</h1>
@@ -106,11 +104,14 @@
           }
         </div>
 
-        <!-- Componente de subida de imágenes... (sin cambios) -->
         @if (isEditMode && currentProductId) {
           <div class="mt-6">
             <h3 class="font-semibold mb-2">Añadir nuevas imágenes</h3>
-            <app-gestion-imagenes-producto [productoId]="currentProductId"></app-gestion-imagenes-producto>
+            <!-- AQUÍ ESTÁ EL CAMBIO -->
+            <app-gestion-imagenes-producto
+              [productoId]="currentProductId"
+              (imagenesSubidas)="recargarProducto()">
+            </app-gestion-imagenes-producto>
           </div>
         } @else {
           <div class="mt-6 p-4 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-md">

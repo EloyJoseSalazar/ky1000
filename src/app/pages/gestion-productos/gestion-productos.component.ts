@@ -185,4 +185,32 @@ export default class GestionProductosComponent implements OnInit, OnDestroy {
     }
   }
 
+  loadProduct(id: string | number): void {
+    this.productService.getOne(id.toString()).subscribe({
+      next: (product) => {
+        // Actualizamos todos los signals y el formulario con la nueva información
+        this.product.set(product);
+        this.productForm.patchValue(product);
+        if (product.images.length > 0) {
+          // Si la imagen principal ya no existe, la reseteamos a la primera
+          if (!product.images.includes(this.mainImage())) {
+            this.mainImage.set(product.images[0]);
+          }
+        } else {
+          this.mainImage.set('');
+        }
+      },
+      error: () => this.router.navigate(['/ingresa'])
+    });
+  }
+
+  // --- NUEVA FUNCIÓN: Se ejecuta cuando el hijo emite el evento 'imagenesSubidas' ---
+  recargarProducto(): void {
+    if (this.currentProductId) {
+      console.log('Evento recibido del hijo. Recargando producto...');
+      this.loadProduct(this.currentProductId);
+    }
+  }
+
+
 }
