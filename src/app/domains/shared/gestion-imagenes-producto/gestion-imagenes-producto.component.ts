@@ -1,7 +1,13 @@
-import { Component, Input, OnInit, signal } from '@angular/core';
+
+import { Component, Input, OnInit, signal, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '@shared/services/product.service';
+
+import { Product } from '@shared/models/product.model';
+import { CartService } from '@shared/services/cart.service';
+
+
 
 @Component({
   selector: 'app-gestion-imagenes-producto',
@@ -10,11 +16,17 @@ import { ProductService } from '@shared/services/product.service';
   imports: [ReactiveFormsModule, CommonModule]
 })
 export class GestionImagenesProductoComponent implements OnInit {
+  @ViewChild('fileInput') fileInput!: ElementRef;
   @Input() productoId!: number | string;
+  @Output() imagenesSubidas = new EventEmitter<void>();
 
   imagenesForm: FormGroup;
   archivosSeleccionados: File[] = [];
   previews: string[] = [];
+
+  triggerFileInput(): void {
+    this.fileInput.nativeElement.click();
+  }
 
   // Signal para el feedback visual de arrastrar y soltar
   isDragging = signal(false);
@@ -27,11 +39,16 @@ export class GestionImagenesProductoComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+        throw new Error('Method not implemented.');
+    }
+
   ngOnInit(): void {
     if (!this.productoId) {
       console.error("Error: El ID del producto es necesario.");
     }
   }
+
 
   // --- NUEVO: Lógica de Pegado desde el Portapapeles ---
   onPaste(event: ClipboardEvent): void {
@@ -126,6 +143,7 @@ export class GestionImagenesProductoComponent implements OnInit {
       next: (response) => {
         alert('¡Las imágenes se guardaron correctamente!');
         this.clearSelection();
+        this.imagenesSubidas.emit();
         // OPCIONAL: Emitir un evento para que el componente padre refresque la lista de imágenes
       },
       error: (err) => {
@@ -134,4 +152,6 @@ export class GestionImagenesProductoComponent implements OnInit {
       }
     });
   }
+
+
 }

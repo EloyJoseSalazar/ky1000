@@ -13,17 +13,32 @@
     (dragover)="onDragOver($event)"
     (dragleave)="onDragLeave($event)"
     (drop)="onDrop($event)">
+    (click)="triggerFileInput()"> <!-- NUEVO: clic para abrir el selector de archivos -->
     <p class="text-gray-500">
       Arrastra y suelta imágenes aquí, o haz clic en este recuadro y presiona
       <kbd class="font-mono bg-gray-200 p-1 rounded">Ctrl</kbd> + <kbd class="font-mono bg-gray-200 p-1 rounded">V</kbd> para pegar desde el portapapeles.
     </p>
   </div>
 
+
+  <!-- Texto para PC -->
+  <p class="text-gray-500 hidden md:block"> <!-- `hidden md:block` -> se oculta en móvil -->
+    Arrastra y suelta imágenes aquí, o haz clic y presiona
+    <kbd>Ctrl</kbd> + <kbd>V</kbd> para pegar.
+  </p>
+
+  <!-- Texto para MÓVIL -->
+  <p class="text-gray-500 md:hidden"> <!-- `md:hidden` -> se muestra solo en móvil -->
+    <span class="font-bold">Toca aquí</span> para seleccionar imágenes de tu galería.
+  </p>
+
+
   <form [formGroup]="imagenesForm" (ngSubmit)="onSubmit()">
     <!-- Input para seleccionar archivos (ahora un poco más discreto) -->
     <div class="mt-4 text-center">
       <label for="imagenes" class="text-sm text-gray-600">O si lo prefieres, selecciónalas manualmente:</label>
       <input
+        #fileInput
         type="file"
         id="imagenes"
         class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mt-1"
@@ -31,6 +46,7 @@
         accept="image/*"
         (change)="onFileSelected($event)"
         formControlName="imagenesInput"
+
       >
     </div>
 
@@ -60,5 +76,7 @@
         </button>
       }
     </div>
+
   </form>
 </div>
+
