@@ -1,40 +1,29 @@
-import { CommonModule } from '@angular/common'; // Para *ngIf, *ngFor, etc.
-
+import { Component, Input, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '@shared/services/product.service';
-import {Component, Input, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-gestion-imagenes-producto',
   templateUrl: './gestion-imagenes-producto.component.html',
-
-  // --- INICIO DE LOS CAMBIOS ---
-  standalone: true, // 1. Declara el componente como independiente
-  imports: [
-    ReactiveFormsModule, // 2. Importa los módulos que usa la plantilla HTML
-    CommonModule
-  ]
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule]
 })
-
 export class GestionImagenesProductoComponent implements OnInit {
-
-  // El ID del producto al que pertenecen las imágenes.
-  // Podrías recibirlo de la ruta o de un componente padre.
-
-  //@Input() productoId!: number;
-  @Input() productoId!: number | string;  //Acepta int y string
+  @Input() productoId!: number | string;
 
   imagenesForm: FormGroup;
   archivosSeleccionados: File[] = [];
   previews: string[] = [];
 
-  constructor(
-    private fb: FormBuilder,
-    private productoService: ProductService // Servicio para hablar con la API
-  ) {
+  // Signal para el feedback visual de arrastrar y soltar
+  isDragging = signal(false);
+  private maxFiles = 5;
+
+  constructor(private fb: FormBuilder, private productoService: ProductService) {
     this.imagenesForm = this.fb.group({
-      // Este control es solo para la validación del input
-      imagenesInput: [null, Validators.required]
+      // El input ya no necesita ser 'required', validaremos por el tamaño del array
+      imagenesInput: [null]
     });
   }
 
@@ -44,58 +33,100 @@ export class GestionImagenesProductoComponent implements OnInit {
     }
   }
 
-  onFileSelected(event: any): void {
-    const files = event.target.files;
+  // --- NUEVO: Lógica de Pegado desde el Portapapeles ---
+  onPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const items = event.clipboardData?.items;
+    if (!items) return;
 
-    if (files.length > 3) {
-      alert("¡Solo puedes seleccionar un máximo de 3 imágenes!");
-      this.imagenesForm.get('imagenesInput')?.reset(); // Limpia el input
-      return;
-    }
-
-    this.archivosSeleccionados = Array.from(files);
-    this.previews = []; // Limpiamos las vistas previas anteriores
-
-    // Generamos las vistas previas
-    for (const file of this.archivosSeleccionados) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.previews.push(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    if (this.archivosSeleccionados.length > 0) {
-      this.imagenesForm.get('imagenesInput')?.setValue(this.archivosSeleccionados);
-    } else {
-      this.imagenesForm.get('imagenesInput')?.setValue(null);
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          this.addImageFile(file);
+        }
+      }
     }
   }
 
-  onSubmit(): void {
-    if (this.archivosSeleccionados.length === 0) {
-      alert("Por favor, selecciona al menos una imagen.");
+  // --- NUEVO: Lógica de Arrastrar y Soltar (Drag and Drop) ---
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(true);
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(false);
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(false);
+
+    const files = event.dataTransfer?.files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        this.addImageFile(files[i]);
+      }
+    }
+  }
+
+  // --- MODIFICADO: Ahora solo llama a la función helper ---
+  onFileSelected(event: any): void {
+    const files = event.target.files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        this.addImageFile(files[i]);
+      }
+    }
+  }
+
+  // --- NUEVO: Función Helper Centralizada para añadir imágenes ---
+  private addImageFile(file: File): void {
+    if (this.archivosSeleccionados.length >= this.maxFiles) {
+      alert(`¡Solo puedes seleccionar un máximo de ${this.maxFiles} imágenes!`);
       return;
     }
 
-    // Usamos FormData para enviar archivos
-    const formData = new FormData();
-    for (const file of this.archivosSeleccionados) {
-      // La clave 'files' debe coincidir con la que espera el backend
-      formData.append('files', file, file.name);
+    // Añadimos el nuevo archivo a nuestras listas
+    this.archivosSeleccionados.push(file);
+
+    // Generamos la vista previa para el nuevo archivo
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.previews.push(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // --- NUEVO: Función para limpiar la selección ---
+  clearSelection(): void {
+    this.archivosSeleccionados = [];
+    this.previews = [];
+    this.imagenesForm.reset();
+  }
+
+  // --- MODIFICADO: La lógica de envío se mantiene, pero más limpia ---
+  onSubmit(): void {
+    if (this.archivosSeleccionados.length === 0) {
+      alert("Por favor, selecciona o pega al menos una imagen.");
+      return;
     }
 
-    console.log(`Enviando ${this.archivosSeleccionados.length} imágenes para el producto ID: ${this.productoId}`);
+    const formData = new FormData();
+    for (const file of this.archivosSeleccionados) {
+      formData.append('files', file, file.name || `pasted-image-${Date.now()}.png`);
+    }
 
-    // Llamamos al servicio para subir las imágenes
     this.productoService.subirImagenes(this.productoId, formData).subscribe({
       next: (response) => {
-        console.log('¡Imágenes subidas con éxito!', response);
         alert('¡Las imágenes se guardaron correctamente!');
-        // Aquí podrías redirigir al usuario o limpiar el formulario
-        this.imagenesForm.reset();
-        this.previews = [];
-        this.archivosSeleccionados = [];
+        this.clearSelection();
+        // OPCIONAL: Emitir un evento para que el componente padre refresque la lista de imágenes
       },
       error: (err) => {
         console.error('Error al subir las imágenes', err);

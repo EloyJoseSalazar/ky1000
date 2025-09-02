@@ -1,52 +1,64 @@
 <div class="container mt-4">
-  <h3>Gestionar Imágenes del Producto</h3>
+  <h3 class="font-semibold text-lg">Gestionar Imágenes</h3>
 
-  <!-- Formulario Reactivo -->
+  <!--
+    NUEVA ZONA DE PEGADO Y ARRASTRE
+    - (paste), (dragover), (dragleave), (drop) son los nuevos listeners de eventos.
+    - [class.border-blue-500] cambiará el color del borde cuando se arrastre una imagen encima.
+  -->
+  <div
+    class="mt-4 p-6 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-gray-400 transition-colors"
+    [class.border-blue-500]="isDragging()"
+    (paste)="onPaste($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)">
+    <p class="text-gray-500">
+      Arrastra y suelta imágenes aquí, o haz clic en este recuadro y presiona
+      <kbd class="font-mono bg-gray-200 p-1 rounded">Ctrl</kbd> + <kbd class="font-mono bg-gray-200 p-1 rounded">V</kbd> para pegar desde el portapapeles.
+    </p>
+  </div>
+
   <form [formGroup]="imagenesForm" (ngSubmit)="onSubmit()">
-
-    <!-- Input para seleccionar archivos -->
-    <div class="form-group">
-      <label for="imagenes">Selecciona hasta 3 imágenes</label>
+    <!-- Input para seleccionar archivos (ahora un poco más discreto) -->
+    <div class="mt-4 text-center">
+      <label for="imagenes" class="text-sm text-gray-600">O si lo prefieres, selecciónalas manualmente:</label>
       <input
         type="file"
         id="imagenes"
-        class="form-control"
+        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mt-1"
         multiple
         accept="image/*"
         (change)="onFileSelected($event)"
         formControlName="imagenesInput"
       >
-      <!-- Mensaje de error si no se seleccionan archivos -->
-      <div *ngIf="imagenesForm.get('imagenesInput')?.touched && imagenesForm.get('imagenesInput')?.errors?.['required']" class="text-danger mt-1">
-        Debes seleccionar al menos una imagen.
-      </div>
     </div>
 
-    <!-- Sección de Vistas Previas -->
-    <div *ngIf="previews.length > 0" class="mt-3">
-      <h4>Vistas Previas:</h4>
-      <div class="d-flex flex-wrap">
-        <div *ngFor="let preview of previews" class="preview-container">
-          <img [src]="preview" class="img-thumbnail" alt="Vista previa">
+    <!-- Sección de Vistas Previas (Mejorada) -->
+    @if (previews.length > 0) {
+      <div class="mt-6">
+        <h4 class="font-semibold">Vistas Previas ({{ previews.length }} / 5):</h4>
+        <div class="flex flex-wrap gap-4 mt-2">
+          @for (preview of previews; track preview) {
+            <div class="w-32 h-32 border rounded-md overflow-hidden">
+              <img [src]="preview" class="w-full h-full object-cover" alt="Vista previa">
+            </div>
+          }
         </div>
       </div>
-    </div>
+    }
 
-    <!-- Botón de envío -->
-    <button type="submit" class="btn btn-primary mt-3" [disabled]="!imagenesForm.valid || archivosSeleccionados.length === 0">
-      Guardar Imágenes
-    </button>
+    <!-- Botones de Acción -->
+    <div class="flex items-center space-x-4 mt-6">
+      <button type="submit" class="bg-black text-white font-semibold py-2 px-6 rounded-md hover:bg-gray-800 disabled:bg-gray-400" [disabled]="archivosSeleccionados.length === 0">
+        Guardar Imágenes
+      </button>
+      <!-- NUEVO: Botón para Limpiar -->
+      @if (archivosSeleccionados.length > 0) {
+        <button type="button" (click)="clearSelection()" class="text-red-600 hover:underline">
+          Limpiar selección
+        </button>
+      }
+    </div>
   </form>
 </div>
-
-<!-- Un poco de CSS para las vistas previas -->
-<style>
-  .preview-container {
-    margin: 5px;
-  }
-  .img-thumbnail {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-  }
-</style>
