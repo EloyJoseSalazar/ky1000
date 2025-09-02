@@ -1,13 +1,7 @@
-
 import { Component, Input, OnInit, signal, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '@shared/services/product.service';
-
-import { Product } from '@shared/models/product.model';
-import { CartService } from '@shared/services/cart.service';
-
-
 
 @Component({
   selector: 'app-gestion-imagenes-producto',
@@ -24,24 +18,14 @@ export class GestionImagenesProductoComponent implements OnInit {
   archivosSeleccionados: File[] = [];
   previews: string[] = [];
 
-  triggerFileInput(): void {
-    this.fileInput.nativeElement.click();
-  }
-
-  // Signal para el feedback visual de arrastrar y soltar
   isDragging = signal(false);
   private maxFiles = 5;
 
   constructor(private fb: FormBuilder, private productoService: ProductService) {
     this.imagenesForm = this.fb.group({
-      // El input ya no necesita ser 'required', validaremos por el tamaño del array
       imagenesInput: [null]
     });
   }
-
-  ngOnDestroy(): void {
-        throw new Error('Method not implemented.');
-    }
 
   ngOnInit(): void {
     if (!this.productoId) {
@@ -49,8 +33,12 @@ export class GestionImagenesProductoComponent implements OnInit {
     }
   }
 
+  // --- LÓGICA DE EVENTOS ---
 
-  // --- NUEVO: Lógica de Pegado desde el Portapapeles ---
+  triggerFileInput(): void {
+    this.fileInput.nativeElement.click();
+  }
+
   onPaste(event: ClipboardEvent): void {
     event.preventDefault();
     const items = event.clipboardData?.items;
@@ -66,7 +54,6 @@ export class GestionImagenesProductoComponent implements OnInit {
     }
   }
 
-  // --- NUEVO: Lógica de Arrastrar y Soltar (Drag and Drop) ---
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
@@ -92,7 +79,6 @@ export class GestionImagenesProductoComponent implements OnInit {
     }
   }
 
-  // --- MODIFICADO: Ahora solo llama a la función helper ---
   onFileSelected(event: any): void {
     const files = event.target.files;
     if (files) {
@@ -102,17 +88,14 @@ export class GestionImagenesProductoComponent implements OnInit {
     }
   }
 
-  // --- NUEVO: Función Helper Centralizada para añadir imágenes ---
+  // --- LÓGICA DE MANEJO DE ARCHIVOS ---
+
   private addImageFile(file: File): void {
     if (this.archivosSeleccionados.length >= this.maxFiles) {
       alert(`¡Solo puedes seleccionar un máximo de ${this.maxFiles} imágenes!`);
       return;
     }
-
-    // Añadimos el nuevo archivo a nuestras listas
     this.archivosSeleccionados.push(file);
-
-    // Generamos la vista previa para el nuevo archivo
     const reader = new FileReader();
     reader.onload = (e: any) => {
       this.previews.push(e.target.result);
@@ -120,31 +103,26 @@ export class GestionImagenesProductoComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  // --- NUEVO: Función para limpiar la selección ---
   clearSelection(): void {
     this.archivosSeleccionados = [];
     this.previews = [];
     this.imagenesForm.reset();
   }
 
-  // --- MODIFICADO: La lógica de envío se mantiene, pero más limpia ---
   onSubmit(): void {
     if (this.archivosSeleccionados.length === 0) {
       alert("Por favor, selecciona o pega al menos una imagen.");
       return;
     }
-
     const formData = new FormData();
     for (const file of this.archivosSeleccionados) {
       formData.append('files', file, file.name || `pasted-image-${Date.now()}.png`);
     }
-
     this.productoService.subirImagenes(this.productoId, formData).subscribe({
       next: (response) => {
         alert('¡Las imágenes se guardaron correctamente!');
         this.clearSelection();
         this.imagenesSubidas.emit();
-        // OPCIONAL: Emitir un evento para que el componente padre refresque la lista de imágenes
       },
       error: (err) => {
         console.error('Error al subir las imágenes', err);
@@ -152,6 +130,4 @@ export class GestionImagenesProductoComponent implements OnInit {
       }
     });
   }
-
-
 }
