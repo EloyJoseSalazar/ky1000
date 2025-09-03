@@ -7,11 +7,14 @@ import { Product } from '@shared/models/product.model';
 import { GestionImagenesProductoComponent } from '@shared/gestion-imagenes-producto/gestion-imagenes-producto.component';
 // Importaciones clave de RxJS
 import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+
 
 @Component({
   selector: 'app-gestion-productos',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, GestionImagenesProductoComponent],
+  imports: [CommonModule, ReactiveFormsModule, GestionImagenesProductoComponent, DragDropModule],
   templateUrl: './gestion-productos.component.html',
 })
 export default class GestionProductosComponent implements OnInit, OnDestroy {
@@ -209,6 +212,80 @@ export default class GestionProductosComponent implements OnInit, OnDestroy {
     if (this.currentProductId) {
       console.log('Evento recibido del hijo. Recargando producto...');
       this.loadProduct(this.currentProductId);
+    }
+  }
+
+// --- NUEVA FUNCIÓN: Se ejecuta al soltar una imagen ---
+
+  onImageDrop(event: CdkDragDrop<string[]>): void {
+    const product = this.product();
+    if (!product) {
+      console.error('onImageDrop fue llamado pero no hay producto cargado.');
+      return;
+    }
+
+    // 1. Espía: Mostremos el orden ANTES del cambio.
+    console.log('--- ORDEN ORIGINAL ---');
+    console.log(product.images);
+    console.log(`Moviendo de índice ${event.previousIndex} a ${event.currentIndex}`);
+
+    // Creamos una copia para no mutar el estado original directamente.
+    const newImagesOrder = [...product.images];
+
+    // 2. Usamos la función del CDK para reordenar la copia.
+    moveItemInArray(newImagesOrder, event.previousIndex, event.currentIndex);
+
+    // 3. Espía: Mostremos el NUEVO orden.
+    console.log('--- NUEVO ORDEN (LOCAL) ---');
+    console.log(newImagesOrder);
+
+    // 4. Actualizamos nuestro signal local para que la UI se refresque instantáneamente.
+    this.product.update(currentProduct => {
+      if (!currentProduct) return null;
+      return { ...currentProduct, images: newImagesOrder };
+    });
+
+    // 5. Espía: Verifiquemos si el signal se actualizó.
+    console.log('--- SIGNAL ACTUALIZADO ---');
+    console.log(this.product()?.images);
+
+    // 6. PERSISTIMOS EL CAMBIO: Llamamos a la API.
+    if (this.currentProductId) {
+      // 1. Tomamos TODOS los valores actuales del formulario.
+       const productDataFromForm = this.productForm.value;
+
+      // 2. Creamos el objeto completo para la actualización,
+      //    combinando los datos del formulario con el nuevo orden de imágenes.
+       const fullProductToUpdate = {
+        ...productDataFromForm, // title, price, description, etc.
+        images: newImagesOrder  // el nuevo array de imágenes reordenado
+        };
+
+
+         console.log(`Enviando nuevo orden a la API para el producto ID: ${this.currentProductId}`);
+        // 3. Enviamos el objeto COMPLETO al servicio.
+        this.productService.update(this.currentProductId.toString(), fullProductToUpdate).subscribe({
+          // --- FIN DEL CAMBIO ---
+
+        next: (updatedProduct) => {
+          // 7. Espía: La API respondió con éxito.
+          console.log('--- RESPUESTA EXITOSA DE LA API ---');
+          console.log(updatedProduct);
+
+          this.product.set(updatedProduct);
+          this.mainImage.set(updatedProduct.images[0]);
+        },
+        error: (err) => {
+          // 8. Espía: La API dio un error.
+          console.error('--- ERROR DE LA API ---', err);
+
+          // Revertimos el cambio en la UI si la API falla.
+          this.product.set(product);
+          alert('No se pudo guardar el nuevo orden. Revisa la consola para más detalles.');
+        }
+      });
+    } else {
+      console.error('No se puede guardar en la API porque currentProductId es nulo.');
     }
   }
 

@@ -84,25 +84,45 @@
           }
         </div>
 
-        <!-- Contenedor de las miniaturas (el código de ayer es correcto) -->
-        <div class="grid grid-cols-6 gap-2">
-          @for(image of product()?.images; track image) {
-            <div class="relative aspect-square">
-              <div
-                (click)="changeMainImage(image)"
-                class="w-full h-full border-2 rounded-md cursor-pointer overflow-hidden"
-                [class.border-blue-500]="image === mainImage()">
-                <img [src]="image" alt="Miniatura" class="w-full h-full object-cover">
+        <!-- Contenedor de las miniaturas  -->
+        <!--
+          El bucle @for ahora envuelve al cdkDropList.
+          Pasamos los datos al cdkDropList usando [cdkDropListData].
+        -->
+        @if (product()?.images; as images) {
+          <div
+            cdkDropList
+            [cdkDropListData]="images"
+            cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="onImageDrop($event)"
+            class="grid grid-cols-6 gap-2">
+
+            <!-- El bucle ahora está FUERA. El cdkDrag es el hijo directo del @for. -->
+            @for (image of images; track image) {
+              <div cdkDrag class="relative aspect-square cursor-move">
+                <div
+                  (click)="changeMainImage(image)"
+                  class="w-full h-full border-2 rounded-md overflow-hidden"
+                  [class.border-blue-500]="image === mainImage()">
+                  <img [src]="image" alt="Miniatura" class="w-full h-full object-cover">
+                </div>
+                <button
+                  (click)="onDeleteImage(image, $event)"
+                  type="button"
+                  class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-800 text-sm font-bold">
+                  &times;
+                </button>
+                <div *cdkDragPlaceholder class="w-full h-full bg-gray-200 border-2 border-dashed border-gray-400 rounded-md"></div>
               </div>
-              <button
-                (click)="onDeleteImage(image, $event)"
-                type="button"
-                class="absolute top-0 right-0 -mt-2 -mr-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-800 text-sm font-bold">
-                &times;
-              </button>
-            </div>
-          }
-        </div>
+            }
+          </div>
+        }
+
+        <!-- El código de los estilos se mantiene igual -->
+        <style>
+          .cdk-drag-preview { opacity: 0.6; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); }
+          .cdk-drag-placeholder { user-select: none; }
+        </style>
 
         @if (isEditMode && currentProductId) {
           <div class="mt-6">
