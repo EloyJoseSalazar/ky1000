@@ -3,9 +3,13 @@
 
     <!-- Columna Izquierda: Galería de Imágenes -->
     <div class="flex flex-col">
+
       <!-- Contenedor de Imagen Principal (con flechas) -->
-      <div #imageContainer class="relative w-full aspect-square border rounded-lg overflow-hidden bg-gray-100">
-        <!-- Imagen Principal -->
+      <div
+        #imageContainer
+        class="relative w-full aspect-square border rounded-lg overflow-hidden bg-gray-100 touch-pan-y">
+
+      <!-- Imagen Principal -->
         <img
           alt="{{ product.title }}"
           class="w-full h-full object-cover transition-opacity duration-300"
