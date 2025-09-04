@@ -12,10 +12,10 @@
       <!-- Imagen Principal -->
         <img
           alt="{{ product.title }}"
-          class="w-full h-full object-cover transition-opacity duration-300"
+          class="w-full h-full object-cover transition-opacity duration-300 select-none"
           [src]="cover()"
+          draggable="false"
         />
-
         <!-- Controles de Desplazamiento (solo si hay más de 1 imagen) -->
         @if (product.images.length > 1) {
           <!-- Botón Anterior -->

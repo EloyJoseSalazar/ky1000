@@ -1,9 +1,8 @@
-import { Component, Input, inject, signal, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
-// FORMA CORRECTA DE IMPORTAR HAMMERJS
 import Hammer from 'hammerjs';
 
 @Component({
@@ -12,7 +11,8 @@ import Hammer from 'hammerjs';
   imports: [CommonModule],
   templateUrl: './product-detail.component.html'
 })
-export default class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+// Ya no necesitamos AfterViewInit aquí, solo OnInit y OnDestroy
+export default class ProductDetailComponent implements OnInit, OnDestroy {
 
   @Input() id?: string;
   product = signal<Product | null>(null);
@@ -34,22 +34,35 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
               this.cover.set(product.images[0]);
               this.currentIndex.set(0);
             }
+
+            // --- ¡LA SOLUCIÓN! ---
+            // Esperamos un instante para que Angular renderice el @if
+            // y luego inicializamos HammerJS.
+            setTimeout(() => {
+              this.setupHammer();
+            }, 0);
           }
         })
     }
   }
 
-  ngAfterViewInit(): void {
-    this.hammerManager = new Hammer(this.imageContainer.nativeElement);
+  // --- NUEVO: Función helper para configurar HammerJS ---
+  setupHammer(): void {
+    // Verificamos si el contenedor de imagen existe en el DOM
+    if (this.imageContainer && this.imageContainer.nativeElement) {
+      console.log('¡Contenedor de imagen encontrado! Creando instancia de HammerJS...');
+      this.hammerManager = new Hammer(this.imageContainer.nativeElement);
+      this.hammerManager.get('swipe').set({ direction: 30 }); // DIRECTION_ALL
 
-    // FORMA CORRECTA DE CONFIGURAR LA DIRECCIÓN
-    this.hammerManager.get('swipe').set({ direction: 30 }); // 30 = DIRECTION_ALL, 6 = DIRECTION_HORIZONTAL
-
-    this.hammerManager.on('swipeleft', () => this.nextImage());
-    this.hammerManager.on('swiperight', () => this.prevImage());
+      this.hammerManager.on('swipeleft', () => this.nextImage());
+      this.hammerManager.on('swiperight', () => this.prevImage());
+    } else {
+      console.error('Error: El contenedor de la imagen no se encontró en el DOM al intentar inicializar HammerJS.');
+    }
   }
 
   ngOnDestroy(): void {
+    // La limpieza se mantiene igual, es una buena práctica
     if (this.hammerManager) {
       this.hammerManager.destroy();
     }
