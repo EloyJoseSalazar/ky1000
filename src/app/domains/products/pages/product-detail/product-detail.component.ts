@@ -54,8 +54,22 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
       this.hammerManager = new Hammer(this.imageContainer.nativeElement);
       this.hammerManager.get('swipe').set({ direction: 30 }); // DIRECTION_ALL
 
-      this.hammerManager.on('swipeleft', () => this.nextImage());
-      this.hammerManager.on('swiperight', () => this.prevImage());
+     // this.hammerManager.on('swipeleft', () => this.nextImage());
+     // this.hammerManager.on('swiperight', () => this.prevImage());
+       // this.hammerManager.on('swipeleft', () => this.prevImage());
+      //this.hammerManager.on('swiperight', () => this.nextImage());
+
+      this.hammerManager.on('swipeleft', () => {
+        console.log('SWIPE IZQUIERDA --> Llamando a nextImage()');
+        this.prevImage();
+
+      });
+
+      this.hammerManager.on('swiperight', () => {
+        console.log('SWIPE DERECHA --> Llamando a prevImage()');
+        this.nextImage();
+      });
+
     } else {
       console.error('Error: El contenedor de la imagen no se encontró en el DOM al intentar inicializar HammerJS.');
     }
