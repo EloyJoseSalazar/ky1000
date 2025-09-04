@@ -66,4 +66,39 @@ export default class ProductDetailComponent {
       this.cartService.addToCart(product);
     }
   }
+
+  // --- NUEVA FUNCIÓN para compartir en WhatsApp ---
+  shareOnWhatsApp(): void {
+    const product = this.product();
+    const imageUrl = this.cover();
+
+    if (!product) {
+      console.error("No se puede compartir porque el producto no está cargado.");
+      return;
+    }
+
+    // 1. Construimos el mensaje de texto. Usamos saltos de línea (`\n`) para formatearlo.
+    const message = `
+¡Mira este increíble producto!
+
+*${product.title}*
+SKU: ${product.slug}
+
+Puedes verlo aquí:
+${window.location.href}
+
+Imagen:
+${imageUrl}
+    `;
+
+    // 2. Codificamos el mensaje para que sea seguro en una URL. ¡Esto es crucial!
+    const encodedMessage = encodeURIComponent(message);
+
+    // 3. Creamos la URL final de WhatsApp.
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+
+    // 4. Abrimos la URL en una nueva pestaña.
+    window.open(whatsappUrl, '_blank');
+  }
+
 }
