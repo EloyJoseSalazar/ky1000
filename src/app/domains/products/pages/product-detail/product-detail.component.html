@@ -4,9 +4,7 @@
     <!-- Columna Izquierda: Galería de Imágenes -->
     <div class="flex flex-col">
       <!-- Contenedor de Imagen Principal (con flechas) -->
-      <div class="relative w-full aspect-square border rounded-lg overflow-hidden bg-gray-100">
-        (swipeleft)="nextImage()"
-        (swiperight)="prevImage()">
+      <div #imageContainer class="relative w-full aspect-square border rounded-lg overflow-hidden bg-gray-100">
         <!-- Imagen Principal -->
         <img
           alt="{{ product.title }}"
@@ -50,7 +48,7 @@
 
     <!-- Columna Derecha: Detalles del Producto -->
     <div class="mt-6 md:mt-0">
-      <p class="text-gray-900 text-sm font-thin mb-1 ">Sku:  {{ product.slug }}</p>
+      <p class="text-black-900 text-sm font-thin mb-1 ">Sku:  {{ product.slug }}</p>
       <h2 class="text-sm title-font text-gray-500 tracking-widest">{{ product.category?.name | uppercase }}</h2>
       <h1 class="text-gray-900 text-3xl title-font font-medium mb-1">{{ product.title }}</h1>
 
