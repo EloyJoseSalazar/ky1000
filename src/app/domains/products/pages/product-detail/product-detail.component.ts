@@ -23,6 +23,8 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
 
   @ViewChild('imageContainer') imageContainer!: ElementRef;
   private hammerManager: HammerManager | null = null;
+  lightboxVisible = signal(false);
+
 
   ngOnInit() {
     if (this.id) {
@@ -118,4 +120,19 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
   }
+
+  // --- NUEVA: Función para abrir la Lightbox ---
+  openLightbox(): void {
+    // Solo abrimos la lightbox si hay imágenes que mostrar
+    if (this.product()?.images && this.product()!.images.length > 0) {
+      this.lightboxVisible.set(true);
+    }
+  }
+
+  // --- NUEVA: Función para cerrar la Lightbox ---
+  closeLightbox(): void {
+    this.lightboxVisible.set(false);
+  }
+
+
 }
