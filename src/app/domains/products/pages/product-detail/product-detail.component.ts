@@ -1,5 +1,5 @@
 
-import { Component, Input, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
@@ -12,8 +12,8 @@ import Hammer from 'hammerjs';
   imports: [CommonModule],
   templateUrl: './product-detail.component.html'
 })
-// Ya no necesitamos AfterViewInit aquí, solo OnInit y OnDestroy
-export default class ProductDetailComponent implements OnInit, OnDestroy {
+// Asegúrate de que implementa AfterViewInit
+export default class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() id?: string;
   product = signal<Product | null>(null);
@@ -21,11 +21,15 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
   private productService = inject(ProductService);
   private cartService = inject(CartService);
   currentIndex = signal(0);
-
-  @ViewChild('imageContainer') imageContainer!: ElementRef;
-  private hammerManager: HammerManager | null = null;
   lightboxVisible = signal(false);
 
+  // --- DOS REFERENCIAS, UNA PARA CADA CONTENEDOR ---
+  @ViewChild('imageContainer') mainGalleryContainer!: ElementRef;
+  @ViewChild('lightboxContainer') lightboxContainer!: ElementRef;
+
+  // --- DOS INSTANCIAS DE HAMMERJS ---
+  private mainHammer: HammerManager | null = null;
+  private lightboxHammer: HammerManager | null = null;
 
   ngOnInit() {
     if (this.id) {
@@ -37,55 +41,74 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
               this.cover.set(product.images[0]);
               this.currentIndex.set(0);
             }
-
-            // --- ¡LA SOLUCIÓN! ---
-            // Esperamos un instante para que Angular renderice el @if
-            // y luego inicializamos HammerJS.
-            setTimeout(() => {
-              this.setupHammer();
-            }, 0);
           }
         })
     }
   }
 
-  // --- NUEVO: Función helper para configurar HammerJS ---
-  setupHammer(): void {
-    // Verificamos si el contenedor de imagen existe en el DOM
-    if (this.imageContainer && this.imageContainer.nativeElement) {
-      console.log('¡Contenedor de imagen encontrado! Creando instancia de HammerJS...');
-      this.hammerManager = new Hammer(this.imageContainer.nativeElement);
-      this.hammerManager.get('swipe').set({ direction: 30 }); // DIRECTION_ALL
-
-      // this.hammerManager.on('swipeleft', () => this.nextImage());
-      // this.hammerManager.on('swiperight', () => this.prevImage());
-      // this.hammerManager.on('swipeleft', () => this.prevImage());
-      //this.hammerManager.on('swiperight', () => this.nextImage());
-
-      this.hammerManager.on('swipeleft', () => {
-        console.log('SWIPE IZQUIERDA --> Llamando a nextImage()');
-        this.prevImage();
-
-      });
-
-      this.hammerManager.on('swiperight', () => {
-        console.log('SWIPE DERECHA --> Llamando a prevImage()');
-        this.nextImage();
-      });
-
-    } else {
-      console.error('Error: El contenedor de la imagen no se encontró en el DOM al intentar inicializar HammerJS.');
-    }
+  // ngAfterViewInit se usa para la galería principal, que siempre está visible
+  ngAfterViewInit(): void {
+    // Usamos setTimeout para asegurarnos de que el @if se haya renderizado
+    setTimeout(() => {
+      this.setupMainGalleryHammer();
+    }, 0);
   }
 
+  // Nos aseguramos de destruir AMBAS instancias al salir de la página
   ngOnDestroy(): void {
-    // La limpieza se mantiene igual, es una buena práctica
-    if (this.hammerManager) {
-      this.hammerManager.destroy();
+    this.destroyHammer(this.mainHammer);
+    this.destroyHammer(this.lightboxHammer);
+  }
+
+  // --- LÓGICA DE LA LIGHTBOX ---
+  openLightbox(): void {
+    if (this.product()?.images && this.product()!.images.length > 0) {
+      this.lightboxVisible.set(true);
+      // Creamos la instancia de HammerJS para la lightbox
+      setTimeout(() => { this.setupLightboxHammer(); }, 0);
     }
   }
 
-  // ... (el resto de tus funciones no necesitan cambios) ...
+  closeLightbox(): void {
+    this.lightboxVisible.set(false);
+    // Destruimos la instancia de HammerJS de la lightbox al cerrar
+    this.lightboxHammer = this.destroyHammer(this.lightboxHammer);
+  }
+
+  // --- LÓGICA DE HAMMERJS (REFACTORIZADA Y SEPARADA) ---
+  private setupMainGalleryHammer(): void {
+    if (this.mainGalleryContainer && this.mainGalleryContainer.nativeElement) {
+      console.log('Creando instancia de HammerJS para la Galería Principal...');
+      this.mainHammer = this.createHammerInstance(this.mainGalleryContainer.nativeElement);
+    }
+  }
+
+  private setupLightboxHammer(): void {
+    if (this.lightboxContainer && this.lightboxContainer.nativeElement) {
+      console.log('Creando instancia de HammerJS para la Lightbox...');
+      this.lightboxHammer = this.createHammerInstance(this.lightboxContainer.nativeElement);
+    }
+  }
+
+  private createHammerInstance(element: HTMLElement): HammerManager {
+    const hammerInstance = new Hammer(element);
+    hammerInstance.get('swipe').set({ direction: 30 }); // DIRECTION_ALL
+
+    // El swipe a la izquierda te lleva a la siguiente imagen
+    hammerInstance.on('swipeleft', () => this.nextImage());
+    // El swipe a la derecha te lleva a la imagen anterior
+    hammerInstance.on('swiperight', () => this.prevImage());
+
+    return hammerInstance;
+  }
+
+  private destroyHammer(hammerInstance: HammerManager | null): null {
+    if (hammerInstance) {
+      hammerInstance.destroy();
+    }
+    return null;
+  }
+//  aqui eloy
   changeCover(newImg: string, index: number): void {
     this.cover.set(newImg);
     this.currentIndex.set(index);
@@ -122,18 +145,8 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
     window.open(whatsappUrl, '_blank');
   }
 
-  // --- NUEVA: Función para abrir la Lightbox ---
-  openLightbox(): void {
-    // Solo abrimos la lightbox si hay imágenes que mostrar
-    if (this.product()?.images && this.product()!.images.length > 0) {
-      this.lightboxVisible.set(true);
-    }
-  }
 
-  // --- NUEVA: Función para cerrar la Lightbox ---
-  closeLightbox(): void {
-    this.lightboxVisible.set(false);
-  }
+
 
 
 }

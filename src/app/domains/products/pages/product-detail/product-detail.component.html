@@ -1,7 +1,4 @@
 
-<!--
-  LA CORRECCIÓN: Envolvemos todo en este @if para crear el alias seguro 'product'.
--->
 @if (product(); as product) {
 
     <div class="grid grid-cols-1 md:grid-cols-2 md:gap-12">
@@ -75,18 +72,13 @@
     </div>
 
 
-  <!-- ======================================================= -->
-    <!--             NUEVO: LIGHTBOX / VISTA AMPLIADA            -->
-    <!-- ======================================================= -->
+  <!-- LIGHTBOX / VISTA AMPLIADA (CORREGIDA) -->
   @if (lightboxVisible()) {
-    <!-- 1. Fondo Oscuro (Overlay) -->
     <div (click)="closeLightbox()" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-
-      <!-- 2. Contenedor Principal (donde aplicamos la lógica de HammerJS) -->
       <div
-        #lightboxImageContainer
+        #lightboxContainer
       (click)="$event.stopPropagation()"
-      class="relative touch-pan-y cursor-grab"> <!-- Clases para el swipe -->
+      class="relative touch-pan-y cursor-grab">
 
       <img
         [src]="cover()"
@@ -94,6 +86,7 @@
         class="block max-w-[90vw] max-h-[85vh] object-contain select-none"
         draggable="false"
       >
+
 
       <!-- Botón de Cierre (X) -->
       <button (click)="closeLightbox()" class="absolute -top-4 -right-4 md:-top-6 md:-right-8 bg-white text-black rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold shadow-lg">
@@ -114,8 +107,10 @@
       }
     </div>
   </div>
-    }
 
+
+
+    }
 
 } @else {
     <p>Cargando producto...</p>
