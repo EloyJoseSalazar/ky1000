@@ -72,21 +72,26 @@
     </div>
 
 
-  <!-- LIGHTBOX / VISTA AMPLIADA (CORREGIDA) -->
+  <!-- LIGHTBOX CON ZOOM -->
   @if (lightboxVisible()) {
     <div (click)="closeLightbox()" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
       <div
         #lightboxContainer
-      (click)="$event.stopPropagation()"
-      class="relative touch-pan-y cursor-grab">
+        (click)="$event.stopPropagation()"
+        class="relative touch-pan-y"> <!-- Ya no necesita cursor-grab, el gesto es más complejo -->
 
-      <img
-        [src]="cover()"
-        alt="{{ product.title }}"
-        class="block max-w-[90vw] max-h-[85vh] object-contain select-none"
-        draggable="false"
-      >
-
+        <!--
+          IMAGEN CON ZOOM:
+          - Usamos [style.transform] para aplicar el zoom y la posición calculados.
+          - `will-change-transform` es una optimización para el navegador.
+        -->
+        <img
+          [src]="cover()"
+          alt="{{ product.title }}"
+          class="block max-w-[90vw] max-h-[85vh] object-contain select-none will-change-transform"
+          [style.transform]="transformStyle()"
+          draggable="false"
+        >
 
       <!-- Botón de Cierre (X) -->
       <button (click)="closeLightbox()" class="absolute -top-4 -right-4 md:-top-6 md:-right-8 bg-white text-black rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold shadow-lg">

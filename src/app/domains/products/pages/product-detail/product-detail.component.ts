@@ -1,5 +1,4 @@
-
-import { Component, Input, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, Input, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, computed, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
@@ -12,9 +11,9 @@ import Hammer from 'hammerjs';
   imports: [CommonModule],
   templateUrl: './product-detail.component.html'
 })
-// Asegúrate de que implementa AfterViewInit
 export default class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
+  // --- PROPIEDADES EXISTENTES ---
   @Input() id?: string;
   product = signal<Product | null>(null);
   cover = signal('');
@@ -23,13 +22,19 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
   currentIndex = signal(0);
   lightboxVisible = signal(false);
 
-  // --- DOS REFERENCIAS, UNA PARA CADA CONTENEDOR ---
-  @ViewChild('imageContainer') mainGalleryContainer!: ElementRef;
+  // --- LÓGICA DE HAMMERJS ---
+  @ViewChild('mainGalleryContainer') mainGalleryContainer!: ElementRef;
   @ViewChild('lightboxContainer') lightboxContainer!: ElementRef;
-
-  // --- DOS INSTANCIAS DE HAMMERJS ---
   private mainHammer: HammerManager | null = null;
   private lightboxHammer: HammerManager | null = null;
+
+  // --- NUEVO: SIGNALS PARA EL ESTADO DEL ZOOM ---
+  currentScale = signal(1);
+  currentX = signal(0);
+  currentY = signal(0);
+  // Un signal "computado" que genera el string del estilo CSS automáticamente
+  transformStyle = computed(() => `translate3d(${this.currentX()}px, ${this.currentY()}px, 0) scale(${this.currentScale()})`);
+  // --- FIN DE LA LÓGICA DE ZOOM ---
 
   ngOnInit() {
     if (this.id) {
@@ -48,13 +53,12 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
 
   // ngAfterViewInit se usa para la galería principal, que siempre está visible
   ngAfterViewInit(): void {
-    // Usamos setTimeout para asegurarnos de que el @if se haya renderizado
+    // CORRECCIÓN: Añadimos el setTimeout para esperar al @if
     setTimeout(() => {
       this.setupMainGalleryHammer();
     }, 0);
   }
 
-  // Nos aseguramos de destruir AMBAS instancias al salir de la página
   ngOnDestroy(): void {
     this.destroyHammer(this.mainHammer);
     this.destroyHammer(this.lightboxHammer);
@@ -64,50 +68,88 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
   openLightbox(): void {
     if (this.product()?.images && this.product()!.images.length > 0) {
       this.lightboxVisible.set(true);
-      // Creamos la instancia de HammerJS para la lightbox
       setTimeout(() => { this.setupLightboxHammer(); }, 0);
     }
   }
 
   closeLightbox(): void {
     this.lightboxVisible.set(false);
-    // Destruimos la instancia de HammerJS de la lightbox al cerrar
     this.lightboxHammer = this.destroyHammer(this.lightboxHammer);
+    // Reseteamos el zoom al cerrar
+    this.resetZoom();
   }
 
-  // --- LÓGICA DE HAMMERJS (REFACTORIZADA Y SEPARADA) ---
+  // --- LÓGICA DE HAMMERJS (ACTUALIZADA) ---
   private setupMainGalleryHammer(): void {
     if (this.mainGalleryContainer && this.mainGalleryContainer.nativeElement) {
-      console.log('Creando instancia de HammerJS para la Galería Principal...');
-      this.mainHammer = this.createHammerInstance(this.mainGalleryContainer.nativeElement);
+      this.mainHammer = this.createHammerInstance(this.mainGalleryContainer.nativeElement, false); // No pinch
     }
   }
 
   private setupLightboxHammer(): void {
     if (this.lightboxContainer && this.lightboxContainer.nativeElement) {
-      console.log('Creando instancia de HammerJS para la Lightbox...');
-      this.lightboxHammer = this.createHammerInstance(this.lightboxContainer.nativeElement);
+      this.lightboxHammer = this.createHammerInstance(this.lightboxContainer.nativeElement, true); // Sí pinch
     }
   }
 
-  private createHammerInstance(element: HTMLElement): HammerManager {
+  private createHammerInstance(element: HTMLElement, enablePinch: boolean): HammerManager {
     const hammerInstance = new Hammer(element);
-    hammerInstance.get('swipe').set({ direction: 30 }); // DIRECTION_ALL
+    hammerInstance.get('swipe').set({ direction: 30 });
 
-    // El swipe a la izquierda te lleva a la siguiente imagen
+    if (enablePinch) {
+      hammerInstance.get('pinch').set({ enable: true });
+      hammerInstance.get('doubletap').set({ taps: 2 });
+      hammerInstance.on('pinchstart pinchmove pinchend doubletap', (event) => this.handlePinch(event));
+    }
+
     hammerInstance.on('swipeleft', () => this.nextImage());
-    // El swipe a la derecha te lleva a la imagen anterior
     hammerInstance.on('swiperight', () => this.prevImage());
-
     return hammerInstance;
   }
 
   private destroyHammer(hammerInstance: HammerManager | null): null {
-    if (hammerInstance) {
-      hammerInstance.destroy();
-    }
+    if (hammerInstance) hammerInstance.destroy();
     return null;
   }
+
+  // --- NUEVA FUNCIÓN PARA MANEJAR EL ZOOM ---
+  private lastScale = 1;
+  private lastX = 0;
+  private lastY = 0;
+
+  handlePinch(event: HammerInput): void {
+    switch(event.type) {
+      case 'pinchstart':
+        this.lastScale = this.currentScale();
+        this.lastX = this.currentX();
+        this.lastY = this.currentY();
+        break;
+      case 'pinchmove':
+        this.currentScale.set(this.lastScale * event.scale);
+        this.currentX.set(this.lastX + event.deltaX);
+        this.currentY.set(this.lastY + event.deltaY);
+        break;
+      case 'pinchend':
+        // Guardamos el estado final para el próximo pinch
+        this.lastScale = this.currentScale();
+        this.lastX = this.currentX();
+        this.lastY = this.currentY();
+        break;
+      case 'doubletap':
+        this.resetZoom();
+        break;
+    }
+  }
+
+  resetZoom(): void {
+    this.currentScale.set(1);
+    this.currentX.set(0);
+    this.currentY.set(0);
+    this.lastScale = 1;
+    this.lastX = 0;
+    this.lastY = 0;
+  }
+  // --- FIN DE LA LÓGICA DE ZOOM ---
 //  aqui eloy
   changeCover(newImg: string, index: number): void {
     this.cover.set(newImg);
