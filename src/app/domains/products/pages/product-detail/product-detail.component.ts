@@ -1,3 +1,4 @@
+
 import { Component, Input, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '@shared/services/product.service';
@@ -56,9 +57,9 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
       this.hammerManager = new Hammer(this.imageContainer.nativeElement);
       this.hammerManager.get('swipe').set({ direction: 30 }); // DIRECTION_ALL
 
-     // this.hammerManager.on('swipeleft', () => this.nextImage());
-     // this.hammerManager.on('swiperight', () => this.prevImage());
-       // this.hammerManager.on('swipeleft', () => this.prevImage());
+      // this.hammerManager.on('swipeleft', () => this.nextImage());
+      // this.hammerManager.on('swiperight', () => this.prevImage());
+      // this.hammerManager.on('swipeleft', () => this.prevImage());
       //this.hammerManager.on('swiperight', () => this.nextImage());
 
       this.hammerManager.on('swipeleft', () => {
