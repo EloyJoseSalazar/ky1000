@@ -11,7 +11,7 @@ import Hammer from 'hammerjs';
   imports: [CommonModule],
   templateUrl: './product-detail.component.html'
 })
-export default class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+export default class ProductDetailComponent implements OnInit, OnDestroy {
 
   // --- PROPIEDADES EXISTENTES ---
   @Input() id?: string;
@@ -41,58 +41,71 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
       this.productService.getOne(this.id)
         .subscribe({
           next: (product) => {
+            console.log('[ESPÍA] ngOnInit: ¡Respuesta de la API recibida!');
             this.product.set(product);
             if (product.images.length > 0) {
               this.cover.set(product.images[0]);
               this.currentIndex.set(0);
             }
+
+            // --- ¡LA SOLUCIÓN! ---
+            // Ahora, DESPUÉS de recibir el producto y renderizar el @if,
+            // inicializamos el HammerJS para la galería principal.
+            setTimeout(() => {
+              this.setupMainGalleryHammer();
+            }, 0);
           }
         })
     }
   }
 
-  // ngAfterViewInit se usa para la galería principal, que siempre está visible
-  ngAfterViewInit(): void {
-    // CORRECCIÓN: Añadimos el setTimeout para esperar al @if
-    setTimeout(() => {
-      this.setupMainGalleryHammer();
-    }, 0);
-  }
 
   ngOnDestroy(): void {
+    console.log('[ESPÍA] ngOnDestroy: Destruyendo componente y listeners...');
     this.destroyHammer(this.mainHammer);
     this.destroyHammer(this.lightboxHammer);
   }
 
   // --- LÓGICA DE LA LIGHTBOX ---
   openLightbox(): void {
+    console.log('[ESPÍA] openLightbox: Abriendo lightbox...');
     if (this.product()?.images && this.product()!.images.length > 0) {
       this.lightboxVisible.set(true);
       setTimeout(() => { this.setupLightboxHammer(); }, 0);
+      console.log('[ESPÍA] openLightbox: Ejecutando setTimeout para setupLightboxHammer...');
     }
   }
 
   closeLightbox(): void {
+    console.log('[ESPÍA] closeLightbox: Cerrando lightbox...');
     this.lightboxVisible.set(false);
     this.lightboxHammer = this.destroyHammer(this.lightboxHammer);
     // Reseteamos el zoom al cerrar
     this.resetZoom();
   }
 
-  // --- LÓGICA DE HAMMERJS (ACTUALIZADA) ---
+  // --- LÓGICA DE HAMMERJS ---
   private setupMainGalleryHammer(): void {
+    console.log('[ESPÍA] setupMainGalleryHammer: Intentando configurar Hammer para la galería principal...');
     if (this.mainGalleryContainer && this.mainGalleryContainer.nativeElement) {
-      this.mainHammer = this.createHammerInstance(this.mainGalleryContainer.nativeElement, false); // No pinch
+      console.log('%c[ESPÍA] ¡ÉXITO! #mainGalleryContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
+      this.mainHammer = this.createHammerInstance(this.mainGalleryContainer.nativeElement, false, 'Galería Principal');
+    } else {
+      console.error('%c[ESPÍA] ¡FALLO! #mainGalleryContainer NO encontrado en el DOM.', 'color: red; font-weight: bold;');
     }
   }
 
   private setupLightboxHammer(): void {
+    console.log('[ESPÍA] setupLightboxHammer: Intentando configurar Hammer para la lightbox...');
     if (this.lightboxContainer && this.lightboxContainer.nativeElement) {
-      this.lightboxHammer = this.createHammerInstance(this.lightboxContainer.nativeElement, true); // Sí pinch
+      console.log('%c[ESPÍA] ¡ÉXITO! #lightboxContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
+      this.lightboxHammer = this.createHammerInstance(this.lightboxContainer.nativeElement, true, 'Lightbox');
+    } else {
+      console.error('%c[ESPÍA] ¡FALLO! #lightboxContainer NO encontrado en el DOM.', 'color: red; font-weight: bold;');
     }
   }
 
-  private createHammerInstance(element: HTMLElement, enablePinch: boolean): HammerManager {
+  private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
     const hammerInstance = new Hammer(element);
     hammerInstance.get('swipe').set({ direction: 30 });
 
@@ -102,13 +115,21 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
       hammerInstance.on('pinchstart pinchmove pinchend doubletap', (event) => this.handlePinch(event));
     }
 
-    hammerInstance.on('swipeleft', () => this.nextImage());
-    hammerInstance.on('swiperight', () => this.prevImage());
+    hammerInstance.on('swipeleft', () => {
+      console.log(`[ESPÍA] Evento detectado: SWIPE IZQUIERDA en ${source}`);
+      this.nextImage();
+    });
+    hammerInstance.on('swiperight', () => {
+      console.log(`[ESPÍA] Evento detectado: SWIPE DERECHA en ${source}`);
+      this.prevImage();
+    });
     return hammerInstance;
   }
 
+
   private destroyHammer(hammerInstance: HammerManager | null): null {
     if (hammerInstance) hammerInstance.destroy();
+    console.log(`[ESPÍA] Destruyendo instancia de HammerJS para `);
     return null;
   }
 
