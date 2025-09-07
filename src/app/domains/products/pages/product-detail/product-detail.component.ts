@@ -4,6 +4,8 @@ import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
 import Hammer from 'hammerjs';
+import { Title, Meta } from '@angular/platform-browser';
+
 
 @Component({
   selector: 'app-product-detail',
@@ -36,27 +38,41 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
   transformStyle = computed(() => `translate3d(${this.currentX()}px, ${this.currentY()}px, 0) scale(${this.currentScale()})`);
   // --- FIN DE LA LÓGICA DE ZOOM ---
 
+  // --- AÑADIR: Inyección de los servicios Title y Meta ---
+  private titleService = inject(Title);
+  private metaService = inject(Meta);
+
   ngOnInit() {
     if (this.id) {
       this.productService.getOne(this.id)
         .subscribe({
           next: (product) => {
-            console.log('[ESPÍA] ngOnInit: ¡Respuesta de la API recibida!');
             this.product.set(product);
             if (product.images.length > 0) {
               this.cover.set(product.images[0]);
               this.currentIndex.set(0);
             }
-
-            // --- ¡LA SOLUCIÓN! ---
-            // Ahora, DESPUÉS de recibir el producto y renderizar el @if,
-            // inicializamos el HammerJS para la galería principal.
-            setTimeout(() => {
-              this.setupMainGalleryHammer();
-            }, 0);
+            // Llamamos a la actualización de meta tags después de cargar el producto
+            this.updateMetaTags(product);
+            // ... (el resto de tu lógica de ngOnInit, como el setTimeout, se mantiene igual) ...
           }
         })
     }
+  }
+
+  // --- LÓGICA DE META TAGS (ACTUALIZADA) ---
+  private updateMetaTags(product: Product): void {
+    const pageTitle = `LA TIENDA - ${product.title}`;
+    // CAMBIO 1: La imagen ahora es la que esté seleccionada actualmente en 'cover()'
+    const imageUrl = this.cover();
+
+    this.titleService.setTitle(pageTitle);
+
+    // Actualizamos las etiquetas. Omitimos la de 'og:description'.
+    this.metaService.updateTag({ property: 'og:title', content: pageTitle });
+    this.metaService.updateTag({ property: 'og:image', content: imageUrl });
+    this.metaService.updateTag({ property: 'og:url', content: window.location.href });
+    this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
   }
 
 
@@ -171,10 +187,15 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
     this.lastY = 0;
   }
   // --- FIN DE LA LÓGICA DE ZOOM ---
-//  aqui eloy
+
   changeCover(newImg: string, index: number): void {
     this.cover.set(newImg);
     this.currentIndex.set(index);
+    // CAMBIO 3: Cada vez que cambiamos de imagen, actualizamos las meta tags.
+    const product = this.product();
+    if (product) {
+      this.updateMetaTags(product);
+    }
   }
 
   nextImage(): void {
@@ -200,11 +221,20 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
 
   shareOnWhatsApp(): void {
     const product = this.product();
-    const imageUrl = this.cover();
-    if (!product) { return; }
-    const message = `¡Mira este increíble producto!\n\n*${product.title}*\nSKU: ${product.slug}\n\nPuedes verlo aquí:\n${window.location.href}\n\nImagen:\n${imageUrl}`;
+    if (!product) return;
+
+    // CAMBIO 2: Actualizamos las meta tags JUSTO ANTES de compartir,
+    // para asegurarnos de que tomen la imagen 'cover' más reciente.
+    this.updateMetaTags(product);
+
+    // El mensaje ahora no incluye la descripción.
+    const text = `*LA TIENDA*\n\n*${product.title}*\n\n¡Échale un vistazo aquí! 👇`;
+    const url = window.location.href;
+
+    const message = `${text}\n${url}`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+
     window.open(whatsappUrl, '_blank');
   }
 
