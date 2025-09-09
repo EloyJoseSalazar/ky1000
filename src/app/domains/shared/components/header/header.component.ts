@@ -4,8 +4,6 @@ import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
 import { RouterLinkWithHref, RouterLinkActive } from '@angular/router';
 import { SearchComponent } from '../search/search.component';
-
-// --- NUEVO: Importamos el servicio y el modelo de categorías ---
 import { CategoryService } from '@shared/services/category.service';
 import { Category } from '@shared/models/category.model';
 
