@@ -9,6 +9,7 @@
     "test": "ng test",
     "dev:ssr": "ng run store:serve-ssr",
     "serve:ssr": "node dist/store/server/main.js",
+    "start:prod": "node dist/store/server/main.js",
     "build:ssr": "ng build && ng run store:server",
     "prerender": "ng run store:prerender"
   },
