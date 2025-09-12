@@ -219,27 +219,31 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+
+
+  // --- FUNCIÓN DE WHATSAPP (ACTUALIZADA Y FINAL) ---
   shareOnWhatsApp(): void {
     const product = this.product();
     if (!product) return;
 
-    // CAMBIO 2: Actualizamos las meta tags JUSTO ANTES de compartir,
-    // para asegurarnos de que tomen la imagen 'cover' más reciente.
+    // 1. Nos aseguramos de que las meta tags están actualizadas con la imagen 'cover' actual.
+    //    Esta llamada es crucial y ya la tenías, ¡perfecto!
     this.updateMetaTags(product);
 
-    // El mensaje ahora no incluye la descripción.
-    const text = `*LA TIENDA*\n\n*${product.title}*\n\n¡Échale un vistazo aquí! 👇`;
+    // 2. Construimos el mensaje de texto en el orden exacto que pediste.
+    const title = `*${product.title}*`;
+    const comment = "¡Échale un vistazo aquí! 👇";
     const url = window.location.href;
 
-    const message = `${text}\n${url}`;
+    // Unimos todo, eliminando "LA TIENDA" del texto, ya que la vista previa del enlace lo reemplaza.
+    const message = `${title}\n\n${comment}\n${url}`;
+
+    // 3. Codificamos y abrimos la URL de WhatsApp (sin cambios aquí).
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
 
     window.open(whatsappUrl, '_blank');
   }
 
-
-
-
-
 }
+
