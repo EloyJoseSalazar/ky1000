@@ -5,7 +5,10 @@ import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
 import Hammer from 'hammerjs';
 import { Title, Meta } from '@angular/platform-browser';
+import { PLATFORM_ID, makeStateKey, TransferState } from '@angular/core';
+import { isPlatformServer } from '@angular/common';
 
+const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
 
 @Component({
   selector: 'app-product-detail',
@@ -38,26 +41,50 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
   transformStyle = computed(() => `translate3d(${this.currentX()}px, ${this.currentY()}px, 0) scale(${this.currentScale()})`);
   // --- FIN DE LA LÓGICA DE ZOOM ---
 
-  // --- AÑADIR: Inyección de los servicios Title y Meta ---
+  // --- INYECCIONES (CON LAS NUEVAS) ---
   private titleService = inject(Title);
   private metaService = inject(Meta);
+  private transferState = inject(TransferState);
+  private platformId = inject(PLATFORM_ID);
 
   ngOnInit() {
     if (this.id) {
-      this.productService.getOne(this.id)
-        .subscribe({
+      // 1. Revisa si los datos ya vienen del servidor (TransferState)
+      const cachedProduct = this.transferState.get(PRODUCT_STATE_KEY, null);
+
+      if (cachedProduct) {
+        // 2a. Si hay datos en caché, los usa directamente
+        this.product.set(cachedProduct);
+        this.initializeComponent(cachedProduct);
+      } else {
+        // 2b. Si no, hace la llamada a la API
+        this.productService.getOne(this.id).subscribe({
           next: (product) => {
-            this.product.set(product);
-            if (product.images.length > 0) {
-              this.cover.set(product.images[0]);
-              this.currentIndex.set(0);
+            // 3. Si estamos en el servidor (SSR), guarda los datos para el cliente
+            if (isPlatformServer(this.platformId)) {
+              this.transferState.set(PRODUCT_STATE_KEY, product);
             }
-            // Llamamos a la actualización de meta tags después de cargar el producto
-            this.updateMetaTags(product);
-            // ... (el resto de tu lógica de ngOnInit, como el setTimeout, se mantiene igual) ...
+            this.product.set(product);
+            this.initializeComponent(product);
           }
-        })
+        });
+      }
     }
+  }
+
+  // --- NUEVA FUNCIÓN HELPER (CON TU LÓGICA INTEGRADA) ---
+  private initializeComponent(product: Product): void {
+    if (product.images.length > 0) {
+      this.cover.set(product.images[0]);
+      this.currentIndex.set(0);
+    }
+    // Actualiza las meta tags (clave para SSR)
+    this.updateMetaTags(product);
+
+    // Mantenemos tu lógica para inicializar HammerJS
+    setTimeout(() => {
+      this.setupMainGalleryHammer();
+    }, 0);
   }
 
   // --- LÓGICA DE META TAGS (ACTUALIZADA) ---
