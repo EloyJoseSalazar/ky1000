@@ -72,6 +72,8 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+
+
   // --- NUEVA FUNCIÓN HELPER (CON TU LÓGICA INTEGRADA) ---
   private initializeComponent(product: Product): void {
     if (product.images.length > 0) {
