@@ -1,8 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+//import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { Product } from '../models/product.model';
 import {BehaviorSubject, catchError, Observable, of, tap} from 'rxjs';
 import {environment} from "../../../../environments/environmen";
+import {isPlatformServer} from "@angular/common";
 
 
 @Injectable({
@@ -11,26 +13,32 @@ import {environment} from "../../../../environments/environmen";
 export class ProductService {
 
   private http = inject(HttpClient);
-  //private apiUrl = environment.apiUrl; // Usa la variable
-  private apiUrl = `${environment.apiUrl}/api/products`;
-
-  //private apiUrl = 'https://api.escuelajs.co/api/v1/products';
-  // private apiUrl = 'http://localhost:8080/api/products';
-  //private apiUrl = 'https://reactive-api-acma.onrender.com/api/products';
-  // private apiUrl = 'https://ko4wgwo0c8gkkkw888808okk.systemash.com/api/products';
-
-  // 1. Un "Subject" que guardará la lista actual de productos. Es nuestro estado central.
+  private platformId = inject(PLATFORM_ID);
+  //private apiUrl = `${environment.apiUrl}/api/products`;
+  private apiUrl: string;
   private products = new BehaviorSubject<Product[]>([]);
 
   // 2. Un Observable público para que los componentes se suscriban y escuchen los cambios.
   public products$: Observable<Product[]> = this.products.asObservable();
 
-  constructor() { }
+  //constructor() { }
+  constructor() {
+    // Si estamos en el SERVIDOR (SSR)...
+    if (isPlatformServer(this.platformId)) {
+      // ...usamos la dirección de la red INTERNA de Docker.
+      this.apiUrl = process.env['INTERNAL_API_URL'] || '';
+      console.log(`[SSR] Usando API URL interna: ${this.apiUrl}`);
+    } else {
+      // Si estamos en el NAVEGADOR del cliente...
+      // ...usamos la dirección PÚBLICA.
+      this.apiUrl = environment.apiUrl;
+      console.log(`[BROWSER] Usando API URL pública: ${this.apiUrl}`);
+    }
+  }
 
-  // 3. Método para la carga inicial y el filtro por categoría
-  // --- MÉTODO getProducts MODIFICADO ---
   getProducts(categoryId?: string, query?: string): Observable<Product[]> {
     // Usamos HttpParams para construir la URL de forma segura
+    const url = `${this.apiUrl}/api/products`;
     let params = new HttpParams();
     if (categoryId) {
       params = params.set('categoryId', categoryId);
@@ -57,6 +65,7 @@ export class ProductService {
   }
 
   getOne(id: string) {
+    const url = `${this.apiUrl}/api/products/${id}`;
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
