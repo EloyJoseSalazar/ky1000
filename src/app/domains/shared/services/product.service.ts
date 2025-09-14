@@ -14,8 +14,8 @@ export class ProductService {
   //private apiUrl = environment.apiUrl; // Usa la variable
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
-   private apiUrl: string;
-   //private apiUrl = `${environment.apiUrl}/api/products`;
+   //private apiUrl: string;
+   private apiUrl = `${environment.apiUrl}/api/products`;
 
   //private apiUrl = 'https://api.escuelajs.co/api/v1/products';
   // private apiUrl = 'http://localhost:8080/api/products';
