@@ -16,7 +16,7 @@ const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
   imports: [CommonModule],
   templateUrl: './product-detail.component.html'
 })
-export default class ProductDetailComponent implements OnInit, OnDestroy {
+export default class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // --- PROPIEDADES EXISTENTES ---
   @Input() id?: string;
@@ -49,18 +49,14 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (this.id) {
-      // 1. Revisa si los datos ya vienen del servidor (TransferState)
       const cachedProduct = this.transferState.get(PRODUCT_STATE_KEY, null);
 
       if (cachedProduct) {
-        // 2a. Si hay datos en caché, los usa directamente
         this.product.set(cachedProduct);
         this.initializeComponent(cachedProduct);
       } else {
-        // 2b. Si no, hace la llamada a la API
         this.productService.getOne(this.id).subscribe({
           next: (product) => {
-            // 3. Si estamos en el servidor (SSR), guarda los datos para el cliente
             if (isPlatformServer(this.platformId)) {
               this.transferState.set(PRODUCT_STATE_KEY, product);
             }
@@ -72,35 +68,40 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-  // --- NUEVA FUNCIÓN HELPER (CON TU LÓGICA INTEGRADA) ---
-  private initializeComponent(product: Product): void {
-    if (product.images.length > 0) {
-      this.cover.set(product.images[0]);
-      this.currentIndex.set(0);
-    }
-    // Actualiza las meta tags (clave para SSR)
-    this.updateMetaTags(product);
-
-    // Mantenemos tu lógica para inicializar HammerJS
+  // --- ngAfterViewInit para el swipe de la galería principal ---
+  ngAfterViewInit(): void {
+    // Es importante esperar a que el @if se resuelva
     setTimeout(() => {
       this.setupMainGalleryHammer();
     }, 0);
   }
 
-  // --- LÓGICA DE META TAGS (ACTUALIZADA) ---
+  // --- Función Helper para inicializar el componente ---
+  private initializeComponent(product: Product): void {
+    if (product.images.length > 0) {
+      this.cover.set(product.images[0]);
+      this.currentIndex.set(0);
+    }
+    // ¡CRUCIAL! Actualizamos las meta tags tan pronto como tenemos los datos
+    this.updateMetaTags(product);
+  }
+
+
+  // --- LÓGICA DE META TAGS (CORREGIDA) ---
   private updateMetaTags(product: Product): void {
-    const pageTitle = `LA TIENDA - ${product.title}`;
-    // CAMBIO 1: La imagen ahora es la que esté seleccionada actualmente en 'cover()'
-    const imageUrl = this.cover();
+    const pageTitle = `${product.title} - LA TIENDA`;
+    const imageUrl = this.cover(); // Usa la imagen seleccionada
 
     this.titleService.setTitle(pageTitle);
 
-    // Actualizamos las etiquetas. Omitimos la de 'og:description'.
+    // Si estamos en el servidor, nos aseguramos de que window.location.href no se use
+    const url = isPlatformServer(this.platformId)
+      ? `https://nuestratienda.systemash.com/product/${product.id}`
+      : window.location.href;
+
     this.metaService.updateTag({ property: 'og:title', content: pageTitle });
     this.metaService.updateTag({ property: 'og:image', content: imageUrl });
-    this.metaService.updateTag({ property: 'og:url', content: window.location.href });
+    this.metaService.updateTag({ property: 'og:url', content: url });
     this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
   }
 
@@ -217,15 +218,19 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
   }
   // --- FIN DE LA LÓGICA DE ZOOM ---
 
+
+  // --- changeCover (CORREGIDA) ---
   changeCover(newImg: string, index: number): void {
     this.cover.set(newImg);
     this.currentIndex.set(index);
-    // CAMBIO 3: Cada vez que cambiamos de imagen, actualizamos las meta tags.
+
     const product = this.product();
     if (product) {
+      // Actualizamos las meta tags cada vez que el usuario cambia la imagen
       this.updateMetaTags(product);
     }
   }
+
 
   nextImage(): void {
     const product = this.product();
@@ -248,26 +253,17 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-  // --- FUNCIÓN DE WHATSAPP (ACTUALIZADA Y FINAL) ---
+  // --- FUNCIÓN DE WHATSAPP (CORREGIDA) ---
   shareOnWhatsApp(): void {
     const product = this.product();
     if (!product) return;
 
-    // 1. Nos aseguramos de que las meta tags están actualizadas con la imagen 'cover' actual.
-    //    Esta llamada es crucial y ya la tenías, ¡perfecto!
     this.updateMetaTags(product);
 
-    // 2. Construimos el mensaje de texto en el orden exacto que pediste.
     const title = `*${product.title}*`;
-    const comment = "¡Échale un vistazo aquí! 👇";
     const url = window.location.href;
+    const message = `${title}\n\n¡Échale un vistazo aquí! 👇\n${url}`;
 
-    // Unimos todo, eliminando "LA TIENDA" del texto, ya que la vista previa del enlace lo reemplaza.
-    const message = `${title}\n\n${comment}\n${url}`;
-
-    // 3. Codificamos y abrimos la URL de WhatsApp (sin cambios aquí).
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
 
