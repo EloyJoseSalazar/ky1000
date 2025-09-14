@@ -26,7 +26,7 @@ export class ProductService {
     // Si estamos en el SERVIDOR (SSR)...
     if (isPlatformServer(this.platformId)) {
       // ...usamos la dirección de la red INTERNA de Docker.
-      this.apiUrl = process.env['INTERNAL_API_URL'] || '';
+      this.apiUrl = process.env['backend-api'] || '';
       console.log(`[SSR] Usando API URL interna: ${this.apiUrl}`);
     } else {
       // Si estamos en el NAVEGADOR del cliente...
