@@ -30,8 +30,6 @@ export function app(): express.Express {
   // All regular routes use the Angular engine
   server.get('*', (req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
-    // Leemos la variable de entorno y la preparamos para inyectarla en la app.
-    const serverApiUrl = process.env['https://ko4wgwo0c8gkkkw888808okk.systemash.com'] || '';
 
     commonEngine
       .render({
@@ -39,11 +37,7 @@ export function app(): express.Express {
         documentFilePath: indexHtml,
         url: `${protocol}://${headers.host}${originalUrl}`,
         publicPath: distFolder,
-        providers: [
-          { provide: APP_BASE_HREF, useValue: baseUrl },
-          { provide: 'SERVER_API_URL', useValue: serverApiUrl } // <-- Nueva línea
-        ],
-
+        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
       })
       .then((html) => res.send(html))
       .catch((err) => next(err));
@@ -73,3 +67,4 @@ if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
 }
 
 export default bootstrap;
+

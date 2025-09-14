@@ -1,6 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, inject, PLATFORM_ID, Optional, Inject } from '@angular/core';
-import { isPlatformServer } from '@angular/common';
+import { Injectable, inject } from '@angular/core';
 import { Product } from '../models/product.model';
 import {BehaviorSubject, catchError, Observable, of, tap} from 'rxjs';
 import {environment} from "../../../../environments/environmen";
@@ -11,16 +10,14 @@ import {environment} from "../../../../environments/environmen";
 })
 export class ProductService {
 
-  //private apiUrl = environment.apiUrl; // Usa la variable
   private http = inject(HttpClient);
-  private platformId = inject(PLATFORM_ID);
-   //private apiUrl: string;
-   private apiUrl = `${environment.apiUrl}/api/products`;
+  //private apiUrl = environment.apiUrl; // Usa la variable
+  private apiUrl = `${environment.apiUrl}/api/products`;
 
   //private apiUrl = 'https://api.escuelajs.co/api/v1/products';
   // private apiUrl = 'http://localhost:8080/api/products';
   //private apiUrl = 'https://reactive-api-acma.onrender.com/api/products';
- // private apiUrl = 'https://ko4wgwo0c8gkkkw888808okk.systemash.com/api/products';
+  // private apiUrl = 'https://ko4wgwo0c8gkkkw888808okk.systemash.com/api/products';
 
   // 1. Un "Subject" que guardará la lista actual de productos. Es nuestro estado central.
   private products = new BehaviorSubject<Product[]>([]);
@@ -28,24 +25,12 @@ export class ProductService {
   // 2. Un Observable público para que los componentes se suscriban y escuchen los cambios.
   public products$: Observable<Product[]> = this.products.asObservable();
 
-  constructor(@Optional() @Inject('SERVER_API_URL') private serverApiUrl: string) {
-    // Si estamos en el servidor, usamos la URL inyectada desde server.ts
-    if (isPlatformServer(this.platformId)) {
-      this.apiUrl = this.serverApiUrl;
-    } else {
-      // Si estamos en el navegador, usamos una ruta relativa.
-      // ¡Asegúrate de que tu backend esté configurado para ser accedido desde el mismo dominio o configura CORS!
-      this.apiUrl = ''; // O la URL base de tu API para el cliente
-    }
-  }
- // constructor() { }
+  constructor() { }
 
-
-
-
+  // 3. Método para la carga inicial y el filtro por categoría
+  // --- MÉTODO getProducts MODIFICADO ---
   getProducts(categoryId?: string, query?: string): Observable<Product[]> {
     // Usamos HttpParams para construir la URL de forma segura
-    const url = `${this.apiUrl}/api/products`;
     let params = new HttpParams();
     if (categoryId) {
       params = params.set('categoryId', categoryId);
@@ -72,12 +57,8 @@ export class ProductService {
   }
 
   getOne(id: string) {
-    const url = `${this.apiUrl}/api/products/${id}`; // Construimos la URL completa
-   // return this.http.get<Product>(`${this.apiUrl}/${id}`);
-    return this.http.get<Product>(url);
+    return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
-
-
 
   subirImagenes(productoId: number | string, formData: FormData): Observable<any> {
     // La URL será algo como: /api/productos/123/imagenes
