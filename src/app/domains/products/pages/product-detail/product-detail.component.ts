@@ -158,7 +158,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
 
   private setupLightboxHammer(): void {
-    console.log('[ESPÍA] setupLightboxHammer: Intentando configurar Hammer para la lightbox...');
+   // console.log('[ESPÍA] setupLightboxHammer: Intentando configurar Hammer para la lightbox...');
     if (this.lightboxContainer && this.lightboxContainer.nativeElement) {
     //  console.log('%c[ESPÍA] ¡ÉXITO! #lightboxContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
       this.lightboxHammer = this.createHammerInstance(this.lightboxContainer.nativeElement, true, 'Lightbox');
@@ -172,14 +172,14 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
   private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
     const hammerInstance = new Hammer(element);
-    //hammerInstance.get('swipe').set({ direction: 30 });
-/*
+    hammerInstance.get('swipe').set({ direction: 30 });
+
     if (enablePinch) {
       hammerInstance.get('pinch').set({ enable: true });
       hammerInstance.get('doubletap').set({ taps: 2 });
       hammerInstance.on('pinchstart pinchmove pinchend doubletap', (event) => this.handlePinch(event));
     }
-*/
+/*
     hammerInstance.on('swipeleft', () => {
       //console.log(`[ESPÍA] Evento detectado: SWIPE IZQUIERDA en ${source}`);
       this.nextImage();
@@ -187,14 +187,17 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     hammerInstance.on('swiperight', () => {
      // console.log(`[ESPÍA] Evento detectado: SWIPE DERECHA en ${source}`);
       this.prevImage();
+
     });
+
+ */
     return hammerInstance;
   }
 
 
   private destroyHammer(hammerInstance: HammerManager | null): null {
     if (hammerInstance) hammerInstance.destroy();
-    console.log(`[ESPÍA] Destruyendo instancia de HammerJS para `);
+   // console.log(`[ESPÍA] Destruyendo instancia de HammerJS para `);
     return null;
   }
 
