@@ -52,13 +52,13 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
        if (this.id) {
       const cachedProduct = this.transferState.get(PRODUCT_STATE_KEY, null);
       if (cachedProduct) {
-     //a22  this.product.set(cachedProduct);
-     //a22  this.initializeComponent(cachedProduct);
+       this.product.set(cachedProduct);  //22
+       this.initializeComponent(cachedProduct); //22
       } else {
         this.productService.getOne(this.id).subscribe({
           next: (product) => {
              if (isPlatformServer(this.platformId)) {
-         //a22     this.transferState.set(PRODUCT_STATE_KEY, product);
+              this.transferState.set(PRODUCT_STATE_KEY, product); //22
             }
             this.product.set(product);
             this.initializeComponent(product);
