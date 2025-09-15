@@ -1,12 +1,12 @@
-import { Component, Input, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, computed, WritableSignal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ProductService } from '@shared/services/product.service';
+import { Component, Input, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef, computed, PLATFORM_ID, makeStateKey, TransferState, AfterViewInit } from '@angular/core';
+import { CommonModule, isPlatformServer, isPlatformBrowser } from '@angular/common'; // <-- Añade isPlatformBrowser
 import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
 import Hammer from 'hammerjs';
 import { Title, Meta } from '@angular/platform-browser';
-import { PLATFORM_ID, makeStateKey, TransferState } from '@angular/core';
-import { isPlatformServer } from '@angular/common';
+import { ProductService } from '@shared/services/product.service';
+//import { PLATFORM_ID, makeStateKey, TransferState } from '@angular/core';
+//import { isPlatformServer } from '@angular/common';
 
 const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
 
@@ -89,20 +89,39 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
 
   // --- LÓGICA DE META TAGS (CORREGIDA) ---
   private updateMetaTags(product: Product): void {
-    const pageTitle = `${product.title} - LA TIENDA`;
+    const pageTitle = `${product.title} - **LA TIENDA`;
     const imageUrl = this.cover(); // Usa la imagen seleccionada
-
     this.titleService.setTitle(pageTitle);
 
     // Si estamos en el servidor, nos aseguramos de que window.location.href no se use
     const url = isPlatformServer(this.platformId)
       ? `https://nuestratienda.systemash.com/product/${product.id}`
       : window.location.href;
-
+    this.titleService.setTitle(pageTitle);
     this.metaService.updateTag({ property: 'og:title', content: pageTitle });
     this.metaService.updateTag({ property: 'og:image', content: imageUrl });
     this.metaService.updateTag({ property: 'og:url', content: url });
     this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+  }
+
+  // --- FUNCIÓN DE WHATSAPP
+  shareOnWhatsApp(): void {
+    // Esta función solo debe funcionar en el navegador, así que la protegemos
+    if (isPlatformBrowser(this.platformId)) {
+      const product = this.product();
+      if (!product) return;
+
+      this.updateMetaTags(product);
+
+      const title = `*${product.title}*`;
+      const url = window.location.href; // Aquí es seguro usar 'window'
+      const message = `${title}\n\n¡Échale un vistazo aquí! 👇\n${url}`;
+
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+
+      window.open(whatsappUrl, '_blank');
+    }
   }
 
 
@@ -112,16 +131,15 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
     this.destroyHammer(this.lightboxHammer);
   }
 
-  // --- LÓGICA DE LA LIGHTBOX ---
+  // --- LÓGICA DE HAMMERJS (¡CON PROTECCIÓN!) ---
   openLightbox(): void {
-    console.log('[ESPÍA] openLightbox: Abriendo lightbox...');
-    if (this.product()?.images && this.product()!.images.length > 0) {
-      this.lightboxVisible.set(true);
+    this.lightboxVisible.set(true);
+    // Solo activamos HammerJS en el navegador
+    if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => { this.setupLightboxHammer(); }, 0);
-      console.log('[ESPÍA] openLightbox: Ejecutando setTimeout para setupLightboxHammer...');
     }
   }
-
+  
   closeLightbox(): void {
     console.log('[ESPÍA] closeLightbox: Cerrando lightbox...');
     this.lightboxVisible.set(false);
@@ -253,22 +271,7 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
     }
   }
 
-  // --- FUNCIÓN DE WHATSAPP (CORREGIDA) ---
-  shareOnWhatsApp(): void {
-    const product = this.product();
-    if (!product) return;
 
-    this.updateMetaTags(product);
-
-    const title = `*${product.title}*`;
-    const url = window.location.href;
-    const message = `${title}\n\n¡Échale un vistazo aquí! 👇\n${url}`;
-
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
-
-    window.open(whatsappUrl, '_blank');
-  }
 
 }
 
