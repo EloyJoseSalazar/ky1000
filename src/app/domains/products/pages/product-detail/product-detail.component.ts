@@ -16,7 +16,7 @@ const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
   imports: [CommonModule],
   templateUrl: './product-detail.component.html'
 })
-export default class ProductDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+export default class ProductDetailComponent implements OnInit, OnDestroy {
 
   // --- PROPIEDADES EXISTENTES ---
   @Input() id?: string;
@@ -28,10 +28,10 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
   lightboxVisible = signal(false);
 
   // --- LÓGICA DE HAMMERJS ---
-  @ViewChild('mainGalleryContainer') mainGalleryContainer!: ElementRef;
-  @ViewChild('lightboxContainer') lightboxContainer!: ElementRef;
-  private mainHammer: HammerManager | null = null;
-  private lightboxHammer: HammerManager | null = null;
+  //@ViewChild('mainGalleryContainer') mainGalleryContainer!: ElementRef;
+  //@ViewChild('lightboxContainer') lightboxContainer!: ElementRef;
+  //private mainHammer: HammerManager | null = null;
+  //private lightboxHammer: HammerManager | null = null;
 
   // --- NUEVO: SIGNALS PARA EL ESTADO DEL ZOOM ---
   currentScale = signal(1);
@@ -72,7 +72,7 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
   ngAfterViewInit(): void {
     // Es importante esperar a que el @if se resuelva
     setTimeout(() => {
-      this.setupMainGalleryHammer();
+//      this.setupMainGalleryHammer();
     }, 0);
   }
 
@@ -127,8 +127,8 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
 
   ngOnDestroy(): void {
     console.log('[ESPÍA] ngOnDestroy: Destruyendo componente y listeners...');
-    this.destroyHammer(this.mainHammer);
-    this.destroyHammer(this.lightboxHammer);
+   // this.destroyHammer(this.mainHammer);
+   // this.destroyHammer(this.lightboxHammer);
   }
 
   // --- LÓGICA DE HAMMERJS (¡CON PROTECCIÓN!) ---
@@ -136,18 +136,19 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
     this.lightboxVisible.set(true);
     // Solo activamos HammerJS en el navegador
     if (isPlatformBrowser(this.platformId)) {
-      setTimeout(() => { this.setupLightboxHammer(); }, 0);
+   //   setTimeout(() => { this.setupLightboxHammer(); }, 0);
     }
   }
-  
+
   closeLightbox(): void {
     console.log('[ESPÍA] closeLightbox: Cerrando lightbox...');
     this.lightboxVisible.set(false);
-    this.lightboxHammer = this.destroyHammer(this.lightboxHammer);
+    //this.lightboxHammer = this.destroyHammer(this.lightboxHammer);
     // Reseteamos el zoom al cerrar
     this.resetZoom();
   }
 
+  /*
   // --- LÓGICA DE HAMMERJS ---
   private setupMainGalleryHammer(): void {
     console.log('[ESPÍA] setupMainGalleryHammer: Intentando configurar Hammer para la galería principal...');
@@ -169,6 +170,7 @@ export default class ProductDetailComponent implements OnInit, AfterViewInit, On
     }
   }
 
+  */
   private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
     const hammerInstance = new Hammer(element);
     hammerInstance.get('swipe').set({ direction: 30 });
