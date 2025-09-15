@@ -72,7 +72,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   ngAfterViewInit(): void {
     // ¡PROTECCIÓN! Solo ejecutamos la inicialización de HammerJS si estamos en un NAVEGADOR.
     if (isPlatformBrowser(this.platformId)) {
-      setTimeout(() => { this.setupMainGalleryHammer(); }, 0);
+      setTimeout(() => { this.setupMainGalleryHammer(); }, 0); //22
     }
   }
 
@@ -85,7 +85,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   }
 
   private updateMetaTags(product: Product): void {
-   /* a22 const pageTitle = `${product.title} - LA TIENDA`;
+    const pageTitle = `${product.title} - LA TIENDA`;
     const imageUrl = this.cover();
 
     // La comprobación aquí es crucial y ya la tenías, ¡perfecto!
@@ -96,7 +96,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     this.metaService.updateTag({ property: 'og:title', content: pageTitle });
     this.metaService.updateTag({ property: 'og:image', content: imageUrl });
     this.metaService.updateTag({ property: 'og:url', content: url });
-    */
+
   }
 
   ngOnDestroy(): void {
@@ -111,7 +111,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     this.lightboxVisible.set(true);
     // ¡PROTECCIÓN! Solo activamos HammerJS para la lightbox si estamos en un NAVEGADOR.
     if (isPlatformBrowser(this.platformId)) {
-       setTimeout(() => { this.setupLightboxHammer(); }, 0);
+       setTimeout(() => { this.setupLightboxHammer(); }, 0); //22
     }
   }
 
