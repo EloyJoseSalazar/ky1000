@@ -49,16 +49,16 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    if (this.id) {
+       if (this.id) {
       const cachedProduct = this.transferState.get(PRODUCT_STATE_KEY, null);
       if (cachedProduct) {
-        this.product.set(cachedProduct);
-        this.initializeComponent(cachedProduct);
+     //a22  this.product.set(cachedProduct);
+     //a22  this.initializeComponent(cachedProduct);
       } else {
         this.productService.getOne(this.id).subscribe({
           next: (product) => {
-            if (isPlatformServer(this.platformId)) {
-              this.transferState.set(PRODUCT_STATE_KEY, product);
+             if (isPlatformServer(this.platformId)) {
+         //a22     this.transferState.set(PRODUCT_STATE_KEY, product);
             }
             this.product.set(product);
             this.initializeComponent(product);
@@ -66,6 +66,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
         });
       }
     }
+
   }
 
   ngAfterViewInit(): void {
@@ -80,11 +81,11 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
       this.cover.set(product.images[0]);
       this.currentIndex.set(0);
     }
-    this.updateMetaTags(product);
+   // s22 this.updateMetaTags(product);
   }
 
   private updateMetaTags(product: Product): void {
-    const pageTitle = `${product.title} - LA TIENDA`;
+   /* a22 const pageTitle = `${product.title} - LA TIENDA`;
     const imageUrl = this.cover();
 
     // La comprobación aquí es crucial y ya la tenías, ¡perfecto!
@@ -95,7 +96,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     this.metaService.updateTag({ property: 'og:title', content: pageTitle });
     this.metaService.updateTag({ property: 'og:image', content: imageUrl });
     this.metaService.updateTag({ property: 'og:url', content: url });
-    // ...
+    */
   }
 
   ngOnDestroy(): void {
