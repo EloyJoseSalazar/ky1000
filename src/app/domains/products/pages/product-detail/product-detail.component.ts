@@ -172,11 +172,11 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
   private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
     const hammerInstance = new Hammer(element);
-  //  hammerInstance.get('swipe').set({ direction: 30 });
+    hammerInstance.get('swipe').set({ direction: 30 });
 
     if (enablePinch) {
-     // hammerInstance.get('pinch').set({ enable: true });
-     // hammerInstance.get('doubletap').set({ taps: 2 });
+      hammerInstance.get('pinch').set({ enable: true });
+      hammerInstance.get('doubletap').set({ taps: 2 });
       hammerInstance.on('pinchstart pinchmove pinchend doubletap', (event) => this.handlePinch(event));
     }
 /*
@@ -207,6 +207,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   private lastY = 0;
 
   handlePinch(event: HammerInput): void {
+   /*
     switch(event.type) {
       case 'pinchstart':
         this.lastScale = this.currentScale();
@@ -228,6 +229,8 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
         this.resetZoom();
         break;
     }
+
+    */
   }
 
   resetZoom(): void {
