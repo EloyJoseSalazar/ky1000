@@ -240,7 +240,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   // --- changeCover (CORREGIDA) ---
 
   changeCover(newImg: string, index: number): void {
-   /* a22 this.cover.set(newImg);
+     this.cover.set(newImg);
     this.currentIndex.set(index);
 
     const product = this.product();
@@ -249,7 +249,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
       this.updateMetaTags(product);
     }
 
-    */
+
   }
 
 
@@ -257,14 +257,14 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     const product = this.product();
     if (!product || product.images.length === 0) return;
     const nextIndex = (this.currentIndex() + 1) % product.images.length;
- //a22   this.changeCover(product.images[nextIndex], nextIndex);
+     this.changeCover(product.images[nextIndex], nextIndex);
   }
 
   prevImage(): void {
     const product = this.product();
     if (!product || product.images.length === 0) return;
     const prevIndex = (this.currentIndex() - 1 + product.images.length) % product.images.length;
- //a22   this.changeCover(product.images[prevIndex], prevIndex);
+     this.changeCover(product.images[prevIndex], prevIndex);
   }
 
   addToCart(): void {
