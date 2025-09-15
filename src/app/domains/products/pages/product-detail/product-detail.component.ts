@@ -200,7 +200,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   private lastScale = 1;
   private lastX = 0;
   private lastY = 0;
-/* a22
+
   handlePinch(event: HammerInput): void {
     switch(event.type) {
       case 'pinchstart':
@@ -233,7 +233,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     this.lastX = 0;
     this.lastY = 0;
   }
-  */
+
   // --- FIN DE LA LÓGICA DE ZOOM ---
 
 
