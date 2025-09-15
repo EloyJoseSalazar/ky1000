@@ -9,18 +9,17 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadComponent: () => import('./domains/products/pages/list/list.component')
+                loadComponent: () => import('./domains/products/pages/list/list.component').then(m => m.default)
             },
             {
                 path: 'about',
-                loadComponent: () => import('./domains/info/pages/about/about.component')
+                loadComponent: () => import('./domains/info/pages/about/about.component').then(m => m.default)
             },
             {
                 path: 'product/:id',
-                loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component')
+                loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component').then(m => m.default)
             },
 
-          // --- INICIO DE LAS NUEVAS RUTAS DE ADMINISTRACIÓN ---
           {
             path: 'ingresa', // Ruta base para la sección de administración
             children: [
@@ -28,13 +27,13 @@ export const routes: Routes = [
               { path: '', redirectTo: 'producto/nuevo', pathMatch: 'full' },
               {
                 path: 'producto/nuevo', // Ruta para crear un nuevo producto
-                loadComponent: () => import('./pages/gestion-productos/gestion-productos.component')
+                loadComponent: () => import('./pages/gestion-productos/gestion-productos.component').then(m => m.default)
               },
 
 
               {
                 path: 'producto/:id', // Ruta para editar un producto existente
-                loadComponent: () => import('./pages/gestion-productos/gestion-productos.component')
+                loadComponent: () => import('./pages/gestion-productos/gestion-productos.component').then(m => m.default)
               }
             ]
           },
