@@ -161,7 +161,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     console.log('[ESPÍA] setupLightboxHammer: Intentando configurar Hammer para la lightbox...');
     if (this.lightboxContainer && this.lightboxContainer.nativeElement) {
       console.log('%c[ESPÍA] ¡ÉXITO! #lightboxContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
-    //  this.lightboxHammer = this.createHammerInstance(this.lightboxContainer.nativeElement, true, 'Lightbox');
+      this.lightboxHammer = this.createHammerInstance(this.lightboxContainer.nativeElement, true, 'Lightbox');
     } else {
       console.error('%c[ESPÍA] ¡FALLO! #lightboxContainer NO encontrado en el DOM.', 'color: red; font-weight: bold;');
     }
@@ -169,10 +169,10 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
 
 
-/*
+
   private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
     const hammerInstance = new Hammer(element);
-    hammerInstance.get('swipe').set({ direction: 30 });
+    //hammerInstance.get('swipe').set({ direction: 30 });
 
     if (enablePinch) {
       hammerInstance.get('pinch').set({ enable: true });
@@ -190,7 +190,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     });
     return hammerInstance;
   }
-*/
+
 
   private destroyHammer(hammerInstance: HammerManager | null): null {
     if (hammerInstance) hammerInstance.destroy();
