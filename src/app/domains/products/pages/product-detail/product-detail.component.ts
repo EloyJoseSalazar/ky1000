@@ -172,7 +172,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
   private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
     const hammerInstance = new Hammer(element);
-    hammerInstance.get('swipe').set({ direction: 30 });
+  //  hammerInstance.get('swipe').set({ direction: 30 });
 
     if (enablePinch) {
       hammerInstance.get('pinch').set({ enable: true });
