@@ -28,10 +28,10 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   lightboxVisible = signal(false);
 
   // --- LÓGICA DE HAMMERJS ---
-  //@ViewChild('mainGalleryContainer') mainGalleryContainer!: ElementRef;
-  //@ViewChild('lightboxContainer') lightboxContainer!: ElementRef;
-  //private mainHammer: HammerManager | null = null;
-  //private lightboxHammer: HammerManager | null = null;
+  @ViewChild('mainGalleryContainer') mainGalleryContainer!: ElementRef;
+  @ViewChild('lightboxContainer') lightboxContainer!: ElementRef;
+  private mainHammer: HammerManager | null = null;
+  private lightboxHammer: HammerManager | null = null;
 
   // --- NUEVO: SIGNALS PARA EL ESTADO DEL ZOOM ---
   currentScale = signal(1);
@@ -72,7 +72,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   ngAfterViewInit(): void {
     // ¡PROTECCIÓN! Solo ejecutamos la inicialización de HammerJS si estamos en un NAVEGADOR.
     if (isPlatformBrowser(this.platformId)) {
-    //  setTimeout(() => { this.setupMainGalleryHammer(); }, 0);
+      setTimeout(() => { this.setupMainGalleryHammer(); }, 0);
     }
   }
 
@@ -81,7 +81,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
       this.cover.set(product.images[0]);
       this.currentIndex.set(0);
     }
-   // s22 this.updateMetaTags(product);
+     this.updateMetaTags(product);
   }
 
   private updateMetaTags(product: Product): void {
@@ -102,8 +102,8 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // ¡PROTECCIÓN! Solo intentamos destruir las instancias si estamos en un NAVEGADOR.
     if (isPlatformBrowser(this.platformId)) {
-     // this.destroyHammer(this.mainHammer);
-     // this.destroyHammer(this.lightboxHammer);
+      this.destroyHammer(this.mainHammer);
+      this.destroyHammer(this.lightboxHammer);
     }
   }
 
@@ -143,7 +143,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
       this.resetZoom();
   }
 
-  /*
+
   // --- LÓGICA DE HAMMERJS ---
   private setupMainGalleryHammer(): void {
     console.log('[ESPÍA] setupMainGalleryHammer: Intentando configurar Hammer para la galería principal...');
@@ -165,8 +165,6 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  */
-  /* a22
 
   private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
     const hammerInstance = new Hammer(element);
@@ -188,14 +186,14 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     });
     return hammerInstance;
   }
-*/
-/*
+
+
   private destroyHammer(hammerInstance: HammerManager | null): null {
     if (hammerInstance) hammerInstance.destroy();
     console.log(`[ESPÍA] Destruyendo instancia de HammerJS para `);
     return null;
   }
-*/
+
   // --- NUEVA FUNCIÓN PARA MANEJAR EL ZOOM ---
   private lastScale = 1;
   private lastX = 0;
