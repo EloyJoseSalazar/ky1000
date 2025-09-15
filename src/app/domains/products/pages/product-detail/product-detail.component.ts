@@ -78,8 +78,8 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
   private initializeComponent(product: Product): void {
     if (product.images.length > 0) {
-   //a22   this.cover.set(product.images[0]);
-   //a22   this.currentIndex.set(0);
+      this.cover.set(product.images[0]);
+      this.currentIndex.set(0);
     }
    // s22 this.updateMetaTags(product);
   }
@@ -268,12 +268,12 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   }
 
   addToCart(): void {
-   /* a22
+
     const product = this.product();
     if (product) {
       this.cartService.addToCart(product);
     }
-    */
+
   }
 
 
