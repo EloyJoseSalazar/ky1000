@@ -1,10 +1,6 @@
-
 import { Routes } from '@angular/router';
 import { LayoutComponent } from '@shared/components/layout/layout.component';
 import { NotFoundComponent } from '@info/pages/not-found/not-found.component';
-
-// --- ¡NUEVO! Importamos el componente directamente ---
-import { ProductDetailComponent } from './domains/products/pages/product-detail/product-detail.component';
 
 export const routes: Routes = [
   {
@@ -13,6 +9,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
+        // USAMOS .then(m => m.default) para asegurar la carga correcta del componente
         loadComponent: () => import('./domains/products/pages/list/list.component').then(m => m.ListComponent)
       },
       {
@@ -20,20 +17,27 @@ export const routes: Routes = [
         loadComponent: () => import('./domains/info/pages/about/about.component').then(m => m.AboutComponent)
       },
       {
-        // --- ¡EL CAMBIO ESTÁ AQUÍ! ---
-        // En lugar de `loadComponent`, usamos `component`.
         path: 'product/:id',
-        component: ProductDetailComponent
+        loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component').then(m => m.ProductDetailComponent)
       },
       {
         path: 'ingresa',
-        loadChildren: () => import('./pages/ingresa.routes').then(m => m.INGRESA_ROUTES),
+        children: [
+          { path: '', redirectTo: 'producto/nuevo', pathMatch: 'full' },
+          {
+            path: 'producto/nuevo',
+            loadComponent: () => import('./pages/gestion-productos/gestion-productos.component').then(m => m.GestionProductosComponent)
+          },
+          {
+            path: 'producto/:id',
+            loadComponent: () => import('./pages/gestion-productos/gestion-productos.component').then(m => m.GestionProductosComponent)
+          }
+        ]
       },
     ]
   },
   {
     path: '**',
-    // Asumimos que NotFoundComponent tampoco usa export default
-    loadComponent: () => import('./domains/info/pages/not-found/not-found.component').then(m => m.NotFoundComponent)
+    component: NotFoundComponent
   }
 ];
