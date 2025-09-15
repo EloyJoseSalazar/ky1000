@@ -36,7 +36,7 @@
 
     <!-- Título y Categoría (flex-grow hace que esta sección ocupe el espacio disponible) -->
     <div class="flex-grow">
-      <h3 class="text-sm text-gray-500">{{ product.category?.name }}</h3>
+      <h3 class="text-sm text-gray-500">{{ product.category.name }}</h3>
       <a [routerLink]="['/product', product.id]">
          <h2 class="text-md font-semibold text-gray-800 truncate hover:text-red-500"> {{ product.title }} </h2>
 
