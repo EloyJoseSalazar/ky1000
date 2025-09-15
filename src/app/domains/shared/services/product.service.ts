@@ -15,26 +15,19 @@ export class ProductService {
   private apiUrl = `${environment.apiUrl}/api/products`;
 
   private products = new BehaviorSubject<Product[]>([]);
-
-  // 2. Un Observable público para que los componentes se suscriban y escuchen los cambios.
-  public products$: Observable<Product[]> = this.products.asObservable();
+   public products$: Observable<Product[]> = this.products.asObservable();
 
   constructor() { }
 
 
   getProducts(categoryId?: string, query?: string): Observable<Product[]> {
-    // Usamos HttpParams para construir la URL de forma segura
-    const url = `${this.apiUrl}/api/products`;
     let params = new HttpParams();
     if (categoryId) {
       params = params.set('categoryId', categoryId);
     }
     if (query) {
-      // La clave 'title' debe coincidir con la que espera tu API de Spring Boot
       params = params.set('title', query);
     }
-
-    // Hacemos la petición con los parámetros
     return this.http.get<Product[]>(this.apiUrl, { params }).pipe(
       tap(products => this.products.next(products))
     );
