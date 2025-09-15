@@ -136,7 +136,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
 
   closeLightbox(): void {
-    console.log('[ESPÍA] closeLightbox: Cerrando lightbox...');
+   // console.log('[ESPÍA] closeLightbox: Cerrando lightbox...');
      this.lightboxVisible.set(false);
     //this.lightboxHammer = this.destroyHammer(this.lightboxHammer);
     // Reseteamos el zoom al cerrar
@@ -146,12 +146,12 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
   // --- LÓGICA DE HAMMERJS ---
   private setupMainGalleryHammer(): void {
-    console.log('[ESPÍA] setupMainGalleryHammer: Intentando configurar Hammer para la galería principal...');
+   // console.log('[ESPÍA] setupMainGalleryHammer: Intentando configurar Hammer para la galería principal...');
     if (this.mainGalleryContainer && this.mainGalleryContainer.nativeElement) {
-      console.log('%c[ESPÍA] ¡ÉXITO! #mainGalleryContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
+    //  console.log('%c[ESPÍA] ¡ÉXITO! #mainGalleryContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
     //  this.mainHammer = this.createHammerInstance(this.mainGalleryContainer.nativeElement, false, 'Galería Principal');
     } else {
-      console.error('%c[ESPÍA] ¡FALLO! #mainGalleryContainer NO encontrado en el DOM.', 'color: red; font-weight: bold;');
+   //   console.error('%c[ESPÍA] ¡FALLO! #mainGalleryContainer NO encontrado en el DOM.', 'color: red; font-weight: bold;');
     }
   }
 
@@ -160,10 +160,10 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   private setupLightboxHammer(): void {
     console.log('[ESPÍA] setupLightboxHammer: Intentando configurar Hammer para la lightbox...');
     if (this.lightboxContainer && this.lightboxContainer.nativeElement) {
-      console.log('%c[ESPÍA] ¡ÉXITO! #lightboxContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
+    //  console.log('%c[ESPÍA] ¡ÉXITO! #lightboxContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
       this.lightboxHammer = this.createHammerInstance(this.lightboxContainer.nativeElement, true, 'Lightbox');
     } else {
-      console.error('%c[ESPÍA] ¡FALLO! #lightboxContainer NO encontrado en el DOM.', 'color: red; font-weight: bold;');
+     // console.error('%c[ESPÍA] ¡FALLO! #lightboxContainer NO encontrado en el DOM.', 'color: red; font-weight: bold;');
     }
   }
 
