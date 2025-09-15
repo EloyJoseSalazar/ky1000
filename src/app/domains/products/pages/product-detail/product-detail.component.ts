@@ -47,10 +47,10 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
   private transferState = inject(TransferState);
   private platformId = inject(PLATFORM_ID);
 
+
   ngOnInit() {
     if (this.id) {
       const cachedProduct = this.transferState.get(PRODUCT_STATE_KEY, null);
-
       if (cachedProduct) {
         this.product.set(cachedProduct);
         this.initializeComponent(cachedProduct);
@@ -68,77 +68,69 @@ export default class ProductDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- ngAfterViewInit para el swipe de la galería principal ---
   ngAfterViewInit(): void {
-    // Es importante esperar a que el @if se resuelva
-    setTimeout(() => {
-//      this.setupMainGalleryHammer();
-    }, 0);
+    // ¡PROTECCIÓN! Solo ejecutamos la inicialización de HammerJS si estamos en un NAVEGADOR.
+    if (isPlatformBrowser(this.platformId)) {
+    //  setTimeout(() => { this.setupMainGalleryHammer(); }, 0);
+    }
   }
 
-  // --- Función Helper para inicializar el componente ---
   private initializeComponent(product: Product): void {
     if (product.images.length > 0) {
       this.cover.set(product.images[0]);
       this.currentIndex.set(0);
     }
-    // ¡CRUCIAL! Actualizamos las meta tags tan pronto como tenemos los datos
     this.updateMetaTags(product);
   }
 
-
-  // --- LÓGICA DE META TAGS (CORREGIDA) ---
   private updateMetaTags(product: Product): void {
-    const pageTitle = `${product.title} - **LA TIENDA`;
-    const imageUrl = this.cover(); // Usa la imagen seleccionada
-    this.titleService.setTitle(pageTitle);
+    const pageTitle = `${product.title} - LA TIENDA`;
+    const imageUrl = this.cover();
 
-    // Si estamos en el servidor, nos aseguramos de que window.location.href no se use
+    // La comprobación aquí es crucial y ya la tenías, ¡perfecto!
     const url = isPlatformServer(this.platformId)
       ? `https://nuestratienda.systemash.com/product/${product.id}`
       : window.location.href;
-    this.titleService.setTitle(pageTitle);
+
     this.metaService.updateTag({ property: 'og:title', content: pageTitle });
     this.metaService.updateTag({ property: 'og:image', content: imageUrl });
     this.metaService.updateTag({ property: 'og:url', content: url });
-    this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    // ...
   }
 
-  // --- FUNCIÓN DE WHATSAPP
+  ngOnDestroy(): void {
+    // ¡PROTECCIÓN! Solo intentamos destruir las instancias si estamos en un NAVEGADOR.
+    if (isPlatformBrowser(this.platformId)) {
+     // this.destroyHammer(this.mainHammer);
+     // this.destroyHammer(this.lightboxHammer);
+    }
+  }
+
+  openLightbox(): void {
+    this.lightboxVisible.set(true);
+    // ¡PROTECCIÓN! Solo activamos HammerJS para la lightbox si estamos en un NAVEGADOR.
+    if (isPlatformBrowser(this.platformId)) {
+      //setTimeout(() => { this.setupLightboxHammer(); }, 0);
+    }
+  }
+
   shareOnWhatsApp(): void {
-    // Esta función solo debe funcionar en el navegador, así que la protegemos
+    // ¡PROTECCIÓN! Esta función solo tiene sentido en el navegador.
     if (isPlatformBrowser(this.platformId)) {
       const product = this.product();
       if (!product) return;
 
       this.updateMetaTags(product);
-
       const title = `*${product.title}*`;
-      const url = window.location.href; // Aquí es seguro usar 'window'
+      const url = window.location.href; // Seguro usar 'window' aquí
       const message = `${title}\n\n¡Échale un vistazo aquí! 👇\n${url}`;
-
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
-
       window.open(whatsappUrl, '_blank');
     }
   }
+  //---eloy
 
-
-  ngOnDestroy(): void {
-    console.log('[ESPÍA] ngOnDestroy: Destruyendo componente y listeners...');
-   // this.destroyHammer(this.mainHammer);
-   // this.destroyHammer(this.lightboxHammer);
-  }
-
-  // --- LÓGICA DE HAMMERJS (¡CON PROTECCIÓN!) ---
-  openLightbox(): void {
-    this.lightboxVisible.set(true);
-    // Solo activamos HammerJS en el navegador
-    if (isPlatformBrowser(this.platformId)) {
-   //   setTimeout(() => { this.setupLightboxHammer(); }, 0);
-    }
-  }
 
   closeLightbox(): void {
     console.log('[ESPÍA] closeLightbox: Cerrando lightbox...');
