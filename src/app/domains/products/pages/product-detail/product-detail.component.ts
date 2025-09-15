@@ -169,7 +169,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
   */
 
-
+/*
   private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
     const hammerInstance = new Hammer(element);
     hammerInstance.get('swipe').set({ direction: 30 });
@@ -190,7 +190,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     });
     return hammerInstance;
   }
-
+*/
 
   private destroyHammer(hammerInstance: HammerManager | null): null {
     if (hammerInstance) hammerInstance.destroy();
