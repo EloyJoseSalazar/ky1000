@@ -181,11 +181,11 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     }
 */
     hammerInstance.on('swipeleft', () => {
-      console.log(`[ESPÍA] Evento detectado: SWIPE IZQUIERDA en ${source}`);
+      //console.log(`[ESPÍA] Evento detectado: SWIPE IZQUIERDA en ${source}`);
       this.nextImage();
     });
     hammerInstance.on('swiperight', () => {
-      console.log(`[ESPÍA] Evento detectado: SWIPE DERECHA en ${source}`);
+     // console.log(`[ESPÍA] Evento detectado: SWIPE DERECHA en ${source}`);
       this.prevImage();
     });
     return hammerInstance;
