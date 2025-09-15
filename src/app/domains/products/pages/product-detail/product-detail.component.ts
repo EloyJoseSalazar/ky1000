@@ -175,8 +175,8 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   //  hammerInstance.get('swipe').set({ direction: 30 });
 
     if (enablePinch) {
-      hammerInstance.get('pinch').set({ enable: true });
-      hammerInstance.get('doubletap').set({ taps: 2 });
+     // hammerInstance.get('pinch').set({ enable: true });
+     // hammerInstance.get('doubletap').set({ taps: 2 });
       hammerInstance.on('pinchstart pinchmove pinchend doubletap', (event) => this.handlePinch(event));
     }
 /*
