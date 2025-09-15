@@ -16,7 +16,7 @@ const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
   imports: [CommonModule],
   templateUrl: './product-detail.component.html'
 })
-export default class ProductDetailComponent implements OnInit, OnDestroy {
+export  class ProductDetailComponent implements OnInit, OnDestroy {
 
   // --- PROPIEDADES EXISTENTES ---
   @Input() id?: string;

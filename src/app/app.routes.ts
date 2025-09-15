@@ -1,47 +1,33 @@
 import { Routes } from '@angular/router';
-import { LayoutComponent } from '@shared/components/layout/layout.component';
-import { NotFoundComponent } from '@info/pages/not-found/not-found.component';
 
+
+// @ts-ignore
 export const routes: Routes = [
-    {
+  {
+    path: '',
+    loadComponent: () => import('./domains/shared/components/layout/layout.component').then(m => m.LayoutComponent),
+    children: [
+      {
         path: '',
-        component: LayoutComponent,
-        children: [
-            {
-                path: '',
-                loadComponent: () => import('./domains/products/pages/list/list.component').then(m => m.default)
-            },
-            {
-                path: 'about',
-                loadComponent: () => import('./domains/info/pages/about/about.component').then(m => m.default)
-            },
-            {
-                path: 'product/:id',
-                loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component').then(m => m.default)
-            },
-
-          {
-            path: 'ingresa', // Ruta base para la sección de administración
-            children: [
-              // Por ahora redirigimos a la creación, en el futuro aquí puede ir un listado de productos
-              { path: '', redirectTo: 'producto/nuevo', pathMatch: 'full' },
-              {
-                path: 'producto/nuevo', // Ruta para crear un nuevo producto
-                loadComponent: () => import('./pages/gestion-productos/gestion-productos.component').then(m => m.default)
-              },
-
-
-              {
-                path: 'producto/:id', // Ruta para editar un producto existente
-                loadComponent: () => import('./pages/gestion-productos/gestion-productos.component').then(m => m.default)
-              }
-            ]
-          },
-
-        ]
-    },
-    {
-        path: '**',
-        component: NotFoundComponent
-    }
+        loadComponent: () => import('./domains/products/pages/list/list.component').then(m => m.ListComponent),
+      },
+      {
+        path: 'about',
+        loadComponent: () => import('./domains/info/pages/about/about.component').then(m => m.AboutComponent),
+      },
+      {
+        path: 'product/:id',
+        loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component').then(m => m.ProductDetailComponent),
+      },
+      {
+        path: 'ingresa',
+        loadChildren: () => import('./pages/ingresa.routes').then(m => m.INGRESA_ROUTES),
+      },
+    ]
+  },
+  {
+    path: '**',
+    loadComponent: () => import('./domains/info/pages/not-found/not-found.component').then(m => m.NotFoundComponent),
+  }
 ];
+

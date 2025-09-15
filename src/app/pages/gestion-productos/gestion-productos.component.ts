@@ -17,7 +17,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
   imports: [CommonModule, ReactiveFormsModule, GestionImagenesProductoComponent, DragDropModule],
   templateUrl: './gestion-productos.component.html',
 })
-export default class GestionProductosComponent implements OnInit, OnDestroy {
+export  class GestionProductosComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private productService = inject(ProductService);

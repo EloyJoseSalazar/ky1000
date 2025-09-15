@@ -13,7 +13,7 @@ import { Observable, switchMap } from 'rxjs';
   imports: [CommonModule, ProductComponent, RouterLinkWithHref],
   templateUrl: './list.component.html'
 })
-export default class ListComponent {
+export  class ListComponent {
 
   products$: Observable<Product[]>;
   private cartService = inject(CartService);
