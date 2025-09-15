@@ -37,8 +37,8 @@ export class LayoutComponent implements OnInit {
   }
 
   private setDefaultMetaTags(): void {
-    this.titleService.setTitle('LA TIENDA - Productos Increíbles');
-    this.metaService.updateTag({ property: 'og:title', content: 'LA TIENDA - Productos Increíbles' });
+    this.titleService.setTitle('LA TIENDA - !Productos Increíbles!!');
+    this.metaService.updateTag({ property: 'og:title', content: 'LA TIENDA -** Productos Increíbles **' });
     this.metaService.updateTag({ property: 'og:description', content: 'Descubre nuestras ofertas exclusivas.' });
     // Usamos la URL de tu logo como imagen por defecto
     this.metaService.updateTag({ property: 'og:image', content: 'https://nuestratienda.systemash.com/assets/logo3.png' });
