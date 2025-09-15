@@ -7,7 +7,7 @@ import { RouterLinkWithHref } from '@angular/router';
   selector: 'app-product',
   standalone: true,
   imports: [CommonModule, RouterLinkWithHref],
-  templateUrl: './product.component.html',
+  templateUrl: 'product.component.html',
 })
 export class ProductComponent {
 

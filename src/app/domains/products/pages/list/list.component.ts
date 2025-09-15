@@ -10,7 +10,7 @@ import { Observable, switchMap } from 'rxjs';
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [CommonModule, ProductComponent, RouterLinkWithHref],
+  imports: [CommonModule, ProductComponent],
   templateUrl: './list.component.html'
 })
 export  class ListComponent {
