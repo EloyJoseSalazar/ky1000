@@ -78,8 +78,8 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
   private initializeComponent(product: Product): void {
     if (product.images.length > 0) {
-      this.cover.set(product.images[0]);
-      this.currentIndex.set(0);
+   //a22   this.cover.set(product.images[0]);
+   //a22   this.currentIndex.set(0);
     }
    // s22 this.updateMetaTags(product);
   }
@@ -116,7 +116,8 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   }
 
   shareOnWhatsApp(): void {
-    // ¡PROTECCIÓN! Esta función solo tiene sentido en el navegador.
+   /* a22
+
     if (isPlatformBrowser(this.platformId)) {
       const product = this.product();
       if (!product) return;
@@ -129,16 +130,17 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
       const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
       window.open(whatsappUrl, '_blank');
     }
+    */
   }
-  //---eloy
+
 
 
   closeLightbox(): void {
     console.log('[ESPÍA] closeLightbox: Cerrando lightbox...');
-    this.lightboxVisible.set(false);
+  //a22  this.lightboxVisible.set(false);
     //this.lightboxHammer = this.destroyHammer(this.lightboxHammer);
     // Reseteamos el zoom al cerrar
-    this.resetZoom();
+    // a22  this.resetZoom();
   }
 
   /*
@@ -164,6 +166,8 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   }
 
   */
+  /* a22
+
   private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
     const hammerInstance = new Hammer(element);
     hammerInstance.get('swipe').set({ direction: 30 });
@@ -184,19 +188,19 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     });
     return hammerInstance;
   }
-
-
+*/
+/*
   private destroyHammer(hammerInstance: HammerManager | null): null {
     if (hammerInstance) hammerInstance.destroy();
     console.log(`[ESPÍA] Destruyendo instancia de HammerJS para `);
     return null;
   }
-
+*/
   // --- NUEVA FUNCIÓN PARA MANEJAR EL ZOOM ---
   private lastScale = 1;
   private lastX = 0;
   private lastY = 0;
-
+/* a22
   handlePinch(event: HammerInput): void {
     switch(event.type) {
       case 'pinchstart':
@@ -229,12 +233,14 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     this.lastX = 0;
     this.lastY = 0;
   }
+  */
   // --- FIN DE LA LÓGICA DE ZOOM ---
 
 
   // --- changeCover (CORREGIDA) ---
+
   changeCover(newImg: string, index: number): void {
-    this.cover.set(newImg);
+   /* a22 this.cover.set(newImg);
     this.currentIndex.set(index);
 
     const product = this.product();
@@ -242,6 +248,8 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
       // Actualizamos las meta tags cada vez que el usuario cambia la imagen
       this.updateMetaTags(product);
     }
+
+    */
   }
 
 
@@ -249,21 +257,23 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     const product = this.product();
     if (!product || product.images.length === 0) return;
     const nextIndex = (this.currentIndex() + 1) % product.images.length;
-    this.changeCover(product.images[nextIndex], nextIndex);
+ //a22   this.changeCover(product.images[nextIndex], nextIndex);
   }
 
   prevImage(): void {
     const product = this.product();
     if (!product || product.images.length === 0) return;
     const prevIndex = (this.currentIndex() - 1 + product.images.length) % product.images.length;
-    this.changeCover(product.images[prevIndex], prevIndex);
+ //a22   this.changeCover(product.images[prevIndex], prevIndex);
   }
 
   addToCart(): void {
+   /* a22
     const product = this.product();
     if (product) {
       this.cartService.addToCart(product);
     }
+    */
   }
 
 
