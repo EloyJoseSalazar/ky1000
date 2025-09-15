@@ -72,7 +72,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   ngAfterViewInit(): void {
     // ¡PROTECCIÓN! Solo ejecutamos la inicialización de HammerJS si estamos en un NAVEGADOR.
     if (isPlatformBrowser(this.platformId)) {
-    //  setTimeout(() => { this.setupMainGalleryHammer(); }, 0);
+      setTimeout(() => { this.setupMainGalleryHammer(); }, 0);
     }
   }
 
@@ -111,7 +111,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     this.lightboxVisible.set(true);
     // ¡PROTECCIÓN! Solo activamos HammerJS para la lightbox si estamos en un NAVEGADOR.
     if (isPlatformBrowser(this.platformId)) {
-      // setTimeout(() => { this.setupLightboxHammer(); }, 0);
+       setTimeout(() => { this.setupLightboxHammer(); }, 0);
     }
   }
 
