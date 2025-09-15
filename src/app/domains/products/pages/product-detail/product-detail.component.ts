@@ -149,7 +149,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     console.log('[ESPÍA] setupMainGalleryHammer: Intentando configurar Hammer para la galería principal...');
     if (this.mainGalleryContainer && this.mainGalleryContainer.nativeElement) {
       console.log('%c[ESPÍA] ¡ÉXITO! #mainGalleryContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
-      this.mainHammer = this.createHammerInstance(this.mainGalleryContainer.nativeElement, false, 'Galería Principal');
+      //this.mainHammer = this.createHammerInstance(this.mainGalleryContainer.nativeElement, false, 'Galería Principal');
     } else {
       console.error('%c[ESPÍA] ¡FALLO! #mainGalleryContainer NO encontrado en el DOM.', 'color: red; font-weight: bold;');
     }
