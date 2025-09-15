@@ -143,7 +143,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
       this.resetZoom();
   }
 
-  /*
+
   // --- LÓGICA DE HAMMERJS ---
   private setupMainGalleryHammer(): void {
     console.log('[ESPÍA] setupMainGalleryHammer: Intentando configurar Hammer para la galería principal...');
@@ -155,6 +155,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+/*
   private setupLightboxHammer(): void {
     console.log('[ESPÍA] setupLightboxHammer: Intentando configurar Hammer para la lightbox...');
     if (this.lightboxContainer && this.lightboxContainer.nativeElement) {
@@ -166,7 +167,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   }
 
   */
-  /* a22
+
 
   private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
     const hammerInstance = new Hammer(element);
@@ -188,7 +189,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     });
     return hammerInstance;
   }
-*/
+
 
   private destroyHammer(hammerInstance: HammerManager | null): null {
     if (hammerInstance) hammerInstance.destroy();
