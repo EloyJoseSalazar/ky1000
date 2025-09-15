@@ -116,7 +116,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   }
 
   shareOnWhatsApp(): void {
-   /* a22
+
 
     if (isPlatformBrowser(this.platformId)) {
       const product = this.product();
@@ -130,7 +130,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
       const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
       window.open(whatsappUrl, '_blank');
     }
-    */
+
   }
 
 
