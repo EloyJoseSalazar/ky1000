@@ -111,7 +111,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     this.lightboxVisible.set(true);
     // ¡PROTECCIÓN! Solo activamos HammerJS para la lightbox si estamos en un NAVEGADOR.
     if (isPlatformBrowser(this.platformId)) {
-      //setTimeout(() => { this.setupLightboxHammer(); }, 0);
+       setTimeout(() => { this.setupLightboxHammer(); }, 0);
     }
   }
 
@@ -137,10 +137,10 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
   closeLightbox(): void {
     console.log('[ESPÍA] closeLightbox: Cerrando lightbox...');
-  //a22  this.lightboxVisible.set(false);
+     this.lightboxVisible.set(false);
     //this.lightboxHammer = this.destroyHammer(this.lightboxHammer);
     // Reseteamos el zoom al cerrar
-    // a22  this.resetZoom();
+      this.resetZoom();
   }
 
   /*
