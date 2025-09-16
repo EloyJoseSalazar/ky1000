@@ -1,12 +1,18 @@
-import { Component, Input, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef, computed, PLATFORM_ID, makeStateKey, TransferState, AfterViewInit } from '@angular/core';
-import { CommonModule, isPlatformServer, isPlatformBrowser } from '@angular/common'; // <-- Añade isPlatformBrowser
+
+import {Component,Input,inject,signal,OnInit,OnDestroy,ViewChild,ElementRef,computed,PLATFORM_ID,
+  makeStateKey,
+  TransferState,
+  AfterViewInit,
+} from '@angular/core';
+
+import { CommonModule, isPlatformServer, isPlatformBrowser } from '@angular/common';
+
 import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
-import Hammer from 'hammerjs';
+// import Hammer from 'hammerjs'; // <-- COMENTA O ELIMINA ESTA LÍNEA
+
 import { Title, Meta } from '@angular/platform-browser';
 import { ProductService } from '@shared/services/product.service';
-//import { PLATFORM_ID, makeStateKey, TransferState } from '@angular/core';
-//import { isPlatformServer } from '@angular/common';
 
 const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
 
@@ -14,9 +20,9 @@ const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
   selector: 'app-product-detail',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './product-detail.component.html'
+  templateUrl: './product-detail.component.html',
 })
-export  class ProductDetailComponent implements OnInit, OnDestroy {
+export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // --- PROPIEDADES EXISTENTES ---
   @Input() id?: string;
@@ -27,19 +33,20 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   currentIndex = signal(0);
   lightboxVisible = signal(false);
 
-  // --- LÓGICA DE HAMMERJS ---
+
+  //  HammerManager como tipo, pero inicializa a null
   @ViewChild('mainGalleryContainer') mainGalleryContainer!: ElementRef;
   @ViewChild('lightboxContainer') lightboxContainer!: ElementRef;
-  private mainHammer: HammerManager | null = null;
-  private lightboxHammer: HammerManager | null = null;
+  private mainHammer: any | null = null; // Usa 'any' si tienes problemas con el tipo HammerManager
+  private lightboxHammer: any | null = null; // o define una interfaz para HammerManager si es posible
+  private HammerJS: any; // Para almacenar la librería importada dinámicamente
 
-  // --- NUEVO: SIGNALS PARA EL ESTADO DEL ZOOM ---
+// --- NUEVO: SIGNALS PARA EL ESTADO DEL ZOOM ---
   currentScale = signal(1);
   currentX = signal(0);
   currentY = signal(0);
-  // Un signal "computado" que genera el string del estilo CSS automáticamente
   transformStyle = computed(() => `translate3d(${this.currentX()}px, ${this.currentY()}px, 0) scale(${this.currentScale()})`);
-  // --- FIN DE LA LÓGICA DE ZOOM ---
+
 
   // --- INYECCIONES (CON LAS NUEVAS) ---
   private titleService = inject(Title);
@@ -47,34 +54,40 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   private transferState = inject(TransferState);
   private platformId = inject(PLATFORM_ID);
 
-
   ngOnInit() {
-       if (this.id) {
+    if (this.id) {
       const cachedProduct = this.transferState.get(PRODUCT_STATE_KEY, null);
       if (cachedProduct) {
-       this.product.set(cachedProduct);  //22
-       this.initializeComponent(cachedProduct); //22
+        this.product.set(cachedProduct);
+        this.initializeComponent(cachedProduct);
       } else {
         this.productService.getOne(this.id).subscribe({
           next: (product) => {
-             if (isPlatformServer(this.platformId)) {
-              this.transferState.set(PRODUCT_STATE_KEY, product); //22
+            if (isPlatformServer(this.platformId)) {
+              this.transferState.set(PRODUCT_STATE_KEY, product);
             }
             this.product.set(product);
             this.initializeComponent(product);
-          }
+          },
         });
       }
     }
-
   }
 
   ngAfterViewInit(): void {
-    // ¡PROTECCIÓN! Solo ejecutamos la inicialización de HammerJS si estamos en un NAVEGADOR.
     if (isPlatformBrowser(this.platformId)) {
-      setTimeout(() => { this.setupMainGalleryHammer(); }, 0); //22
+      // Importa Hammer.js dinámicamente solo en el navegador
+      import('hammerjs')
+        .then((module) => {
+          this.HammerJS = module.default; // Guarda la referencia al constructor de Hammer
+          setTimeout(() => {
+            this.setupMainGalleryHammer();
+          }, 0); // La setTimeout es una buena práctica para asegurar que el DOM esté listo.
+        })
+        .catch((err) => console.error('Error loading Hammer.js:', err));
     }
   }
+
 
   private initializeComponent(product: Product): void {
     if (product.images.length > 0) {
@@ -83,6 +96,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     }
    // s22 this.updateMetaTags(product);
   }
+
 
   private updateMetaTags(product: Product): void {
     const pageTitle = `${product.title} - LA TIENDA`;
@@ -99,13 +113,6 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnDestroy(): void {
-    // ¡PROTECCIÓN! Solo intentamos destruir las instancias si estamos en un NAVEGADOR.
-    if (isPlatformBrowser(this.platformId)) {
-     // this.destroyHammer(this.mainHammer);
-     // this.destroyHammer(this.lightboxHammer);
-    }
-  }
 
   openLightbox(): void {
     this.lightboxVisible.set(true);
@@ -144,62 +151,71 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   }
 
 
-  // --- LÓGICA DE HAMMERJS ---
+// Modifica setupMainGalleryHammer
   private setupMainGalleryHammer(): void {
-   // console.log('[ESPÍA] setupMainGalleryHammer: Intentando configurar Hammer para la galería principal...');
-    if (this.mainGalleryContainer && this.mainGalleryContainer.nativeElement) {
-    //  console.log('%c[ESPÍA] ¡ÉXITO! #mainGalleryContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
-    //  this.mainHammer = this.createHammerInstance(this.mainGalleryContainer.nativeElement, false, 'Galería Principal');
+    if (isPlatformBrowser(this.platformId) && this.HammerJS && this.mainGalleryContainer?.nativeElement) {
+      console.log('[ESPÍA] ¡ÉXITO! #mainGalleryContainer encontrado. Creando instancia...');
+      this.mainHammer = this.createHammerInstance(this.mainGalleryContainer.nativeElement, false, 'Galería Principal');
+    } else if (!isPlatformBrowser(this.platformId)) {
+      console.log('[ESPÍA] setupMainGalleryHammer: No en el navegador, omitiendo HammerJS.');
     } else {
-   //   console.error('%c[ESPÍA] ¡FALLO! #mainGalleryContainer NO encontrado en el DOM.', 'color: red; font-weight: bold;');
+      console.error('[ESPÍA] ¡FALLO! #mainGalleryContainer NO encontrado o HammerJS no cargado.');
     }
   }
 
-
-
+  // Modifica setupLightboxHammer
   private setupLightboxHammer(): void {
-   // console.log('[ESPÍA] setupLightboxHammer: Intentando configurar Hammer para la lightbox...');
-    if (this.lightboxContainer && this.lightboxContainer.nativeElement) {
-    //  console.log('%c[ESPÍA] ¡ÉXITO! #lightboxContainer encontrado. Creando instancia...', 'color: green; font-weight: bold;');
+    if (isPlatformBrowser(this.platformId) && this.HammerJS && this.lightboxContainer?.nativeElement) {
+      console.log('[ESPÍA] ¡ÉXITO! #lightboxContainer encontrado. Creando instancia...');
       this.lightboxHammer = this.createHammerInstance(this.lightboxContainer.nativeElement, true, 'Lightbox');
+    } else if (!isPlatformBrowser(this.platformId)) {
+      console.log('[ESPÍA] setupLightboxHammer: No en el navegador, omitiendo HammerJS.');
     } else {
-     // console.error('%c[ESPÍA] ¡FALLO! #lightboxContainer NO encontrado en el DOM.', 'color: red; font-weight: bold;');
+      console.error('[ESPÍA] ¡FALLO! #lightboxContainer NO encontrado o HammerJS no cargado.');
     }
   }
 
 
-
-
-  private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): HammerManager {
-    const hammerInstance = new Hammer(element);
+  // Modifica createHammerInstance para usar this.HammerJS
+  private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): any {
+    if (!this.HammerJS) {
+      console.error('Hammer.js no está disponible. No se puede crear la instancia.');
+      return null;
+    }
+    const hammerInstance = new this.HammerJS(element);
     hammerInstance.get('swipe').set({ direction: 30 });
 
     if (enablePinch) {
       hammerInstance.get('pinch').set({ enable: true });
       hammerInstance.get('doubletap').set({ taps: 2 });
-      hammerInstance.on('pinchstart pinchmove pinchend doubletap', (event) => this.handlePinch(event));
+      hammerInstance.on('pinchstart pinchmove pinchend doubletap', (event: any) => this.handlePinch(event));
     }
-/*
+
     hammerInstance.on('swipeleft', () => {
-      //console.log(`[ESPÍA] Evento detectado: SWIPE IZQUIERDA en ${source}`);
       this.nextImage();
     });
     hammerInstance.on('swiperight', () => {
-     // console.log(`[ESPÍA] Evento detectado: SWIPE DERECHA en ${source}`);
       this.prevImage();
-
     });
 
- */
     return hammerInstance;
   }
 
+  ngOnDestroy(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.destroyHammer(this.mainHammer);
+      this.destroyHammer(this.lightboxHammer);
+    }
+  }
 
-  private destroyHammer(hammerInstance: HammerManager | null): null {
-    if (hammerInstance) hammerInstance.destroy();
-   // console.log(`[ESPÍA] Destruyendo instancia de HammerJS para `);
+  private destroyHammer(hammerInstance: any | null): null {
+    if (hammerInstance) {
+      hammerInstance.destroy();
+      console.log(`[ESPÍA] Destruyendo instancia de HammerJS.`);
+    }
     return null;
   }
+
 
   // --- NUEVA FUNCIÓN PARA MANEJAR EL ZOOM ---
   private lastScale = 1;
@@ -207,7 +223,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
   private lastY = 0;
 
   handlePinch(event: HammerInput): void {
-   /*
+
     switch(event.type) {
       case 'pinchstart':
         this.lastScale = this.currentScale();
@@ -230,7 +246,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
         break;
     }
 
-    */
+
   }
 
   resetZoom(): void {
@@ -242,10 +258,7 @@ export  class ProductDetailComponent implements OnInit, OnDestroy {
     this.lastY = 0;
   }
 
-  // --- FIN DE LA LÓGICA DE ZOOM ---
 
-
-  // --- changeCover (CORREGIDA) ---
 
   changeCover(newImg: string, index: number): void {
      this.cover.set(newImg);
