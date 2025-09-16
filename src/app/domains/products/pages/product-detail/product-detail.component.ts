@@ -1,15 +1,28 @@
 
-import {Component,Input,inject,signal,OnInit,OnDestroy,ViewChild,ElementRef,computed,PLATFORM_ID,
+import {
+  Component,
+  Input,
+  inject,
+  signal,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+  computed,
+  PLATFORM_ID,
   makeStateKey,
   TransferState,
   AfterViewInit,
+  DestroyRef, // <-- Nueva importación
 } from '@angular/core';
 
 import { CommonModule, isPlatformServer, isPlatformBrowser } from '@angular/common';
+import { ActivatedRoute } from '@angular/router'; // <-- Nueva importación
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'; // <-- Nueva importación
 
 import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
-// import Hammer from 'hammerjs'; // <-- COMENTA O ELIMINA ESTA LÍNEA
+// import Hammer from 'hammerjs'; // <-- COMENTA O ELIMINA ESTA LÍNEA (ya lo hicimos)
 
 import { Title, Meta } from '@angular/platform-browser';
 import { ProductService } from '@shared/services/product.service';
@@ -23,7 +36,6 @@ const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
   templateUrl: './product-detail.component.html',
 })
 export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit {
-
   // --- PROPIEDADES EXISTENTES ---
   @Input() id?: string;
   product = signal<Product | null>(null);
@@ -33,125 +45,154 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
   currentIndex = signal(0);
   lightboxVisible = signal(false);
 
-
-  //  HammerManager como tipo, pero inicializa a null
+  // --- LÓGICA DE HAMMERJS ---
   @ViewChild('mainGalleryContainer') mainGalleryContainer!: ElementRef;
   @ViewChild('lightboxContainer') lightboxContainer!: ElementRef;
-  private mainHammer: any | null = null; // Usa 'any' si tienes problemas con el tipo HammerManager
-  private lightboxHammer: any | null = null; // o define una interfaz para HammerManager si es posible
+  private mainHammer: any | null = null; // Usamos 'any' por la carga dinámica
+  private lightboxHammer: any | null = null; // Usamos 'any' por la carga dinámica
   private HammerJS: any; // Para almacenar la librería importada dinámicamente
 
-// --- NUEVO: SIGNALS PARA EL ESTADO DEL ZOOM ---
+  // --- NUEVO: SIGNALS PARA EL ESTADO DEL ZOOM ---
   currentScale = signal(1);
   currentX = signal(0);
   currentY = signal(0);
   transformStyle = computed(() => `translate3d(${this.currentX()}px, ${this.currentY()}px, 0) scale(${this.currentScale()})`);
 
-
-  // --- INYECCIONES (CON LAS NUEVAS) ---
+  // --- INYECCIONES (CON LAS NUEVAS Y LAS EXISTENTES) ---
   private titleService = inject(Title);
   private metaService = inject(Meta);
   private transferState = inject(TransferState);
   private platformId = inject(PLATFORM_ID);
+  private route = inject(ActivatedRoute); // <-- Inyección de ActivatedRoute
+  private destroyRef = inject(DestroyRef); // <-- Inyección de DestroyRef
 
   ngOnInit() {
-    if (this.id) {
-      const cachedProduct = this.transferState.get(PRODUCT_STATE_KEY, null);
-      if (cachedProduct) {
-        this.product.set(cachedProduct);
-        this.initializeComponent(cachedProduct);
+    // La suscripción a los parámetros de la ruta ahora manejará la carga inicial y los cambios.
+    // Esto asegura que cada vez que el ID en la URL cambie (incluso si el componente no se destruye),
+    // se intente cargar el producto correspondiente.
+    this.route.params.pipe(
+      takeUntilDestroyed(this.destroyRef) // Esto gestiona automáticamente la desuscripción cuando el componente se destruye
+    ).subscribe(params => {
+      // Actualiza la propiedad 'id' del componente con el valor de la URL
+      this.id = params['id'];
+      if (this.id) {
+        // Llama a la función de carga de producto con el ID actual
+        this.loadProduct(this.id);
       } else {
-        this.productService.getOne(this.id).subscribe({
-          next: (product) => {
-            if (isPlatformServer(this.platformId)) {
-              this.transferState.set(PRODUCT_STATE_KEY, product);
-            }
-            this.product.set(product);
-            this.initializeComponent(product);
-          },
-        });
+        // Opcional: Manejar el caso donde no hay ID en la URL (ej. redirigir a 404)
+        console.warn('No product ID found in route parameters.');
+        this.product.set(null); // Limpiar el producto si no hay ID
       }
+    });
+  }
+
+  // Nueva función para cargar el producto, que incluye la lógica de TransferState y el servicio.
+  private loadProduct(productId: string): void {
+    const cachedProduct = this.transferState.get(PRODUCT_STATE_KEY, null);
+
+    // Si hay un producto en caché Y es el producto que estamos buscando actualmente
+    // @ts-ignore
+    if (cachedProduct && cachedProduct.id === productId) {
+      this.product.set(cachedProduct);
+      this.initializeComponent(cachedProduct);
+      // Una vez que usamos el estado, lo removemos para que no se use incorrectamente en futuras navegaciones
+      // a menos que sea específicamente para el mismo producto que está en caché.
+      this.transferState.remove(PRODUCT_STATE_KEY);
+    } else {
+      // Si no hay caché o no es el producto correcto, cargar desde el servicio
+      this.productService.getOne(productId).subscribe({
+        next: (product) => {
+          // Si estamos en el servidor, guardamos el producto en TransferState
+          if (isPlatformServer(this.platformId)) {
+            this.transferState.set(PRODUCT_STATE_KEY, product);
+          }
+          this.product.set(product);
+          this.initializeComponent(product);
+        },
+        error: (err) => {
+          console.error('Error loading product:', err);
+          // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje
+          // o redirigiendo a una página de "producto no encontrado".
+          this.product.set(null); // Asegúrate de que el producto sea null en caso de error
+        }
+      });
     }
   }
 
+
   ngAfterViewInit(): void {
+    // ¡PROTECCIÓN! Solo ejecutamos la inicialización de HammerJS si estamos en un NAVEGADOR.
     if (isPlatformBrowser(this.platformId)) {
       // Importa Hammer.js dinámicamente solo en el navegador
       import('hammerjs')
         .then((module) => {
-          this.HammerJS = module.default; // Guarda la referencia al constructor de Hammer
+          this.HammerJS = module.default;
           setTimeout(() => {
             this.setupMainGalleryHammer();
-          }, 0); // La setTimeout es una buena práctica para asegurar que el DOM esté listo.
+          }, 0);
         })
         .catch((err) => console.error('Error loading Hammer.js:', err));
     }
   }
-
 
   private initializeComponent(product: Product): void {
     if (product.images.length > 0) {
       this.cover.set(product.images[0]);
       this.currentIndex.set(0);
     }
-   // s22 this.updateMetaTags(product);
+    this.updateMetaTags(product); // Descomentado si lo quieres activo
   }
-
 
   private updateMetaTags(product: Product): void {
     const pageTitle = `${product.title} - LA TIENDA`;
     const imageUrl = this.cover();
 
-    // La comprobación aquí es crucial y ya la tenías, ¡perfecto!
     const url = isPlatformServer(this.platformId)
-      ? `https://nuestratienda.systemash.com/product/${product.id}`
+      ? `https://nuestratienda.systemash.com/product/${product.id}` // Asegúrate de que este dominio sea correcto
       : window.location.href;
 
+    this.titleService.setTitle(pageTitle); // También actualiza el título directamente
     this.metaService.updateTag({ property: 'og:title', content: pageTitle });
     this.metaService.updateTag({ property: 'og:image', content: imageUrl });
     this.metaService.updateTag({ property: 'og:url', content: url });
-
+    this.metaService.updateTag({ name: 'description', content: product.description }); // Opcional: añadir descripción
   }
 
+  ngOnDestroy(): void {
+    // La desuscripción de route.params ya está manejada por takeUntilDestroyed
+    if (isPlatformBrowser(this.platformId)) {
+      this.destroyHammer(this.mainHammer);
+      this.destroyHammer(this.lightboxHammer);
+    }
+  }
 
   openLightbox(): void {
     this.lightboxVisible.set(true);
-    // ¡PROTECCIÓN! Solo activamos HammerJS para la lightbox si estamos en un NAVEGADOR.
     if (isPlatformBrowser(this.platformId)) {
-       setTimeout(() => { this.setupLightboxHammer(); }, 0); //22
+      setTimeout(() => { this.setupLightboxHammer(); }, 0);
     }
   }
 
   shareOnWhatsApp(): void {
-
-
     if (isPlatformBrowser(this.platformId)) {
       const product = this.product();
       if (!product) return;
 
-      this.updateMetaTags(product);
+      this.updateMetaTags(product); // Asegúrate de que las meta tags estén actualizadas con el producto actual
       const title = `*${product.title}*`;
-      const url = window.location.href; // Seguro usar 'window' aquí
+      const url = window.location.href;
       const message = `${title}\n\n¡Échale un vistazo aquí! 👇\n${url}`;
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
       window.open(whatsappUrl, '_blank');
     }
-
   }
-
-
 
   closeLightbox(): void {
-   // console.log('[ESPÍA] closeLightbox: Cerrando lightbox...');
-     this.lightboxVisible.set(false);
-    //this.lightboxHammer = this.destroyHammer(this.lightboxHammer);
-    // Reseteamos el zoom al cerrar
-      this.resetZoom();
+    this.lightboxVisible.set(false);
+    this.resetZoom();
   }
 
-
-// Modifica setupMainGalleryHammer
   private setupMainGalleryHammer(): void {
     if (isPlatformBrowser(this.platformId) && this.HammerJS && this.mainGalleryContainer?.nativeElement) {
       console.log('[ESPÍA] ¡ÉXITO! #mainGalleryContainer encontrado. Creando instancia...');
@@ -163,7 +204,6 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
     }
   }
 
-  // Modifica setupLightboxHammer
   private setupLightboxHammer(): void {
     if (isPlatformBrowser(this.platformId) && this.HammerJS && this.lightboxContainer?.nativeElement) {
       console.log('[ESPÍA] ¡ÉXITO! #lightboxContainer encontrado. Creando instancia...');
@@ -175,8 +215,6 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
     }
   }
 
-
-  // Modifica createHammerInstance para usar this.HammerJS
   private createHammerInstance(element: HTMLElement, enablePinch: boolean, source: string): any {
     if (!this.HammerJS) {
       console.error('Hammer.js no está disponible. No se puede crear la instancia.');
@@ -201,13 +239,6 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
     return hammerInstance;
   }
 
-  ngOnDestroy(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.destroyHammer(this.mainHammer);
-      this.destroyHammer(this.lightboxHammer);
-    }
-  }
-
   private destroyHammer(hammerInstance: any | null): null {
     if (hammerInstance) {
       hammerInstance.destroy();
@@ -216,37 +247,34 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
     return null;
   }
 
-
-  // --- NUEVA FUNCIÓN PARA MANEJAR EL ZOOM ---
   private lastScale = 1;
   private lastX = 0;
   private lastY = 0;
 
-  handlePinch(event: HammerInput): void {
-
+  handlePinch(event: any): void { // Usamos 'any' para el tipo de evento de Hammer
+    /*
+    // Descomenta y ajusta si la lógica de pinch está en un estado deseado
     switch(event.type) {
-      case 'pinchstart':
-        this.lastScale = this.currentScale();
-        this.lastX = this.currentX();
-        this.lastY = this.currentY();
-        break;
-      case 'pinchmove':
-        this.currentScale.set(this.lastScale * event.scale);
-        this.currentX.set(this.lastX + event.deltaX);
-        this.currentY.set(this.lastY + event.deltaY);
-        break;
-      case 'pinchend':
-        // Guardamos el estado final para el próximo pinch
-        this.lastScale = this.currentScale();
-        this.lastX = this.currentX();
-        this.lastY = this.currentY();
-        break;
-      case 'doubletap':
-        this.resetZoom();
-        break;
+        case 'pinchstart':
+          this.lastScale = this.currentScale();
+          this.lastX = this.currentX();
+          this.lastY = this.currentY();
+          break;
+        case 'pinchmove':
+          this.currentScale.set(this.lastScale * event.scale);
+          this.currentX.set(this.lastX + event.deltaX);
+          this.currentY.set(this.lastY + event.deltaY);
+          break;
+        case 'pinchend':
+          this.lastScale = this.currentScale();
+          this.lastX = this.currentX();
+          this.lastY = this.currentY();
+          break;
+        case 'doubletap':
+          this.resetZoom();
+          break;
     }
-
-
+    */
   }
 
   resetZoom(): void {
@@ -258,46 +286,34 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
     this.lastY = 0;
   }
 
-
-
   changeCover(newImg: string, index: number): void {
-     this.cover.set(newImg);
+    this.cover.set(newImg);
     this.currentIndex.set(index);
 
     const product = this.product();
     if (product) {
-      // Actualizamos las meta tags cada vez que el usuario cambia la imagen
       this.updateMetaTags(product);
     }
-
-
   }
-
 
   nextImage(): void {
     const product = this.product();
     if (!product || product.images.length === 0) return;
     const nextIndex = (this.currentIndex() + 1) % product.images.length;
-     this.changeCover(product.images[nextIndex], nextIndex);
+    this.changeCover(product.images[nextIndex], nextIndex);
   }
 
   prevImage(): void {
     const product = this.product();
     if (!product || product.images.length === 0) return;
     const prevIndex = (this.currentIndex() - 1 + product.images.length) % product.images.length;
-     this.changeCover(product.images[prevIndex], prevIndex);
+    this.changeCover(product.images[prevIndex], prevIndex);
   }
 
   addToCart(): void {
-
     const product = this.product();
     if (product) {
       this.cartService.addToCart(product);
     }
-
   }
-
-
-
 }
-
