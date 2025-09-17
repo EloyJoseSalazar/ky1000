@@ -148,7 +148,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
     const imageUrl = this.cover();
 
     const url = isPlatformServer(this.platformId)
-      ? `https://nuestratienda.systemash.com/product/${product.id}` // Asegúrate de que este dominio sea correcto
+      ? `https://latienda.systemash.com/product/${product.id}` // Asegúrate de que este dominio sea correcto
       : window.location.href;
 
     this.titleService.setTitle(pageTitle); // También actualiza el título directamente
