@@ -81,6 +81,7 @@
         <li><a routerLink="/" (click)="toggleMenu()" class="block">Home</a></li>
         <li><a routerLink="/about" (click)="toggleMenu()" class="block">About</a></li>
         <li><a routerLink="/Ubicaciones" (click)="toggleMenu()" class="block">Locations</a></li>
+        <li><a routerLink="/login" (click)="toggleMenu()" class="block">Login</a></li>
         <li><a routerLink="/ingresa" (click)="toggleMenu()" class="block">Ingresa</a></li>
         <li class="pt-2 mt-2 border-t"><span class="font-semibold text-gray-500">CATEGORÍAS</span></li>
         <li><a routerLink="/" (click)="toggleMenu()" class="block pl-2">Todas</a></li>
@@ -90,6 +91,27 @@
       </ul>
     </div>
   }
+
+  <nav>
+    <ul class="flex space-x-4 items-center">
+      <li><a routerLink="/" class="hover:text-gray-300">Inicio</a></li>
+      <li><a routerLink="/about" class="hover:text-gray-300">Acerca de</a></li>
+      <li><a routerLink="/gestion-imagenes-producto" class="hover:text-gray-300">Gestión Imágenes</a></li>
+      <!-- Añadir más enlaces si tienes -->
+
+      <!-- Botón de autenticación condicional -->
+      <li *ngIf="!(isAuthenticated$ | async)">
+        <a routerLink="/login" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+          Ingresar
+        </a>
+      </li>
+      <li *ngIf="isAuthenticated$ | async">
+        <button (click)="onLogout()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+          Cerrar Sesión
+        </button>
+      </li>
+    </ul>
+  </nav>
 
 
   <!-- 2. Side Menu del Carrito (Completo y Corregido) -->
