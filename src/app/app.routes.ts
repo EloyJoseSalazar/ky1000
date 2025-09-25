@@ -2,31 +2,25 @@ import { Routes } from '@angular/router';
 import { LayoutComponent } from '@shared/components/layout/layout.component';
 import { NotFoundComponent } from '@info/pages/not-found/not-found.component';
 import { LoginComponent } from './pages/login/login.component';
-import { GestionImagenesProductoComponent } from './domains/shared/gestion-imagenes-producto/gestion-imagenes-producto.component'; // ¡Importa tu componente a proteger!
+// Importa ambos componentes de gestión, aunque el `authGuard` puede ser aplicado al padre `ingresa`
+import { GestionImagenesProductoComponent } from './domains/shared/gestion-imagenes-producto/gestion-imagenes-producto.component';
+import { GestionProductosComponent } from './pages/gestion-productos/gestion-productos.component';
+
 import { authGuard } from './domains/shared/guards/auth.guard'; // ¡Importa tu AuthGuard!
 
 export const routes: Routes = [
   {
     path: '',
     component: LayoutComponent,
-
     children: [
       {
         path: '',
-        // USAMOS .then(m => m.default) para asegurar la carga correcta del componente
         loadComponent: () => import('./domains/products/pages/list/list.component').then(m => m.ListComponent)
       },
-
-      { path: 'login', component: LoginComponent },
-
-      // La ruta protegida:
       {
-        path: 'gestion-imagenes-producto',
-        component: GestionImagenesProductoComponent,
-        canActivate: [authGuard] // ¡Aplica el guardián aquí!
+        path: 'login',
+        component: LoginComponent
       },
-
-
       {
         path: 'about',
         loadComponent: () => import('./domains/info/pages/about/about.component').then(m => m.AboutComponent)
@@ -36,8 +30,15 @@ export const routes: Routes = [
         loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component').then(m => m.ProductDetailComponent)
       },
 
+      // Rutas Protegidas
       {
-        path: 'ingresa',
+        path: 'gestion-imagenes-producto', // Esta ruta ya estaba protegida, la mantenemos
+        component: GestionImagenesProductoComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'ingresa', // Protegemos el módulo 'ingresa' completo
+        canActivate: [authGuard], // Aplicamos el guard a la ruta padre
         children: [
           { path: '', redirectTo: 'producto/nuevo', pathMatch: 'full' },
           {
@@ -50,11 +51,8 @@ export const routes: Routes = [
           }
         ]
       },
-
     ]
-
   },
-
   {
     path: '**',
     component: NotFoundComponent

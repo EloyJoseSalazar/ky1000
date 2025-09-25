@@ -16,7 +16,8 @@ export const authGuard: CanActivateFn = (route, state): Observable<boolean> => {
       } else {
         // Si no está autenticado, redirige a la página de login
         // y guarda la URL intentada para redirigir después del login
-        router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+         router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+       // return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
         return false;
       }
     })

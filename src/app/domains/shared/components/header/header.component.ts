@@ -1,52 +1,77 @@
-
-import { Component, inject, signal, OnInit } from '@angular/core'; // Importamos OnInit
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
 import { RouterLinkWithHref, RouterLinkActive } from '@angular/router';
-import { RouterLink, Router } from '@angular/router'; // Necesario para RouterLink y para logout
-import { AuthService } from '../../services/auth.service'; // Asegúrate de la ruta correcta
+import { RouterLink, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { SearchComponent } from '../search/search.component';
 import { CategoryService } from '@shared/services/category.service';
 import { Category } from '@shared/models/category.model';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs'; // Importar Observable
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, RouterLinkWithHref, RouterLinkActive, RouterLink, SearchComponent],
   templateUrl: './header.component.html',
-  //styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.css'] // <-- ¡Descomenta o añade esto!
 })
-export class HeaderComponent implements OnInit { // Implementamos OnInit
+export class HeaderComponent implements OnInit {
   hideSideMenu = signal(true);
-  showMenu = signal(false);
+  showMenu = signal(false); // Para el menú móvil
+  showCategoriesDropdown = signal(false); // Para el dropdown de categorías en PC
+
+  // --- Propiedades para el Auth ---
+  isAuthenticated$: Observable<boolean>;
+  currentUser$: Observable<string | null>;
+  showUserMenu = signal(false); // Signal para controlar la visibilidad del submenú de usuario
+
 
   private cartService = inject(CartService);
   cart = this.cartService.cart;
   total = this.cartService.total;
 
-  // --- NUEVO: Lógica para categorías ---
   private categoryService = inject(CategoryService);
   categories = signal<Category[]>([]);
-  showCategoriesDropdown = signal(false); // Para controlar el dropdown en PC
 
-
-  isAuthenticated$!: Observable<boolean>; // Para suscribirse al estado de autenticación
-
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router) {
+    // Inicializar los Observables del AuthService en el constructor
+    this.isAuthenticated$ = this.authService.isAuthenticated$;
+    this.currentUser$ = this.authService.currentUser$;
+  }
 
   ngOnInit() {
-    // Cargamos las categorías cuando el componente se inicia
     this.categoryService.getAll().subscribe(data => {
       this.categories.set(data);
     });
   }
 
-  onLogout(): void {
-    this.authService.logout(); // Llama al método logout del servicio
+  // --- Métodos de Auth ---
+  onLoginClick(): void {
+    this.router.navigate(['/login']);
   }
 
+  navigateToGestionProductos(): void {
+    // CAMBIO AQUÍ: Navegamos a la ruta específica para crear un nuevo producto
+    this.router.navigate(['/ingresa/producto/nuevo']); // Ajusta la ruta a tu 'Crear Producto'
+    this.showUserMenu.set(false);
+  }
 
+  toggleUserMenu(): void {
+    this.showUserMenu.update(prevState => !prevState);
+  }
+
+  onLogout(): void {
+    this.authService.logout();
+    this.showUserMenu.set(false); // Oculta el menú después de cerrar sesión
+  }
+
+ // navigateToGestionProductos(): void {
+  //  this.router.navigate(['/gestion-productos']);
+   // this.showUserMenu.set(false); // Oculta el menú después de navegar
+ // }
+
+  // --- Métodos existentes ---
   toogleSideMenu() {
     this.hideSideMenu.update(prevState => !prevState);
   }
@@ -55,14 +80,9 @@ export class HeaderComponent implements OnInit { // Implementamos OnInit
     this.showMenu.update(prevState => !prevState);
   }
 
-  // --- NUEVO ---
   toggleCategoriesDropdown() {
     this.showCategoriesDropdown.update(prevState => !prevState);
   }
-
-
-
-  // ... (tus otros métodos de carrito) ...
 
   removeFromCart(productId: number) {
     this.cartService.removeFromCart(productId);

@@ -1,9 +1,10 @@
+
+
 <nav class="sticky top-0 z-40 bg-white shadow-md relative">
   <div class="w-full max-w-7xl mx-auto px-4">
 
-    <!-- VISTA MÓVIL (Funciona, no se toca) -->
+    <!-- VISTA MÓVIL -->
     <div class="block md:hidden">
-      <!-- ... (código de la vista móvil sin cambios) ... -->
       <div class="flex items-center justify-between h-16">
         <div class="flex-shrink-0">
           <button (click)="toggleMenu()" type="button" class="p-2"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
@@ -12,6 +13,8 @@
           <a routerLink="/" class="flex items-center space-x-2"><img src="/assets/logo3.png" class="h-10" alt="LoVendo"/><span class="font-bold text-xl">LA TIENDA</span></a>
         </div>
         <div class="flex-shrink-0">
+          <!-- Aquí puedes integrar un botón de login/usuario también para móvil si lo necesitas -->
+          <!-- O dejar que el menú móvil tenga las opciones -->
           <button class="p-2 border rounded relative" (click)="toogleSideMenu()">
             <div class="absolute -top-2 -left-2 rounded h-5 w-5 bg-black text-white text-xs">{{ cart().length }}</div>
             <svg class="w-6 h-6" viewBox="0 0 24 24"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -26,7 +29,7 @@
     <!-- =============================================== -->
     <div class="hidden md:grid md:grid-cols-[auto_1fr_auto] md:items-center h-20 md:gap-x-6">
 
-      <!-- Columna 1: Logo y Navegación (se ajusta a su contenido) -->
+      <!-- Columna 1: Logo y Navegación -->
       <div class="flex items-center space-x-6">
         <a routerLink="/" class="flex-shrink-0">
           <img src="/assets/logo3.png" class="h-10" alt="LoVendo"/>
@@ -48,23 +51,47 @@
         </div>
       </div>
 
-      <!-- Columna 2: Campo de Búsqueda (ocupa todo el espacio restante) -->
+      <!-- Columna 2: Campo de Búsqueda -->
       <div class="w-full max-w-md mx-auto">
         <app-search />
       </div>
 
-      <!-- Columna 3: Ingresa y Carrito (se ajusta a su contenido) -->
+      <!-- Columna 3: Ingresa y Carrito -->
       <div class="flex items-center justify-end space-x-4">
-        <a routerLink="/ingresa" routerLinkActive="underline" class="hover:underline">Ingresa</a>
+        <!-- Lógica de autenticación: Botón "Ingresar" o menú de usuario -->
+        <ng-container *ngIf="!(isAuthenticated$ | async); else userLoggedInMenu">
+          <button (click)="onLoginClick()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            Ingresar
+          </button>
+        </ng-container>
+
+        <ng-template #userLoggedInMenu>
+          <div class="user-menu-container relative">
+            <button (click)="toggleUserMenu()" class="user-button flex items-center space-x-1">
+              <span>{{ (currentUser$ | async) || 'Usuario' }}</span>
+              <span *ngIf="!showUserMenu()">▼</span>
+              <span *ngIf="showUserMenu()">▲</span>
+            </button>
+
+            @if (showUserMenu()) {
+              <div (mouseleave)="toggleUserMenu()" class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20">
+                <button (click)="navigateToGestionProductos()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Crear Producto</button>
+                <button (click)="onLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Cerrar la Cuenta</button>
+              </div>
+            }
+          </div>
+        </ng-template>
+
+        <!-- Botón del carrito -->
         <button class="p-2 border rounded relative" (click)="toogleSideMenu()">
           <div class="absolute -top-2 -left-2 rounded h-5 w-5 bg-black text-white text-xs">{{ cart().length }}</div>
           <svg class="w-6 h-6" viewBox="0 0 24 24"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </button>
       </div>
+     </div>
+
+
     </div>
-
-
-  </div>
 
   <!-- ======================================================= -->
   <!--            NUEVO: MENÚS OCULTOS (FINAL)                 -->
@@ -81,8 +108,13 @@
         <li><a routerLink="/" (click)="toggleMenu()" class="block">Home</a></li>
         <li><a routerLink="/about" (click)="toggleMenu()" class="block">About</a></li>
         <li><a routerLink="/Ubicaciones" (click)="toggleMenu()" class="block">Locations</a></li>
-        <li><a routerLink="/login" (click)="toggleMenu()" class="block">Login</a></li>
-        <li><a routerLink="/ingresa" (click)="toggleMenu()" class="block">Ingresa</a></li>
+        <!-- Botones de auth para móvil -->
+        @if (!(isAuthenticated$ | async)) {
+          <li><button (click)="onLoginClick(); toggleMenu()" class="block w-full text-left py-2">Ingresar</button></li>
+        } @else {
+          <li><button (click)="navigateToGestionProductos(); toggleMenu()" class="block w-full text-left py-2">Crear Producto</button></li>
+          <li><button (click)="onLogout(); toggleMenu()" class="block w-full text-left py-2">Cerrar la Cuenta</button></li>
+        }
         <li class="pt-2 mt-2 border-t"><span class="font-semibold text-gray-500">CATEGORÍAS</span></li>
         <li><a routerLink="/" (click)="toggleMenu()" class="block pl-2">Todas</a></li>
         @for(category of categories(); track category.id) {
@@ -92,14 +124,12 @@
     </div>
   }
 
-  <nav>
+  <!-- Eliminamos esta sección duplicada que tenías al final, ya que la lógica de auth ahora está en la vista PC -->
+  <!-- <nav>
     <ul class="flex space-x-4 items-center">
       <li><a routerLink="/" class="hover:text-gray-300">Inicio</a></li>
       <li><a routerLink="/about" class="hover:text-gray-300">Acerca de</a></li>
       <li><a routerLink="/gestion-imagenes-producto" class="hover:text-gray-300">Gestión Imágenes</a></li>
-      <!-- Añadir más enlaces si tienes -->
-
-      <!-- Botón de autenticación condicional -->
       <li *ngIf="!(isAuthenticated$ | async)">
         <a routerLink="/login" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
           Ingresar
@@ -111,12 +141,11 @@
         </button>
       </li>
     </ul>
-  </nav>
+  </nav> -->
 
 
   <!-- 2. Side Menu del Carrito (Completo y Corregido) -->
   @if (!hideSideMenu()) {
-    <!-- Overlay para el carrito -->
     <div (click)="toogleSideMenu()" class="fixed inset-0 bg-black bg-opacity-50 z-50"></div>
   }
 
@@ -125,16 +154,15 @@
     [class.translate-x-0]="!hideSideMenu()"
     [class.translate-x-full]="hideSideMenu()">
 
-     <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center">
       <p class="text-xl font-semibold">Mi Carrito de Compra</p>
       <button (click)="toogleSideMenu()" class="p-1">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
 
-     <div class="pt-4 flex flex-col h-full">
+    <div class="pt-4 flex flex-col h-full">
       <div class="flex-grow">
-        <!-- CÓDIGO DEL @for AHORA INCLUIDO -->
         @for (item of cart(); track item.id) {
           <div class="flex flex-col border-b pb-2 mb-2">
             <div class="flex justify-between items-start">
@@ -167,10 +195,9 @@
         </div>
         <button class="w-full mt-4 bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800">Proceder al Pago</button>
       </div>
+
     </div>
-  </div>
-
+    </div>
 </nav>
-
 
 

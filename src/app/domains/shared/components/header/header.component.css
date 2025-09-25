@@ -1,0 +1,72 @@
+/* header.component.css */
+
+/* Estilos para el contenedor del menú de usuario */
+.user-menu-container {
+  /* Esto ya debería estar cubierto por Tailwind con `relative` en el HTML,
+     pero lo ponemos aquí para claridad si no lo tienes en Tailwind */
+  position: relative;
+  display: inline-block; /* Asegura que el contenedor solo ocupe el ancho de su contenido */
+}
+
+/* Estilos para el botón del nombre de usuario */
+.user-button {
+  /* Puedes ajustar estos estilos para que coincidan con tu diseño */
+  background-color: #2e3a4e; /* Ejemplo de color de fondo, ajusta a tu tema */
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600; /* semi-bold */
+  transition: background-color 0.3s ease;
+  min-width: 120px; /* Ancho mínimo para el botón */
+  text-align: center;
+}
+
+.user-button:hover {
+  background-color: #4a5a70; /* Color al pasar el ratón */
+}
+
+/* Estilos para el menú desplegable */
+/* @if (showUserMenu()) {} en el HTML ya se encarga de mostrar/ocultar con *ngIf,
+   así que aquí solo definimos el estilo cuando está presente. */
+.dropdown-menu {
+  /* La posición absoluta es crucial para que se despliegue sobre el contenido */
+  position: absolute;
+  /* Alinea el menú a la derecha del botón */
+  right: 0;
+  /* Margen superior para separarlo del botón */
+  margin-top: 0.5rem; /* ~8px */
+  /* Color de fondo */
+  background-color: white;
+  /* Sombra para darle profundidad */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  /* Borde redondeado */
+  border-radius: 0.375rem; /* ~6px */
+  /* Ancho del menú */
+  min-width: 180px; /* Puedes ajustar el ancho */
+  /* Z-index para que esté encima de otros elementos */
+  z-index: 20; /* Coincide con el z-index en el HTML */
+  /* Padding interno */
+  padding: 0.5rem 0;
+  /* Transición opcional para una apertura/cierre más suave */
+  /* Puedes añadir transform u opacity para efectos más avanzados */
+}
+
+.dropdown-menu button {
+  /* Estilos para los botones dentro del menú desplegable */
+  display: block; /* Cada botón ocupa su propia línea */
+  width: 100%; /* Ocupa todo el ancho del menú */
+  padding: 0.75rem 1rem; /* Padding interno */
+  text-align: left; /* Alinea el texto a la izquierda */
+  background-color: transparent; /* Fondo transparente por defecto */
+  border: none; /* Sin borde */
+  color: #374151; /* Color de texto, ajusta a tu tema */
+  font-size: 0.875rem; /* Texto pequeño */
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f3f4f6; /* Fondo al pasar el ratón */
+}
