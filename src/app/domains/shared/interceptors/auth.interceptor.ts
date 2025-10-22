@@ -1,30 +1,25 @@
-import { inject } from '@angular/core'; // Necesitas inject aquí
-import {
-  HttpRequest,
-  HttpHandlerFn, // Usa HttpHandlerFn para interceptores funcionales
-  HttpEvent,
-} from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AuthService } from '../services/auth.service'; // Asegúrate de que la ruta sea correcta
+// src/app/domains/shared/interceptors/auth.interceptor.ts (REFINADO)
 
-// Define el interceptor como una función, no una clase
-export const authInterceptor: (req: HttpRequest<unknown>, next: HttpHandlerFn) => Observable<HttpEvent<unknown>> = (req, next) => {
-  const authService = inject(AuthService); // Usa inject para obtener el servicio
-  const token = authService.getToken(); // Obtiene el token del servicio
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { AuthService } from '../services/auth.service'; // Asegúrate que la ruta sea correcta
 
-  // Si hay un token, clona la petición y añade la cabecera de autorización
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+  // Asumimos que AuthService tiene un método getToken() que lee de localStorage
+  const token = authService.getToken();
+
   if (token) {
-    // Excluir peticiones a '/auth/login' o '/auth/register' del interceptor para evitar bucles o añadir el token antes de obtenerlo
-    if (req.url.includes('/auth/login') || req.url.includes('/auth/register')) {
-      return next(req); // Pasa la petición sin modificar
-    }
-
-    req = req.clone({
+    // Clonamos la petición para añadir la nueva cabecera
+    const clonedReq = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
       }
     });
+    // Pasamos la petición clonada al siguiente manejador
+    return next(clonedReq);
   }
 
+  // Si no hay token, la petición original continúa sin cambios
   return next(req);
 };

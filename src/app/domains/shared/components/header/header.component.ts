@@ -95,4 +95,12 @@ export class HeaderComponent implements OnInit {
   decreaseQuantity(productId: number) {
     this.cartService.updateQuantity(productId, -1);
   }
+
+  // 👇 NUEVO MÉTODO AÑADIDO 👇
+  navigateToListaProductos() {
+    this.router.navigate(['/ingresa/lista-productos']);
+    this.showUserMenu.set(false); // También cierra el menú de usuario al navegar
+  }
+  // 👆 FIN DEL MÉTODO AÑADIDO 👆
+
 }

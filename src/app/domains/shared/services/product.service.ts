@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Product } from '../models/product.model';
 import {BehaviorSubject, catchError, Observable, of, tap} from 'rxjs';
 import {environment} from "../../../../environments/environmen";
+import {PagedResponse} from "@shared/models/paged-response.model";
 
 
 
@@ -19,6 +20,36 @@ export class ProductService {
 
   constructor() { }
 
+
+  // filtro de busqueda  de la pagina listado de producto - product-table
+
+  getProductsPaged(filters: any, page: number, size: number): Observable<PagedResponse<Product>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    // Añadir filtros si existen
+    if (filters.sku) {
+      params = params.append('sku', filters.sku);
+    }
+
+
+    // Añadir el filtro de título si existe
+    if (filters.title) {
+      params = params.append('title', filters.title);
+    }
+
+
+    if (filters.categoryId) {
+      params = params.append('categoryId', filters.categoryId);
+    }
+    if (filters.startDate) {
+      params = params.append('startDate', new Date(filters.startDate).toISOString());
+    }
+    // ... otros filtros
+
+    return this.http.get<PagedResponse<Product>>(`${this.apiUrl}/paged`, { params });
+  }
 
   getProducts(categoryId?: string, query?: string): Observable<Product[]> {
     let params = new HttpParams();
@@ -70,8 +101,8 @@ export class ProductService {
   }
 
 
-  getBySlug(slug: string): Observable<Product | null> {
-    return this.http.get<Product>(`${this.apiUrl}/slug/${slug}`).pipe(
+  getBySku(sku: string): Observable<Product | null> {
+    return this.http.get<Product>(`${this.apiUrl}/sku/${sku}`).pipe(
       catchError(error => {
         // Si el error es un 404 (Not Found), devolvemos un 'null' observable
         // para que el componente sepa que el producto no existe.

@@ -13,4 +13,4 @@ export const INGRESA_ROUTES: Routes = [
 ];
 
 
-//loadComponent: () => import('./domains/info/pages/about/about.component').then(m => m.AboutComponent),
+//loadComponent: () => import('./domains/info/pages/contacto/contacto.component').then(m => m.ContactoComponent),

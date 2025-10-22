@@ -2,11 +2,8 @@ import { Routes } from '@angular/router';
 import { LayoutComponent } from '@shared/components/layout/layout.component';
 import { NotFoundComponent } from '@info/pages/not-found/not-found.component';
 import { LoginComponent } from './pages/login/login.component';
-// Importa ambos componentes de gestión, aunque el `authGuard` puede ser aplicado al padre `ingresa`
 import { GestionImagenesProductoComponent } from './domains/shared/gestion-imagenes-producto/gestion-imagenes-producto.component';
-import { GestionProductosComponent } from './pages/gestion-productos/gestion-productos.component';
-
-import { authGuard } from './domains/shared/guards/auth.guard'; // ¡Importa tu AuthGuard!
+import { authGuard } from './domains/shared/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -22,33 +19,38 @@ export const routes: Routes = [
         component: LoginComponent
       },
       {
-        path: 'about',
-        loadComponent: () => import('./domains/info/pages/about/about.component').then(m => m.AboutComponent)
+        path: 'contacto',
+        loadComponent: () => import('./domains/info/pages/contacto/contacto.component').then(m => m.ContactoComponent)
       },
       {
         path: 'product/:id',
         loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component').then(m => m.ProductDetailComponent)
       },
-
       // Rutas Protegidas
       {
-        path: 'gestion-imagenes-producto', // Esta ruta ya estaba protegida, la mantenemos
+        path: 'gestion-imagenes-producto',
         component: GestionImagenesProductoComponent,
         canActivate: [authGuard]
       },
       {
         path: 'ingresa', // Protegemos el módulo 'ingresa' completo
-        canActivate: [authGuard], // Aplicamos el guard a la ruta padre
+        canActivate: [authGuard], // El guard ya protege todo lo que está adentro
         children: [
-          { path: '', redirectTo: 'producto/nuevo', pathMatch: 'full' },
+          // Rutas que ya tenías para crear y editar productos
           {
             path: 'producto/nuevo',
             loadComponent: () => import('./pages/gestion-productos/gestion-productos.component').then(m => m.GestionProductosComponent)
           },
           {
-            path: 'producto/:id',
+            // CAMBIO: La ruta ahora espera un SKU en lugar de un ID
+            path: 'producto/:sku',
             loadComponent: () => import('./pages/gestion-productos/gestion-productos.component').then(m => m.GestionProductosComponent)
-          }
+          },
+          {
+            path: 'lista-productos', // La URL será /ingresa/lista-productos
+            loadComponent: () => import('./pages/product-list/product-list.component').then(m => m.ProductListComponent)
+          },
+          { path: '', redirectTo: 'lista-productos', pathMatch: 'full' },
         ]
       },
     ]

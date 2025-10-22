@@ -1,0 +1,31 @@
+<p>product-filters works!</p>
+<form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="filters-container">
+
+  <div class="form-field">
+    <label for="title">Título</label>
+    <input id="title" type="text" formControlName="title" placeholder="Buscar por título...">
+  </div>
+
+  <div class="form-field">
+    <label for="sku">SKU</label>
+    <input id="sku" type="text" formControlName="sku" placeholder="Buscar por SKU...">
+  </div>
+
+  <div class="form-field">
+    <label for="category">Categoría</label>
+    <select id="category" formControlName="categoryId">
+      <option value="">Todas</option>
+      <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+    </select>
+  </div>
+
+  <div class="form-field">
+    <label for="creationDate">Fecha de Creación</label>
+    <input id="creationDate" type="date" formControlName="creationDate">
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn-primary">Buscar</button>
+    <button type="button" (click)="resetFilters()" class="btn-secondary">Limpiar</button>
+  </div>
+</form>

@@ -1,7 +1,10 @@
-<!-- Quitamos la búsqueda y la lista de categorías de aquí -->
+<!--  Forma parte de la Pagina de inicio  donde se muestra las publicaciones -->
+<app-banner>
+</app-banner>
 <div class="flex mt-5 flex-col md:flex-row md:space-x-4">
   <!-- El div de la lista de categorías se ha ELIMINADO -->
   <div class="grid grid-cols-2 gap-4 md:gap-8 w-full md:grid-cols-4">
+
     @for (product of (products$ | async); track product.id) {
       <app-product
         [product]="product"

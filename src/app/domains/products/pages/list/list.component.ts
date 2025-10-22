@@ -6,11 +6,14 @@ import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
 import { ProductService } from '@shared/services/product.service';
 import { Observable, switchMap } from 'rxjs';
+import {BannerComponent} from "../../../../components/banner/banner.component";
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [CommonModule, ProductComponent],
+  imports: [CommonModule,
+    BannerComponent,
+    ProductComponent],
   templateUrl: './list.component.html'
 })
 export  class ListComponent {

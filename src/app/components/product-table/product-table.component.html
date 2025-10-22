@@ -1,0 +1,65 @@
+
+<div class="table-container">
+  <table>
+    <thead>
+    <tr>
+      <th>Estado</th>
+      <th>Imagen</th>
+      <th>SKU</th>
+      <th>Título</th>
+      <th>Categoría</th>
+      <th>Precio</th>
+      <th>Existencia</th>
+      <th colspan="2">Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let product of products">
+
+      <!-- 👇 CÓDIGO RESTAURADO PARA EL CHECKBOX DE ESTADO 👇 -->
+      <td>
+        <label class="switch">
+          <input
+            type="checkbox"
+            [checked]="product.isactive"
+            (change)="onStatusChange($event, product.id)">
+          <span class="slider round"></span>
+        </label>
+      </td>
+
+      <!-- 👇 CÓDIGO RESTAURADO PARA LA IMAGEN 👇 -->
+      <td>
+        <img
+          [src]="product.images[0] || defaultImage"
+          [alt]="product.title"
+          class="product-thumbnail"
+          (error)="handleImageError($event)">
+      </td>
+
+      <!-- 3. SKU -->
+      <td>{{ product.sku }}</td>
+      <!-- 4. Título -->
+      <td>{{ product.title }}</td>
+      <!-- 5. Categoría -->
+      <td>{{ product.category.name }}</td>
+      <!-- 6. Precio -->
+      <td>{{ product.price | currency:'USD':'symbol':'1.2-2' }}</td>
+      <!-- 7. Existencia -->
+      <td>{{ product.stock }}</td>
+
+      <!-- 8. Botón Modificar (Mantenemos la corrección que ya funciona) -->
+      <td>
+        <button (click)="onEdit(product.sku)" class="action-btn edit-btn" title="Modificar">✏️</button>
+      </td>
+
+      <!-- 9. Botón Eliminar -->
+      <td>
+        <button (click)="onDelete(product.id)" class="action-btn delete-btn" title="Eliminar">🗑️</button>
+      </td>
+    </tr>
+    <tr *ngIf="products.length === 0">
+      <td colspan="9" class="no-results">No se encontraron productos.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

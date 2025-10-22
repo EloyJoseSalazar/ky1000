@@ -1,23 +1,25 @@
-import {ApplicationConfig, inject} from '@angular/core';
+// src/app/app.config.ts (CORREGIDO)
+
+import { ApplicationConfig } from '@angular/core';
 import { PreloadAllModules, provideRouter, withComponentInputBinding, withPreloading } from '@angular/router';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { provideClientHydration } from '@angular/platform-browser';
+
 import { routes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-
-import { provideHttpClient, withFetch ,withInterceptors } from '@angular/common/http'; // ¡Importa withInterceptors!
-import { authInterceptor  } from './domains/shared/interceptors/auth.interceptor';
-import {AuthService} from "@shared/services/auth.service"; // ¡Importa tu interceptor!
-
+import { authInterceptor } from './domains/shared/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules)),
-    provideHttpClient(withFetch()), // Es importante que withFetch() esté aquí para habilitar HttpClient
-    provideClientHydration(withEventReplay()), // Si usas SSR
-    provideHttpClient(
-      withInterceptors([
-        authInterceptor // ¡Ahora puedes pasar la función directamente!
-      ])
-    ),
-  ]
+    provideClientHydration(), // Simplificado si no usas event replay
 
+    // --- AQUÍ ESTÁ EL CAMBIO CLAVE ---
+    // Una sola llamada a provideHttpClient con todas las características
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([
+        authInterceptor
+      ])
+    )
+  ]
 };
