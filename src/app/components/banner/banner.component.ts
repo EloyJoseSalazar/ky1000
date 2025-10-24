@@ -24,7 +24,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   currentIndex = signal<number>(0);
 
   private intervalId: any;
-  private readonly SCROLL_INTERVAL = 3000; // 3 segundos
+  private readonly SCROLL_INTERVAL = 6000; // 6 segundos
 
   ngOnInit(): void {
     this.loadBanners();

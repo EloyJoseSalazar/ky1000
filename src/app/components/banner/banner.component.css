@@ -7,8 +7,9 @@
 .banner-container {
   position: relative;
   width: 100%;
-  max-width: 1200px; /* Ajusta al ancho máximo de tu diseño */
-  margin: 0 auto;
+  max-width: 1500px; /* Ajusta al ancho máximo de tu diseño */
+  margin: 0 ;
+  /* margin: 0 auto; */
   overflow: hidden;
   border-radius: 8px; /* Opcional: bordes redondeados */
 }
@@ -39,7 +40,7 @@
 
 .slide img {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
   /* Define un aspect-ratio para evitar saltos de layout */
   /* PC: 4:1 o 3:1 es común */
