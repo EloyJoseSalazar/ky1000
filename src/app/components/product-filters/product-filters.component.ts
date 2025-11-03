@@ -31,9 +31,9 @@ export class ProductFiltersComponent implements OnInit {
 
   ngOnInit() {
 // Cargar categorías para el dropdown
-    this.categoryService.getAll().subscribe(cats => {
-      this.categories = cats;
-    });
+  //  this.categoryService.getAll().subscribe(cats => {
+   //   this.categories = cats;
+    //});
 
 // Emitir cambios automáticamente mientras el usuario escribe (opcional, pero mejora la UX)
     this.filterForm.valueChanges.pipe(
