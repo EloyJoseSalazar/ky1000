@@ -14,10 +14,7 @@ export class CategoryService {
   constructor() { }
 
   getAll() {
-   // return this.http.get<Category[]>(`https://api.escuelajs.co/api/v1/categories`);
-  //  return this.http.get<Category[]>(`http://localhost:8080/api/categories`);
-  //  return this.http.get<Category[]>(`https://reactive-api-acma.onrender.com/api/categories`);
-    //return this.http.get<Category[]>(`https://ko4wgwo0c8gkkkw888808okk.systemash.com/api/categories`);
+
     return this.http.get<Category[]>(`${this.apiUrl}/api/categories`);
   }
 }

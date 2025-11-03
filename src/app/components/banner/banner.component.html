@@ -8,7 +8,7 @@
   <div class="banner-container">
     <div class="slides" #slidesContainer>
       @for (banner of banners(); track banner.id_banner) {
-        <div class="slide" (click)="onBannerClick(banner)">
+       <div class="slide" (click)="onBannerClick(banner)">
           <img [src]="banner.imageUrl" [alt]="banner.altText" loading="lazy">
         </div>
       }

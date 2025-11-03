@@ -99,7 +99,10 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   // Maneja el clic en un banner
   onBannerClick(banner: Banner): void {
     console.log('Banner clicked:', banner);
+
+
     switch (banner.linkType) {
+/*
       case 'CATEGORY':
         // Asume que tienes una ruta /products que acepta un queryParam 'category'
         this.router.navigate(['/products'], { queryParams: { category: banner.linkValue } });
@@ -115,6 +118,10 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
       case 'EXTERNAL':
         window.open(banner.linkValue, '_blank');
         break;
+*/
     }
+
+
   }
+
 }

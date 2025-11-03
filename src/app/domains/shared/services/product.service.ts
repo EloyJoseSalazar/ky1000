@@ -15,6 +15,7 @@ export class ProductService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/api/products`;
 
+
   private products = new BehaviorSubject<Product[]>([]);
    public products$: Observable<Product[]> = this.products.asObservable();
 

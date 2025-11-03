@@ -11,7 +11,8 @@ import {environment} from "../../../../environments/environmen";
 })
 export class BannerService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/api/v1/public/banners`; // Ajusta la URL base de tu API
+//private apiUrl = `${environment.apiUrl}/api/banners`; // Ajusta la URL base de tu API
+  private apiUrl = `${environment.apiUrl}/banners`; // Ajusta la URL base de tu API
 
   getActiveBanners(): Observable<Banner[]> {
     return this.http.get<Banner[]>(`${this.apiUrl}/active`);
