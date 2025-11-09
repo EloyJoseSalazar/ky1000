@@ -44,14 +44,16 @@ export class ProductListComponent implements OnInit {
   }
 
   handleFilters(filters: any) {
-    // 👇 PASO DE DEPURACIÓN: Muestra los filtros recibidos en la consola del navegador 👇
+
     console.log('Filtros recibidos del componente hijo:', filters);
 
     const apiFilters: { [key: string]: any } = {};
 
     for (const key in filters) {
       const value = filters[key];
-      if (value !== null && value !== undefined && value !== '') {
+
+      // 🟢 CORRECCIÓN CLAVE: Excluir la cadena 'undefined'
+      if (value !== null && value !== undefined && value !== '' && String(value).toLowerCase() !== 'undefined') {
         apiFilters[key] = value;
       }
     }
@@ -89,5 +91,6 @@ export class ProductListComponent implements OnInit {
   handleStatusChange(event: { id: number; isActive: boolean }) {
     this.productService.update(event.id.toString(), { isactive: event.isActive }).subscribe({});
   }
+
 }
 

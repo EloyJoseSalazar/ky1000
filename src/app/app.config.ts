@@ -7,10 +7,11 @@ import { provideClientHydration } from '@angular/platform-browser';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './domains/shared/interceptors/auth.interceptor';
+import { withRouterConfig } from '@angular/router';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules)),
+    provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules),withRouterConfig({ onSameUrlNavigation: 'reload' })),
     provideClientHydration(), // Simplificado si no usas event replay
 
     // --- AQUÍ ESTÁ EL CAMBIO CLAVE ---

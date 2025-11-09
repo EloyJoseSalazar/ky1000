@@ -43,7 +43,9 @@ export class HeaderComponent implements OnInit {
   ngOnInit() {
     this.categoryService.getAll().subscribe(data => {
       this.categories.set(data);
+      console.log("eliguiendo departamento ..")
     });
+
   }
 
   // --- Métodos de Auth ---
@@ -55,6 +57,7 @@ export class HeaderComponent implements OnInit {
     // CAMBIO AQUÍ: Navegamos a la ruta específica para crear un nuevo producto
     this.router.navigate(['/ingresa/producto/nuevo']); // Ajusta la ruta a tu 'Crear Producto'
     this.showUserMenu.set(false);
+
   }
 
   toggleUserMenu(): void {
@@ -96,11 +99,21 @@ export class HeaderComponent implements OnInit {
     this.cartService.updateQuantity(productId, -1);
   }
 
-  // 👇 NUEVO MÉTODO AÑADIDO 👇
+
   navigateToListaProductos() {
     this.router.navigate(['/ingresa/lista-productos']);
     this.showUserMenu.set(false); // También cierra el menú de usuario al navegar
   }
-  // 👆 FIN DEL MÉTODO AÑADIDO 👆
+  navigateToCategory(categoryId: number) {
+    this.router.navigate(
+      ['/'],
+      {
+        queryParams: { categoryId: categoryId },
+        // **Clave:** Forzar la navegación aunque la ruta sea la misma
+        queryParamsHandling: 'merge'
+      }
+    );
+    this.toggleCategoriesDropdown();
+  }
 
 }

@@ -3,6 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '@shared/services/product.service';
 
+/*
+ * NOTA DE GEMINI:
+ * Este archivo estaba 100% correcto.
+ * El método onSubmit() ya usa la clave 'files' (plural) que el backend espera.
+ * No se requieren cambios aquí.
+*/
+
 @Component({
   selector: 'app-gestion-imagenes-producto',
   templateUrl: './gestion-imagenes-producto.component.html',
@@ -92,6 +99,7 @@ export class GestionImagenesProductoComponent implements OnInit {
 
   private addImageFile(file: File): void {
     if (this.archivosSeleccionados.length >= this.maxFiles) {
+      // (No usar alert() en producción real, es solo para el ejemplo)
       alert(`¡Solo puedes seleccionar un máximo de ${this.maxFiles} imágenes!`);
       return;
     }
@@ -115,9 +123,11 @@ export class GestionImagenesProductoComponent implements OnInit {
       return;
     }
     const formData = new FormData();
+    // Esta clave 'files' (plural) es la correcta para tu backend
     for (const file of this.archivosSeleccionados) {
       formData.append('files', file, file.name || `pasted-image-${Date.now()}.png`);
     }
+
     this.productoService.subirImagenes(this.productoId, formData).subscribe({
       next: (response) => {
         alert('¡Las imágenes se guardaron correctamente!');
@@ -126,6 +136,7 @@ export class GestionImagenesProductoComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al subir las imágenes', err);
+        // El error 400 que recibes aquí es por el backend, no por este código.
         alert('Ocurrió un error al guardar las imágenes.');
       }
     });

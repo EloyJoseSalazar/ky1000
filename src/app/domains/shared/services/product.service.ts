@@ -5,8 +5,6 @@ import {BehaviorSubject, catchError, Observable, of, tap} from 'rxjs';
 import {environment} from "../../../../environments/environmen";
 import {PagedResponse} from "@shared/models/paged-response.model";
 
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -15,15 +13,12 @@ export class ProductService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/api/products`;
 
-
   private products = new BehaviorSubject<Product[]>([]);
-   public products$: Observable<Product[]> = this.products.asObservable();
+  public products$: Observable<Product[]> = this.products.asObservable();
 
   constructor() { }
 
-
   // filtro de busqueda  de la pagina listado de producto - product-table
-
   getProductsPaged(filters: any, page: number, size: number): Observable<PagedResponse<Product>> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -34,12 +29,10 @@ export class ProductService {
       params = params.append('sku', filters.sku);
     }
 
-
     // Añadir el filtro de título si existe
     if (filters.title) {
       params = params.append('title', filters.title);
     }
-
 
     if (filters.categoryId) {
       params = params.append('categoryId', filters.categoryId);
@@ -51,20 +44,6 @@ export class ProductService {
 
     return this.http.get<PagedResponse<Product>>(`${this.apiUrl}/paged`, { params });
   }
-
-  getProducts(categoryId?: string, query?: string): Observable<Product[]> {
-    let params = new HttpParams();
-    if (categoryId) {
-      params = params.set('categoryId', categoryId);
-    }
-    if (query) {
-      params = params.set('title', query);
-    }
-    return this.http.get<Product[]>(this.apiUrl, { params }).pipe(
-      tap(products => this.products.next(products))
-    );
-  }
-
 
   // 4. NUEVO MÉTODO: Para buscar por título
   searchByTitle(term: string) {
@@ -79,11 +58,12 @@ export class ProductService {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
+  // Este método estaba bien, solo pasa el FormData
   subirImagenes(productoId: number | string, formData: FormData): Observable<any> {
     // La URL será algo como: /api/productos/123/imagenes
     return this.http.post(`${this.apiUrl}/${productoId}/imagenes`, formData);
   }
-// -----------------> 25 08 2025
+
   // ... tus otros métodos como getOne(), etc. ...
 
   // CREAR un nuevo producto
@@ -101,7 +81,6 @@ export class ProductService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-
   getBySku(sku: string): Observable<Product | null> {
     return this.http.get<Product>(`${this.apiUrl}/sku/${sku}`).pipe(
       catchError(error => {
@@ -116,10 +95,21 @@ export class ProductService {
     );
   }
 
+  // ⬇️ --- MÉTODO CORREGIDO --- ⬇️
   deleteImage(productId: number | string, imageUrl: string): Observable<Product> {
-    // El endpoint espera un cuerpo con la URL de la imagen
-    const body = { imageUrl: imageUrl };
-    return this.http.delete<Product>(`${this.apiUrl}/${productId}/imagenes`, { body: body });
-  }
+    // CORRECCIÓN: El backend (ProductHandler.kt) fue modificado para esperar un Query Param.
+    // Ya no se envía un 'body' en el DELETE, lo cual causaba el '400 Bad Request'.
 
+    // 1. Usamos HttpParams para construir la consulta de forma segura.
+    // La clave 'imageUrl' debe coincidir con request.queryParam("imageUrl") en el handler
+    const params = new HttpParams()
+      .set('imageUrl', imageUrl);
+
+    // 2. Definimos la URL del endpoint
+    const url = `${this.apiUrl}/${productId}/imagenes`;
+
+    // 3. Hacemos la llamada DELETE, pasando los 'params'. No se envía 'body'.
+    return this.http.delete<Product>(url, { params: params });
+  }
+  // ⬆️ --- FIN DE LA CORRECCIÓN --- ⬆️
 }

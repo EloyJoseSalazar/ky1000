@@ -1,3 +1,6 @@
+// E:\WebStorm\KY1001\src\app\domains\shared\components\layout\layout.component.ts
+// E:\WebStorm\KY1001\src\app\domains\shared\components\layout\layout.component.ts
+
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from '@shared/components/header/header.component';
@@ -7,7 +10,8 @@ import { filter } from 'rxjs';
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent],
+  imports: [RouterOutlet, HeaderComponent], // No necesitas CommonModule ni RouterLink aquí
+  // 👇 VOLVEMOS AL TEMPLATE EN LÍNEA. NO MÁS BARRA LATERAL
   template: `
     <app-header />
     <main class="container mx-auto p-4">
@@ -24,15 +28,8 @@ export class LayoutComponent implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event) => {
-      // CADA VEZ que una navegación termina, hacemos esto:
-
-      // 1. Ponemos los valores POR DEFECTO.
+      // Tu lógica de Meta Tags está perfecta
       this.setDefaultMetaTags();
-
-      // 2. Si estás usando SSR, el TransferState ya habrá hecho su trabajo.
-      //    En el lado del cliente, esto asegura que si navegas de una página
-      //    a otra, las etiquetas se resetean antes de que el nuevo componente
-      //    las establezca.
     });
   }
 
@@ -40,7 +37,6 @@ export class LayoutComponent implements OnInit {
     this.titleService.setTitle('LA TIENDA - !Productos Increíbles!!');
     this.metaService.updateTag({ property: 'og:title', content: 'LA TIENDA -** Productos Increíbles **' });
     this.metaService.updateTag({ property: 'og:description', content: 'Descubre nuestras ofertas exclusivas.' });
-    // Usamos la URL de tu logo como imagen por defecto
     this.metaService.updateTag({ property: 'og:image', content: 'https://latienda.systemash.com/assets/logo3.png' });
   }
 }

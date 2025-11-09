@@ -1,3 +1,5 @@
+
+// E:\WebStorm\KY1001\src\app\app.routes.ts
 import { Routes } from '@angular/router';
 import { LayoutComponent } from '@shared/components/layout/layout.component';
 import { NotFoundComponent } from '@info/pages/not-found/not-found.component';

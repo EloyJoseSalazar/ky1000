@@ -12,10 +12,10 @@
   </div>
 
   <div class="form-field">
-    <label for="category">Categoría</label>
+    <label for="category">Categoríay</label>
     <select id="category" formControlName="categoryId">
-      <option value="">Todas</option>
-      <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+      <option [ngValue]="null">Todas</option>
+      <option *ngFor="let cat of categories" [ngValue]="cat.id_cate">{{ cat.name }}</option>
     </select>
   </div>
 

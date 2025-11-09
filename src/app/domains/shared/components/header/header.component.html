@@ -36,9 +36,13 @@
             <button (click)="toggleCategoriesDropdown()" class="hover:underline flex items-center">Categorías<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></button>
             @if (showCategoriesDropdown()) {
               <div (mouseleave)="toggleCategoriesDropdown()" class="absolute mt-2 w-48 bg-white rounded-md shadow-lg z-20">
-                <a routerLink="/" (click)="toggleCategoriesDropdown()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Todas</a>
-                @for(category of categories(); track category.id) {
-                  <a [routerLink]="['/']" [queryParams]="{category_id: category.id}" (click)="toggleCategoriesDropdown()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ category.name }}</a>
+                <a routerLink="/" (click)="toggleCategoriesDropdown()"
+                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Todas</a>
+                @for(category of categories(); track category.id_cate) {
+                  <a (click)="navigateToCategory(category.id_cate)"
+                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    {{ category.name }}
+                  </a>
                 }
               </div>
             }
@@ -117,8 +121,14 @@
         }
         <li class="pt-2 mt-2 border-t"><span class="font-semibold text-gray-500">CATEGORÍAS</span></li>
         <li><a routerLink="/" (click)="toggleMenu()" class="block pl-2">Todas</a></li>
-        @for(category of categories(); track category.id) {
-          <li><a [routerLink]="['/']" [queryParams]="{category_id: category.id}" (click)="toggleMenu()" class="block pl-2">{{ category.name }}</a></li>
+        @for(category of categories(); track category.id_cate) {
+          <li><a [routerLink]="['/']"
+                 [queryParams]="{categoryId: category.id_cate}"
+                 (click)="toggleMenu()"
+                 [queryParamsHandling]="'merge'"
+                 class="block pl-2">{{ category.name }}
+          </a>
+          </li>
         }
       </ul>
     </div>

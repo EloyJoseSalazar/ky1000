@@ -8,7 +8,10 @@
     </button>
   </header>
 
-  <app-product-filters (filtersApplied)="handleFilters($event)"></app-product-filters>
+  <app-product-filters
+    (filtersApplied)=" handleFilters($event)">
+
+  </app-product-filters>
 
   <ng-container *ngIf="pagedResponse$ | async as response">
 
@@ -20,7 +23,7 @@
     </app-product-table>
 
     <app-pagination
-      [currentPage]="response.page"
+      [currentPage]="response.page "
       [totalPages]="response.totalPages"
       (pageChange)="handlePageChange($event)">
     </app-pagination>
