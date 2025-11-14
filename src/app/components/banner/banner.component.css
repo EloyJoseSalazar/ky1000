@@ -7,9 +7,9 @@
 .banner-container {
   position: relative;
   width: 100%;
-  max-width: 1500px; /* Ajusta al ancho máximo de tu diseño */
-  margin: 0 ;
-  /* margin: 0 auto; */
+  max-width: 1400px; /* Ajusta al ancho máximo de tu diseño */
+  margin: 0;
+  /* margin: 0 auto; si quieres centrarlo si es menor al ancho total de pantalla */
   overflow: hidden;
   border-radius: 8px; /* Opcional: bordes redondeados */
 }
@@ -43,8 +43,8 @@
   height: 100%;
   display: block;
   /* Define un aspect-ratio para evitar saltos de layout */
-  /* PC: 4:1 o 3:1 es común */
-  aspect-ratio: 3 / 1;
+  /* PC: Reducido un 35% de altura aprox. (era 3/1, ahora 4.6/1) */
+  aspect-ratio: 4.6 / 1;
   object-fit: cover; /* Asegura que la imagen cubra el espacio */
 }
 
@@ -106,9 +106,10 @@
 /* Esqueleto de carga */
 .banner-skeleton {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px; /* Ajustado para coincidir con banner-container */
   margin: 0 auto;
-  aspect-ratio: 3 / 1;
+  /* PC: Coincide con el nuevo aspect-ratio de la imagen */
+  aspect-ratio: 4.6 / 1;
   background-color: #e0e0e0;
   border-radius: 8px;
   display: flex;
@@ -119,8 +120,9 @@
 
 /* Responsividad para Móvil */
 @media (max-width: 768px) {
-  .slide img {
-    /* En móvil, quizás prefieras un aspect-ratio más cuadrado */
+  .slide img,
+  .banner-skeleton {
+    /* En móvil mantenemos el ratio más cuadrado (16:9) */
     aspect-ratio: 16 / 9;
   }
 

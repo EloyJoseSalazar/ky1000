@@ -1,4 +1,3 @@
-
 <div class="table-container">
   <table>
     <thead>
@@ -8,6 +7,7 @@
       <th>SKU</th>
       <th>Título</th>
       <th>Categoría</th>
+      <th>Afiliado</th> <!-- <-- 1. NUEVO ENCABEZADO -->
       <th>Precio</th>
       <th>Existencia</th>
       <th colspan="2">Acciones</th>
@@ -16,7 +16,7 @@
     <tbody>
     <tr *ngFor="let product of products">
 
-      <!-- 👇 CÓDIGO RESTAURADO PARA EL CHECKBOX DE ESTADO 👇 -->
+      <!-- 1. Estado -->
       <td>
         <label class="switch">
           <input
@@ -27,7 +27,7 @@
         </label>
       </td>
 
-      <!-- 👇 CÓDIGO RESTAURADO PARA LA IMAGEN 👇 -->
+      <!-- 2. Imagen -->
       <td>
         <img
           [src]="product.images[0] || defaultImage"
@@ -42,23 +42,28 @@
       <td>{{ product.title }}</td>
       <!-- 5. Categoría -->
       <td>{{ product.category.name }}</td>
-      <!-- 6. Precio -->
+
+      <!-- 6. *** NUEVA COLUMNA DE AFILIADO *** -->
+      <td>{{ product.nombreAfiliado || 'N/A' }}</td>
+
+      <!-- 7. Precio -->
       <td>{{ product.price | currency:'USD':'symbol':'1.2-2' }}</td>
-      <!-- 7. Existencia -->
+      <!-- 8. Existencia -->
       <td>{{ product.stock }}</td>
 
-      <!-- 8. Botón Modificar (Mantenemos la corrección que ya funciona) -->
+      <!-- 9. Modificar -->
       <td>
         <button (click)="onEdit(product.sku)" class="action-btn edit-btn" title="Modificar">✏️</button>
       </td>
 
-      <!-- 9. Botón Eliminar -->
+      <!-- 10. Eliminar -->
       <td>
         <button (click)="onDelete(product.id)" class="action-btn delete-btn" title="Eliminar">🗑️</button>
       </td>
     </tr>
+    <!-- Fila de "No resultados" -->
     <tr *ngIf="products.length === 0">
-      <td colspan="9" class="no-results">No se encontraron productos.</td>
+      <td colspan="10" class="no-results">No se encontraron productos.</td> <!-- 3. Colspan ahora es 10 -->
     </tr>
     </tbody>
   </table>

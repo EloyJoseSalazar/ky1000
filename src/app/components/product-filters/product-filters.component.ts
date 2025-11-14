@@ -6,7 +6,8 @@ import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {Category} from "@shared/models/category.model";
 import {debounceTime} from "rxjs";
 import {CategoryService} from "@shared/services/category.service";
-
+import { Afiliado } from '@shared/models/afiliado.model'; // <-- 1. IMPORTAR MODELO
+import { AfiliadoService } from '@shared/services/afiliado.service'; // <-- 2. IMPORTAR SERVICIO
 
 @Component({
   selector: 'app-product-filters',
@@ -19,82 +20,85 @@ export class ProductFiltersComponent implements OnInit {
   @Output() filtersApplied = new EventEmitter<any>();
 
   private fb = inject(FormBuilder);
-// Asumo que tienes un servicio para obtener todas las categorías
   private categoryService = inject(CategoryService);
+  private afiliadoService = inject(AfiliadoService); // <-- 3. INYECTAR SERVICIO
 
   categories: Category[] = [];
+  afiliados: Afiliado[] = []; // <-- 4. AÑADIR ARRAY PARA AFILIADOS
 
   filterForm = this.fb.group({
     title: [''],
     sku: [''],
-   // categoryId: [''],
     categoryId: [null as number | null],
-    creationDate: ['']
+    afiliadoCodigo: [null as string | null], // <-- 5. AÑADIR AL FORMULARIO
+    creationDate: [''] // Este campo no parece estar en tu API, pero lo dejamos
   });
 
   ngOnInit() {
-// Cargar categorías para el dropdown
+    // Cargar categorías
     this.categoryService.getAll().subscribe(cate => {
-      // 👇 ¡NUEVA DEPURACIÓN CRÍTICA AQUÍ! 👇
-      console.log('DATOS CRUDOS DEL CATEGORY SERVICE:', cate);
-      if (cate && cate.length > 0) {
-        console.log('ID DE LA PRIMERA CATEGORÍA:', cate[0].id_cate);
-        console.log('TIPO DE ID (debe ser "number"):', typeof cate[0].id_cate);
-      }
-      // 👆 FIN DE DEPURACIÓN 👆
-
       this.categories = cate;
     });
 
-// Emitir cambios automáticamente mientras el usuario escribe (opcional, pero mejora la UX)
+    // --- 6. CARGAR AFILIADOS ---
+    this.afiliadoService.getAllAfiliados().subscribe(data => {
+      this.afiliados = data;
+    });
+    // ----------------------------
+
+    // Emitir cambios automáticamente
     this.filterForm.valueChanges.pipe(
-      debounceTime(500) // Espera 500ms después de la última pulsación de tecla
-    ).subscribe(value => {
+      debounceTime(500)
+    ).subscribe(() => {
       this.applyFilters();
     });
-
   }
 
   applyFilters() {
-    // 1. Obtenemos todos los valores del formulario
     const formValue = this.filterForm.getRawValue();
-
     const activeFilters: any = {};
 
-    // Función auxiliar para verificar si un valor es 'útil'
     const isUseful = (value: any) =>
       value !== null &&
       value !== undefined &&
-      value !== '' &&
-      value !== 'undefined'; // <-- CLAVE: Excluir la cadena "undefined"
+      value !== ''; // Un valor 0 o false es útil, pero aquí no aplica
 
-    // 2. Revisamos cada campo
     if (isUseful(formValue.title)) {
       activeFilters.title = formValue.title;
     }
-
     if (isUseful(formValue.sku)) {
       activeFilters.sku = formValue.sku;
     }
-
     if (isUseful(formValue.categoryId)) {
-      // 3. Convertimos a string antes de emitir, para estandarizar
       activeFilters.categoryId = String(formValue.categoryId);
     }
 
+    // --- 7. AÑADIR LÓGICA DE FILTRO DE AFILIADO ---
+    if (isUseful(formValue.afiliadoCodigo)) {
+      activeFilters.afiliadoCodigo = formValue.afiliadoCodigo; // Ya es string
+    }
+    // ---------------------------------------------
+
     if (isUseful(formValue.creationDate)) {
-      activeFilters.creationDate = formValue.creationDate;
+      // Tu API actual no parece filtrar por fecha, pero si lo hiciera:
+      // activeFilters.startDate = formValue.creationDate;
+      // Por ahora lo ignoramos para que no dé error
     }
 
-
-    console.log('Valor RAW de categoryId en el form:', formValue.categoryId);
     console.log('Filtros FINALES a emitir:', activeFilters);
-
     this.filtersApplied.emit(activeFilters);
   }
 
   resetFilters() {
-    this.filterForm.reset();
-    this.applyFilters(); // Emitirá un objeto vacío, mostrando todos los productos
+    // Reseteamos el formulario a sus valores iniciales nulos/vacíos
+    this.filterForm.reset({
+      title: '',
+      sku: '',
+      categoryId: null,
+      afiliadoCodigo: null, // <-- 8. RESETEAR NUEVO CAMPO
+      creationDate: ''
+    });
+    // applyFilters() se llamará automáticamente por el valueChanges
   }
 }
+

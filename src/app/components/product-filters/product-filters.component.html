@@ -1,31 +1,56 @@
-<p>product-filters works!</p>
+<!--
+  Tu HTML de filtros, ahora con el nuevo combobox
+  y el 'name' correcto en el formControlName
+-->
 <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="filters-container">
 
+  <!-- Título -->
   <div class="form-field">
     <label for="title">Título</label>
     <input id="title" type="text" formControlName="title" placeholder="Buscar por título...">
   </div>
 
+  <!-- SKU -->
   <div class="form-field">
     <label for="sku">SKU</label>
     <input id="sku" type="text" formControlName="sku" placeholder="Buscar por SKU...">
   </div>
 
-  <div class="form-field">
-    <label for="category">Categoríay</label>
+  <!-- Categoría -->
+  <div class.bind="form-field">
+    <label for="category">Categoría</label> <!-- Corregí el typo 'Categoríay' -->
     <select id="category" formControlName="categoryId">
       <option [ngValue]="null">Todas</option>
       <option *ngFor="let cat of categories" [ngValue]="cat.id_cate">{{ cat.name }}</option>
     </select>
   </div>
 
+  <!-- ****** NUEVO COMBOBOX DE AFILIADO ****** -->
+  <div class="form-field">
+    <label for="afiliado">Afiliado</label>
+    <select id="afiliado" formControlName="afiliadoCodigo">
+      <option [ngValue]="null">Todos</option>
+      <!--
+        El valor [ngValue] es el 'codigo_afiliado' (lo que espera el backend)
+        El texto (label) es el 'nombre_afiliado' (lo que ve el usuario)
+      -->
+      <option *ngFor="let afi of afiliados" [ngValue]="afi.codigo_afiliado">
+        {{ afi.nombre_afiliado }}
+      </option>
+    </select>
+  </div>
+  <!-- **************************************** -->
+
+  <!-- Fecha (Lo dejamos, aunque el filtro no lo use) -->
   <div class="form-field">
     <label for="creationDate">Fecha de Creación</label>
     <input id="creationDate" type="date" formControlName="creationDate">
   </div>
 
+  <!-- Acciones -->
   <div class="form-actions">
     <button type="submit" class="btn-primary">Buscar</button>
     <button type="button" (click)="resetFilters()" class="btn-secondary">Limpiar</button>
   </div>
+
 </form>

@@ -10,6 +10,10 @@ export interface Product {
     images: string[];
     creationAt: string;
     category: Category;
+
+  afiliadoCodigo?: string;
+  nombreAfiliado?: string;
+
     updatedAt: string;
     isactive: boolean;
 

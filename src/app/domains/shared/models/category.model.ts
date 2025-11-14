@@ -1,6 +1,7 @@
+
 export interface Category {
   id_cate: number;
-    name: string;
-    image: string;
-    sku: string;
+  name: string;
+  sku_cate: string;
+  image: string;
 }
