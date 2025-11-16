@@ -1,3 +1,4 @@
+// src/app/domains/shared/services/product.service.ts
 import {
   HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
@@ -6,11 +7,11 @@ import {BehaviorSubject, catchError, Observable, of, tap} from 'rxjs';
 import {environment} from "../../../../environments/environmen";
 import {PagedResponse} from "@shared/models/paged-response.model";
 
-// --- INICIO DE CORRECCIÓN: DTO para el body del PATCH ---
+
 export interface UpdateStatusRequest {
   isActive: boolean;
 }
-// --- FIN DE CORRECCIÓN ---
+
 
 @Injectable({
   providedIn: 'root'
@@ -49,16 +50,16 @@ export class ProductService {
       params = params.append('categoryId', filters.categoryId);
     }
 
-    // --- ¡¡¡ 3. CORRECCIÓN QUE FALTABA!!! ---
+
     if (filters.afiliadoCodigo) {
       params = params.append('afiliadoCodigo', filters.afiliadoCodigo);
     }
-    // -------------------------------------
+
 
     if (filters.startDate) {
       params = params.append('startDate', new Date(filters.startDate).toISOString());
     }
-    // ... otros filtros
+
 
     console.log('Filtros ENVIADOS a la API:', params.toString()); // <-- Buen log para depurar
     return this.http.get<PagedResponse<Product>>(`${this.apiUrl}/paged`, { params });
@@ -76,7 +77,7 @@ export class ProductService {
   }
   // --- *** FIN DEL NUEVO MÉTODO *** ---
 
-  // ... (El resto de tus métodos: searchByTitle, getOne, subirImagenes, create, etc.)
+
 
   // 4. NUEVO MÉTODO: Para buscar por título
   searchByTitle(term: string) {
@@ -118,9 +119,14 @@ export class ProductService {
   }
 
   deleteImage(productId: number | string, imageUrl: string): Observable<Product> {
-    const params = new HttpParams()
-      .set('imageUrl', imageUrl);
     const url = `${this.apiUrl}/${productId}/imagenes`;
-    return this.http.delete<Product>(url, { params: params });
+
+    // 1. Creamos el objeto 'body' que el backend espera
+    const body = { imageUrl: imageUrl };
+
+    // 2. Usamos la opción 'body' en lugar de 'params'
+    // OJO: La sintaxis para enviar un body en un DELETE es { body: ... }
+    return this.http.delete<Product>(url, { body: body }); // <-- ¡SOLUCIONADO!
   }
+
 }

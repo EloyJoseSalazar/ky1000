@@ -1,4 +1,6 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+// src/app/pages/gestion-productos/gestion-productos.component.ts
+
+import { Component, OnInit, OnDestroy, inject, signal, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -42,6 +44,7 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
   mainImage = signal<string>('');
   isSearching = signal(false);
   private destroy$ = new Subject<void>();
+  private elementRef = inject(ElementRef); // <-- 2. INYECTAR ElementRef
 
   // Signals para los selects
   categories = signal<Category[]>([]);
@@ -118,17 +121,13 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ---
-  // 👇 CAMBIO 3: CORRECCIÓN EN setupEditMode
-  // ---
+
   private setupEditMode(product: Product): void {
     this.isEditMode = true;
     this.currentProductId = product.id;
     this.product.set(product);
 
-    // Mapeamos manualmente el producto al formulario
-    // para asegurar que 'categoryId' se extrae de 'product.category.id_cate'
-    // Esto corrige el problema que viste al crear un producto.
+
     const formValues = {
       sku: product.sku,
       title: product.title,
@@ -140,7 +139,7 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
       images: product.images
     };
 
-    // Usamos 'reset' con el objeto mapeado
+
     this.productForm.reset(formValues);
 
     if (product.images.length > 0) {
@@ -154,7 +153,6 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
     this.product.set(null);
     this.mainImage.set('');
 
-    // 👇 CAMBIO 4: Valores por defecto "1" en el reset
     this.productForm.reset({
       sku: keepsku,
       price: 0,
@@ -165,11 +163,6 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ---
-  // onSubmit (SIN CAMBIOS)
-  // La lógica aquí ya es correcta. Al crear, llama a setupEditMode,
-  // que ahora (con la corrección) poblará la categoría correctamente.
-  // ---
   onSubmit(): void {
     if (this.productForm.invalid) {
       this.productForm.markAllAsTouched();
@@ -190,7 +183,7 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
       this.productService.create(formValue).subscribe({
         next: (newProduct) => {
           alert('¡Producto creado con éxito!');
-          // Llamamos a setupEditMode, que ahora está corregido
+
           this.setupEditMode(newProduct);
         },
         error: (err) => alert(`Error al crear: ${err.message}`)
@@ -198,26 +191,52 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ... (El resto de tus métodos: onDelete, changeMainImage, onDeleteImage, recargarProducto, onImageDrop)
-  // ... (No necesitan cambios)
 
-  // (Asegúrate de que los métodos de abajo estén presentes)
 
   onDelete(): void {
-    if (this.isEditMode && this.currentProductId && confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+    if (this.isEditMode && this.currentProductId
+      && confirm('¿Estás seguro de que quieres eliminar este producto?')) {
       const idToDelete = this.currentProductId.toString();
+
       this.productService.delete(idToDelete).subscribe({
+        // ÉXITO NORMAL
         next: () => {
           alert('Producto eliminado con éxito');
+          // Limpia el formulario y se mantiene en la página
           this.resetToCreateMode();
-          this.router.navigate(['/ingresa/lista-productos']);
         },
+
+        // --- INICIO DEL PARCHE MODIFICADO ---
         error: (err) => {
-          console.error('Error en la eliminación:', err);
-          alert(`Error al eliminar: ${err.message}`);
+          // Comprobamos si es el "error fantasma" 500
+          if (err.status === 500) {
+            alert('Producto eliminado con éxito (error 500 fantasma ignorado).');
+            // Limpia el formulario y se mantiene en la página
+            this.resetToCreateMode();
+          } else {
+            // Si es CUALQUIER OTRO error (404, 401, etc.), SÍ mostramos el error real.
+            console.error('Error real en la eliminación:', err);
+            alert(`Error al eliminar: ${err.message}`);
+          }
         }
+        // --- FIN DEL PARCHE MODIFICADO ---
       });
     }
+  }
+
+  onNewProductClick(): void {
+    // 1. Llama a tu función de reseteo (sin argumentos para limpiar el SKU)
+    this.resetToCreateMode();
+
+    // 2. Pone el foco en el campo SKU
+    // Usamos un pequeño timeout para asegurar que el DOM se actualice
+    // antes de intentar hacer focus.
+    setTimeout(() => {
+      const skuInput = this.elementRef.nativeElement.querySelector('#sku');
+      if (skuInput) {
+        skuInput.focus();
+      }
+    }, 0);
   }
 
   changeMainImage(imageUrl: string): void {

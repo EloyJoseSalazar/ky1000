@@ -55,6 +55,13 @@
         <button type="submit" [disabled]="productForm.invalid" class="px-6 py-2 bg-black text-white font-semibold rounded-md hover:bg-gray-800 disabled:bg-gray-400">
           {{ isEditMode ? 'Guardar Cambios' : 'Crear Producto' }}
         </button>
+
+        <button type="button"
+                (click)="onNewProductClick()" class="px-6 py-2 bg-blue-600 text-white
+font-semibold rounded-md hover:bg-blue-700">
+          Nuevo Producto
+        </button>
+
         @if (isEditMode) {
           <button type="button" (click)="onDelete()" class="px-6 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700">
             Eliminar

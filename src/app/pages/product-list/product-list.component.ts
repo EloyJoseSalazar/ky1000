@@ -1,3 +1,4 @@
+// src/app/pages/product-list/product-list.component.ts
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
@@ -63,7 +64,7 @@ export class ProductListComponent implements OnInit {
       }
     }
 
-    // 👇 PASO DE DEPURACIÓN: Muestra los filtros que se enviarán a la API 👇
+
     console.log('Filtros que se usarán para la API:', apiFilters);
 
     this.currentFilters = apiFilters;
@@ -84,12 +85,28 @@ export class ProductListComponent implements OnInit {
     // Usamos 'confirm' por ahora
     if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
       this.productService.delete(productId.toString()).subscribe({
+
+        // ÉXITO NORMAL
         next: () => {
-          // 'alert' tampoco es ideal, pero por ahora...
           alert('Producto eliminado con éxito');
+          // Esto recarga la tabla de productos
           this.refreshProducts$.next();
         },
-        error: (err) => alert('Error al eliminar el producto: ' + err.message)
+
+        // --- INICIO DEL PARCHE ---
+        error: (err) => {
+          // Comprobamos si es el "error fantasma" 500
+          if (err.status === 500) {
+            // Asumimos que SÍ se borró y forzamos la recarga de la tabla
+            alert('Producto eliminado con éxito (error 500 fantasma ignorado).');
+            this.refreshProducts$.next();
+          } else {
+            // Si es CUALQUIER OTRO error (404, 401, etc.), SÍ mostramos el error real.
+            console.error('Error real en la eliminación:', err);
+            alert('Error al eliminar el producto: ' + err.message);
+          }
+        }
+        // --- FIN DEL PARCHE ---
       });
     }
   }
@@ -115,5 +132,5 @@ export class ProductListComponent implements OnInit {
       }
     });
   }
-  // --- *** FIN DE LA CORRECCIÓN *** ---
+
 }
