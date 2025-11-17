@@ -1,28 +1,7 @@
-<!--
- Aqui Muestra  el productos Publicado en la pagina Principal Inicio
--->
-
 <div class="group border rounded-lg shadow-sm overflow-hidden flex flex-col h-full">
 
-  <!--
-    CONTENEDOR DE LA IMAGEN: La clave de la solución.
-    - `relative`: Para posicionar elementos dentro si fuera necesario.
-    - `overflow-hidden`: Oculta cualquier parte de la imagen que se salga.
-    - `aspect-square`: ¡LA MAGIA! Fuerza a este div a ser un cuadrado perfecto.
-  -->
-
-    <div class="relative overflow-hidden aspect-[4/5] md:aspect-square">
+  <div class="relative overflow-hidden aspect-[4/5] md:aspect-square">
     <a [routerLink]="['/product', product.id]">
-      <!--
-        LA IMAGEN:
-        - `w-full h-full`: Hace que la imagen intente llenar el contenedor cuadrado.
-        - `object-cover`: Le dice a la imagen que se expanda para llenar el espacio
-                         manteniendo su proporción, recortando lo que sobre.
-                         Esto evita que se estire o se aplaste.
-        - `transition-transform...`: Crea una animación suave para el efecto de zoom.
-        - `group-hover:scale-105`: Cuando el ratón está sobre el `div` con la clase `group`,
-                                   esta imagen se hará un 5% más grande (efecto zoom).
-      -->
       <img
         [src]="product.images[0]"
         [alt]="product.title"
@@ -31,32 +10,32 @@
     </a>
   </div>
 
-  <!-- Contenedor para el texto y el botón -->
   <div class="p-4 flex flex-col flex-grow">
 
-    <!-- Título y Categoría (flex-grow hace que esta sección ocupe el espacio disponible) -->
     <div class="flex-grow">
-      <h3 class="text-sm text-gray-500">{{ product.category.name }}</h3>
       <a [routerLink]="['/product', product.id]">
-         <h2 class="text-md font-semibold text-gray-800 truncate hover:text-red-500"> {{ product.title }} </h2>
 
+        <h2 class="text-md font-semibold text-gray-800 h-12 line-clamp-2 hover:text-red-500">
+          {{ product.title }}
+        </h2>
 
-     <!-- Precio y Botón de Añadir -->
-          <div class="flex justify-between items-center ">
-          <span class="text-lg font-bold text-gray-900">{{ product.price | currency }}</span>
-         <!--
-          <button
-            (click)="onAddToCart()"
-            class="bg-red-500 text-white rounded-full w-9 h-9 flex items-center justify-center hover:bg-red-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-          </button>
-          -->
-    </div>
+        <div class="flex justify-between items-center ">
 
-      </a>  <!--  </a> lo movi hasta aqui para para hacer toda la plantilla clickeable -->
+          <span class="font-bold text-gray-900">
+
+            <span class="text-xl font-medium">US$ </span>
+
+            <span class="text-2xl">{{ priceDollars }}</span>
+
+            <span class="text-sm font-medium relative top-[-0.5em]">
+              {{ priceCents }}
+            </span>
+            </span>
+        </div>
+
+      </a>
     </div>
 
   </div>
+
 </div>
