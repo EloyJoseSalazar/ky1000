@@ -34,9 +34,7 @@ export class LayoutComponent implements OnInit {
   }
 
   private setDefaultMetaTags(): void {
-    this.titleService.setTitle('LA TIENDA - !Productos Increíbles!!');
-    this.metaService.updateTag({ property: 'og:title', content: 'LA TIENDA -** Productos Increíbles **' });
-    this.metaService.updateTag({ property: 'og:description', content: 'Descubre nuestras ofertas exclusivas.' });
-    this.metaService.updateTag({ property: 'og:image', content: 'https://latienda.systemash.com/assets/logo3.png' });
+    this.titleService.setTitle('TiendaP2P - !Productos Increíbles!!');
+    this.metaService.updateTag({ property: 'og:image', content: 'https://www.TiendaP2P.com/assets/logo.png' });
   }
 }

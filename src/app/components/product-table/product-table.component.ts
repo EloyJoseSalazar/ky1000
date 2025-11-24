@@ -18,7 +18,7 @@ export class ProductTableComponent {
   @Output() remove = new EventEmitter<number>();
   @Output() statusChange = new EventEmitter<{ id: number; isActive: boolean }>();
 
-  defaultImage = '/assets/images.png';
+  defaultImage = '/assets/logo.png';
   public router = inject(Router);
 
 
