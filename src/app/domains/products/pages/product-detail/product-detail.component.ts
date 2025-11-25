@@ -69,23 +69,19 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
   private destroyRef = inject(DestroyRef); // <-- Inyección de DestroyRef
 
   ngOnInit() {
-    // CAMBIO IMPORTANTE:
-    // Nos suscribimos a route.data (Datos del Resolver) en vez de route.params
-    this.route.data.pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(data => {
-      // 'productData' debe coincidir con lo que pusimos en app.routes.ts
-      const product = data['productData'];
 
-      if (product) {
-        console.log('✅ Producto cargado desde Resolver (SSR):', product.title);
-        this.product.set(product);
-        this.initializeComponent(product);
-        // ESTO ACTUALIZA LOS META TAGS PARA WHATSAPP
-        this.updateMetaTags(product);
+    this.route.params.pipe(
+      takeUntilDestroyed(this.destroyRef) // Esto gestiona automáticamente la desuscripción cuando el componente se destruye
+    ).subscribe(params => {
+
+      this.id = params['id'];
+      if (this.id) {
+
+        this.loadProduct(this.id);
       } else {
-        console.warn('⚠️ El Resolver retornó null. Producto no encontrado o error.');
-        this.product.set(null);
+
+        console.warn('No product ID found in route parameters.');
+        this.product.set(null); // Limpiar el producto si no hay ID
       }
     });
   }
