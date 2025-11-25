@@ -1,4 +1,6 @@
 
+// src/app/domains/products/pages/product-detail/product-detail.component.ts
+
 import {
   Component,
   Input,
@@ -67,21 +69,23 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
   private destroyRef = inject(DestroyRef); // <-- Inyección de DestroyRef
 
   ngOnInit() {
-    // La suscripción a los parámetros de la ruta ahora manejará la carga inicial y los cambios.
-    // Esto asegura que cada vez que el ID en la URL cambie (incluso si el componente no se destruye),
-    // se intente cargar el producto correspondiente.
-    this.route.params.pipe(
-      takeUntilDestroyed(this.destroyRef) // Esto gestiona automáticamente la desuscripción cuando el componente se destruye
-    ).subscribe(params => {
-      // Actualiza la propiedad 'id' del componente con el valor de la URL
-      this.id = params['id'];
-      if (this.id) {
-        // Llama a la función de carga de producto con el ID actual
-        this.loadProduct(this.id);
+    // CAMBIO IMPORTANTE:
+    // Nos suscribimos a route.data (Datos del Resolver) en vez de route.params
+    this.route.data.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(data => {
+      // 'productData' debe coincidir con lo que pusimos en app.routes.ts
+      const product = data['productData'];
+
+      if (product) {
+        console.log('✅ Producto cargado desde Resolver (SSR):', product.title);
+        this.product.set(product);
+        this.initializeComponent(product);
+        // ESTO ACTUALIZA LOS META TAGS PARA WHATSAPP
+        this.updateMetaTags(product);
       } else {
-        // Opcional: Manejar el caso donde no hay ID en la URL (ej. redirigir a 404)
-        console.warn('No product ID found in route parameters.');
-        this.product.set(null); // Limpiar el producto si no hay ID
+        console.warn('⚠️ El Resolver retornó null. Producto no encontrado o error.');
+        this.product.set(null);
       }
     });
   }
