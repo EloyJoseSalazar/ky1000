@@ -1,10 +1,8 @@
-// src/app/domains/shared/services/product.resolver.ts
-
 import { inject } from '@angular/core';
 import { ResolveFn, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
-import { catchError, of } from 'rxjs'; // <--- IMPORTANTE
+import { catchError, of } from 'rxjs'; // <--- Importante: 'of' crea un observable vacío
 
 export const productResolver: ResolveFn<Product | null> = (
   route: ActivatedRouteSnapshot,
@@ -13,15 +11,15 @@ export const productResolver: ResolveFn<Product | null> = (
   const productService = inject(ProductService);
   const id = route.paramMap.get('id');
 
-  if (!id) {
-    return of(null); // Si no hay ID, retornamos null y dejamos pasar
-  }
+  // Si no hay ID, retornamos null inmediatamente para no bloquear
+  if (!id) return of(null);
 
+  // Intentamos obtener el producto
   return productService.getOne(id).pipe(
-    // IMPORTANTE: Si la API falla (404, 500), no rompemos la app.
-    // Retornamos null para que el componente cargue y maneje el error.
+    // BLOQUE DE SEGURIDAD:
     catchError((error) => {
-      console.error('🔴 Error en el Resolver:', error);
+      console.error('🔴 El Resolver falló, pero dejamos cargar la página:', error);
+      // Retornamos null para que la página cargue vacía en vez de quedarse blanca
       return of(null);
     })
   );

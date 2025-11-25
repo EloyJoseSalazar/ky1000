@@ -67,22 +67,23 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
   private destroyRef = inject(DestroyRef); // <-- Inyección de DestroyRef
 
   ngOnInit() {
-    // Suscribirse a los datos del Resolver (NO a los params de la URL)
+    // Escuchar los datos que vienen del Resolver (definido en app.routes.ts)
     this.route.data.pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(data => {
-      const product = data['productData']; // 'productData' debe coincidir con app.routes.ts
+      // 'productData' es el nombre que pusiste en el resolve: {} de las rutas
+      const product = data['productData'];
 
       if (product) {
-        console.log('🟢 Producto cargado desde Resolver:', product.title);
+        console.log('✅ Producto cargado por Resolver:', product.title);
         this.product.set(product);
         this.initializeComponent(product);
-        this.updateMetaTags(product); // Esto activa WhatsApp
+        // IMPORTANTE: Esto es lo que busca WhatsApp
+        this.updateMetaTags(product);
       } else {
-        console.error('🟠 El Resolver retornó null (Producto no encontrado o error API)');
+        console.warn('⚠️ No se recibió producto del Resolver (Posible error de API)');
+        // Aquí podrías redirigir o mostrar un mensaje de error
         this.product.set(null);
-        // Opcional: Redirigir a 404
-        // this.router.navigate(['/not-found']);
       }
     });
   }
