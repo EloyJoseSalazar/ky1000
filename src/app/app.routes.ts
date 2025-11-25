@@ -1,4 +1,3 @@
-
 // E:\WebStorm\KY1001\src\app\app.routes.ts
 import { Routes } from '@angular/router';
 import { LayoutComponent } from '@shared/components/layout/layout.component';
@@ -6,6 +5,7 @@ import { NotFoundComponent } from '@info/pages/not-found/not-found.component';
 import { LoginComponent } from './pages/login/login.component';
 import { GestionImagenesProductoComponent } from './domains/shared/gestion-imagenes-producto/gestion-imagenes-producto.component';
 import { authGuard } from './domains/shared/guards/auth.guard';
+import { productResolver } from './domains/shared/services/product.resolver'; // Asegúrate de que esta ruta sea correcta
 
 export const routes: Routes = [
   {
@@ -24,10 +24,15 @@ export const routes: Routes = [
         path: 'contacto',
         loadComponent: () => import('./domains/info/pages/contacto/contacto.component').then(m => m.ContactoComponent)
       },
+      // --- AQUI ESTA EL CAMBIO IMPORTANTE ---
       {
         path: 'product/:id',
-        loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component').then(m => m.ProductDetailComponent)
+        loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component').then(m => m.ProductDetailComponent),
+        resolve: {
+          productData: productResolver // <--- Esto obliga a esperar los datos
+        }
       },
+      // -------------------------------------
       // Rutas Protegidas
       {
         path: 'gestion-imagenes-producto',

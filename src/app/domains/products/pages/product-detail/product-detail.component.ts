@@ -67,21 +67,21 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
   private destroyRef = inject(DestroyRef); // <-- Inyección de DestroyRef
 
   ngOnInit() {
-    // La suscripción a los parámetros de la ruta ahora manejará la carga inicial y los cambios.
-    // Esto asegura que cada vez que el ID en la URL cambie (incluso si el componente no se destruye),
-    // se intente cargar el producto correspondiente.
-    this.route.params.pipe(
-      takeUntilDestroyed(this.destroyRef) // Esto gestiona automáticamente la desuscripción cuando el componente se destruye
-    ).subscribe(params => {
-      // Actualiza la propiedad 'id' del componente con el valor de la URL
-      this.id = params['id'];
-      if (this.id) {
-        // Llama a la función de carga de producto con el ID actual
-        this.loadProduct(this.id);
-      } else {
-        // Opcional: Manejar el caso donde no hay ID en la URL (ej. redirigir a 404)
-        console.warn('No product ID found in route parameters.');
-        this.product.set(null); // Limpiar el producto si no hay ID
+    // Ya no necesitas suscribirte a route.params para hacer el fetch
+    // porque el Resolver YA lo hizo antes de cargar el componente.
+
+    this.route.data.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(data => {
+      const product = data['productData']; // El nombre que pusimos en routes
+
+      if (product) {
+        this.product.set(product);
+        this.initializeComponent(product);
+
+        // IMPORTANTE: Actualizar Meta Tags INMEDIATAMENTE
+        // Como el dato ya está aquí, el servidor generará los tags correctos.
+        this.updateMetaTags(product);
       }
     });
   }
