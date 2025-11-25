@@ -1,16 +1,19 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core'; // <--- IMPORTANTE: Inject y PLATFORM_ID
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { environment } from '../../../../environments/environmen';
 import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
-import { isPlatformBrowser } from '@angular/common'; // <--- IMPORTANTE: Para saber si estamos en navegador
 
+
+import { jwtDecode } from 'jwt-decode';
+
+// Interfaz para las credenciales de login
 interface LoginRequest {
   email: string;
   password: string;
 }
 
+// Interfaz para la respuesta del backend al login
 interface LoginResponse {
   message: string;
   email: string;
@@ -24,66 +27,43 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
   private tokenKey = 'jwt_token';
 
-  // Inicializamos con valores "seguros" (false/null)
-  // El verdadero chequeo se hará en el constructor solo si es navegador
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  private currentUserSubject = new BehaviorSubject<string | null>(null);
+  private currentUserSubject = new BehaviorSubject<string | null>(this.extractUsernameFromToken());
   currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object // <--- Inyectamos el ID de la plataforma
-  ) {
-    // Solo actualizamos el estado si estamos en el NAVEGADOR
-    if (isPlatformBrowser(this.platformId)) {
-      this.updateAuthenticationStatus();
-      this.updateCurrentUser();
-    }
+  constructor(private http: HttpClient, private router: Router) {
+    this.updateAuthenticationStatus();
+    this.updateCurrentUser();
   }
 
   private hasToken(): boolean {
-    // PROTECCIÓN SSR: Si es servidor, retornamos false y no tocamos localStorage
-    if (isPlatformBrowser(this.platformId)) {
-      const token = localStorage.getItem(this.tokenKey);
-      return !!token;
-    }
-    return false;
+    const token = localStorage.getItem(this.tokenKey);
+    return !!token;
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/api/auth/login`, credentials).pipe(
       tap(response => {
         if (response && response.token) {
-          // PROTECCIÓN SSR
-          if (isPlatformBrowser(this.platformId)) {
-            localStorage.setItem(this.tokenKey, response.token);
-            this.updateAuthenticationStatus();
-            this.updateCurrentUser();
-          }
+          localStorage.setItem(this.tokenKey, response.token);
+          this.updateAuthenticationStatus();
+          this.updateCurrentUser();
         }
       })
     );
   }
 
   logout(): void {
-    // PROTECCIÓN SSR
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem(this.tokenKey);
-      this.updateAuthenticationStatus();
-      this.updateCurrentUser();
-      this.router.navigate(['/login']);
-    }
+    localStorage.removeItem(this.tokenKey);
+    this.updateAuthenticationStatus();
+    this.updateCurrentUser();
+    this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
-    // PROTECCIÓN SSR: El servidor no tiene tokens
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem(this.tokenKey);
-    }
-    return null;
+    return localStorage.getItem(this.tokenKey);
   }
 
   private updateAuthenticationStatus(): void {
@@ -95,9 +75,10 @@ export class AuthService {
   }
 
   private extractUsernameFromToken(): string | null {
-    const token = this.getToken(); // getToken ya es seguro ahora
+    const token = this.getToken();
     if (token) {
       try {
+        // Usa jwtDecode directamente aquí
         const decodedToken: any = jwtDecode(token);
         return decodedToken?.sub || decodedToken?.username || decodedToken?.email || null;
       } catch (e) {
@@ -108,4 +89,19 @@ export class AuthService {
     }
     return null;
   }
+
+  // Ahora la función decodeToken ya no es necesaria, porque llamamos a jwtDecode directamente
+  // private decodeToken(token: string): any {
+  //   try {
+  //     return jwtDecode(token);
+  //   } catch (error: unknown) {
+  //     if (error instanceof Error) {
+  //       console.error('Error al decodificar el token JWT:', error.message);
+  //     } else {
+  //       console.error('Error al decodificar el token JWT (desconocido):', error);
+  //     }
+  //     throw new Error('Token JWT inválido o corrupto.');
+  //   }
+  // }
 }
+
