@@ -28,23 +28,10 @@ export class ProductService {
     this.http = http;
   }
 
-  // --- MODIFICACIÓN CLAVE AQUÍ ---
   getOne(id: string) {
-    let url = `${this.apiUrl}/${id}`;
-
-    // 🕵️‍♂️ TRUCO COOLIFY: Si estamos en el SERVIDOR, usamos la red interna
-    if (isPlatformServer(this.platformId)) {
-      // Reemplazamos la URL pública (https://...) por la interna del Docker
-      // Asegúrate que 'backend-api' es el nombre que vimos en tu Coolify
-      const internalUrl = 'http://backend-api:8080';
-
-      // Reemplazamos solo la base de la URL (environment.apiUrl)
-      url = url.replace(environment.apiUrl, internalUrl);
-
-      console.log(`[SSR] Conectando internamente a: ${url}`);
-    }
-
-    return this.http.get<Product>(url);
+    // Simplemente llamamos a la URL normal.
+    // Si falla en el servidor, el Resolver (Paso 2) lo atrapará.
+    return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
   // ------------------------------
 
