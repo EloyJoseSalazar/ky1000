@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { ResolveFn, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
-import { catchError, of } from 'rxjs'; // <--- Importante: 'of' crea un observable vacío
+import { catchError, of, timeout } from 'rxjs'; // <--- IMPORTANTE: Agregamos 'timeout'
 
 export const productResolver: ResolveFn<Product | null> = (
   route: ActivatedRouteSnapshot,
@@ -11,15 +11,21 @@ export const productResolver: ResolveFn<Product | null> = (
   const productService = inject(ProductService);
   const id = route.paramMap.get('id');
 
-  // Si no hay ID, retornamos null inmediatamente para no bloquear
   if (!id) return of(null);
 
-  // Intentamos obtener el producto
+  console.log(`[SSR] Intentando resolver producto ID: ${id}`); // Log para depurar en servidor
+
   return productService.getOne(id).pipe(
-    // BLOQUE DE SEGURIDAD:
+    // 🔥 VÁLVULA DE SEGURIDAD:
+    // Si la API tarda más de 3000ms (3 segundos), cortamos la espera.
+    timeout(3000),
+
     catchError((error) => {
-      console.error('🔴 El Resolver falló, pero dejamos cargar la página:', error);
-      // Retornamos null para que la página cargue vacía en vez de quedarse blanca
+      // Este mensaje saldrá en los logs de Coolify si algo falla
+      console.error(`[SSR ERROR] Falló la carga del producto ${id}. Causa:`, error);
+
+      // Retornamos null para que la página cargue (aunque sea sin datos de producto)
+      // en lugar de quedarse en blanco eternamente.
       return of(null);
     })
   );
