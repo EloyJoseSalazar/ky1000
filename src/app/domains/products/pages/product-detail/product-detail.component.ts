@@ -70,18 +70,11 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
     // Ya no necesitas suscribirte a route.params para hacer el fetch
     // porque el Resolver YA lo hizo antes de cargar el componente.
 
-    this.route.data.pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(data => {
-      const product = data['productData']; // El nombre que pusimos en routes
-
+    this.route.data.subscribe(data => {
+      const product = data['productData']; // Debe coincidir con el nombre puesto en routes
       if (product) {
         this.product.set(product);
-        this.initializeComponent(product);
-
-        // IMPORTANTE: Actualizar Meta Tags INMEDIATAMENTE
-        // Como el dato ya está aquí, el servidor generará los tags correctos.
-        this.updateMetaTags(product);
+        this.updateMetaTags(product); // ¡Esto activa la imagen en WhatsApp!
       }
     });
   }
