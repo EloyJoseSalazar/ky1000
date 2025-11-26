@@ -27,9 +27,9 @@ export const routes: Routes = [
       {
         path: 'product/:id',
         loadComponent: () => import('./domains/products/pages/product-detail/product-detail.component').then(m => m.ProductDetailComponent),
-      //  resolve: {
-       //   productData: productResolver // <--- ¡RESOLVER ACTIVADO!
-       // }
+        resolve: {
+          productData: productResolver // <--- ¡RESOLVER ACTIVADO!
+        }
       },
       // -----------------------
       {
