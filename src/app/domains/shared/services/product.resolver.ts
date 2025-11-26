@@ -2,8 +2,7 @@ import { inject } from '@angular/core';
 import { ResolveFn, ActivatedRouteSnapshot } from '@angular/router';
 import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
-import { of, timer, race } from 'rxjs'; // Importamos race y timer
-import { map, catchError, take } from 'rxjs/operators';
+import { catchError, of, timeout } from 'rxjs'; // <--- Solo timeout
 
 export const productResolver: ResolveFn<Product | null> = (route: ActivatedRouteSnapshot) => {
   const productService = inject(ProductService);
@@ -11,14 +10,16 @@ export const productResolver: ResolveFn<Product | null> = (route: ActivatedRoute
 
   if (!id) return of(null);
 
-  // Ponemos a competir: La API Interna vs Un cronómetro de 0.8 segundos
-  return race(
-    productService.getOne(id),
-    timer(800).pipe(map(() => null))
-  ).pipe(
-    take(1),
-    catchError((err) => {
-      console.error('🔴 Error en Resolver:', err);
+  console.log('[SSR] Resolver iniciado para ID:', id);
+
+  return productService.getOne(id).pipe(
+    // ⏱️ CORTAMOS A LOS 1000ms (1 segundo)
+    timeout(1000),
+
+    catchError((error) => {
+      // Si entra aquí, es que saltó el timeout o falló la red.
+      // DEVOLVEMOS NULL para que la página cargue sí o sí.
+      console.error('⚠️ [SSR FALLBACK] El servidor falló/tardó. Cargando en cliente...', error);
       return of(null);
     })
   );

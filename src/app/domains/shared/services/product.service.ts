@@ -27,23 +27,25 @@ export class ProductService {
     this.http = http;
   }
 
-  // --- CONFIGURACIÓN FINAL ---
+// ... imports
+// (Asegúrate de tener isPlatformServer e Inject)
+
   getOne(id: string) {
+    // 1. Por defecto: URL Pública
     let url = `${this.apiUrl}/${id}`;
 
-    // Si estamos en el SERVIDOR (SSR), usamos la red interna que confirmamos con CURL.
-    // Al tener 'withFetch', esto volará 🚀
+    // 2. Si es SERVIDOR: ¡MARTILLAZO! 🔨
     if (isPlatformServer(this.platformId)) {
-      const internalUrl = 'http://backend-api:8080';
-      url = url.replace(environment.apiUrl, internalUrl);
-      console.log(`[SSR] Usando red interna (backend-api): ${url}`);
+      // Escribimos la dirección interna DIRECTAMENTE.
+      // Sin replace, sin variables. Solo la verdad.
+      // Confirmado por tu curl: http://backend-api:8080
+      url = `http://backend-api:8080/api/products/${id}`;
+
+      console.log(`[SSR FORCE] URL Interna Forzada: ${url}`);
     }
 
     return this.http.get<Product>(url);
   }
-  // ---------------------------
-
-  // ... (Mantén el resto de tus métodos igual) ...
 
   getProductsPaged(filters: any, page: number, size: number, includeInactive: boolean = false): Observable<PagedResponse<Product>> {
     let params = new HttpParams().set('page', page.toString()).set('size', size.toString()).set('includeInactive', includeInactive.toString());
