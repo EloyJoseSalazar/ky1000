@@ -4,7 +4,7 @@ import { Product } from '../models/product.model';
 import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../../environments/environmen';
 import { PagedResponse } from "@shared/models/paged-response.model";
-import { isPlatformServer } from '@angular/common';
+import { isPlatformServer } from '@angular/common'; // <--- IMPORTANTE
 
 export interface UpdateStatusRequest {
   isActive: boolean;
@@ -16,7 +16,9 @@ export interface UpdateStatusRequest {
 export class ProductService {
 
   private http: HttpClient;
-  private apiUrl = `${environment.apiUrl}/api/products`; // URL Pública
+  // URL Pública (para los usuarios en su casa)
+  private apiUrl = `${environment.apiUrl}/api/products`;
+
   private products = new BehaviorSubject<Product[]>([]);
   public products$: Observable<Product[]> = this.products.asObservable();
 
@@ -27,26 +29,28 @@ export class ProductService {
     this.http = http;
   }
 
-// ... imports
-// (Asegúrate de tener isPlatformServer e Inject)
-
+  // --- MODIFICACIÓN CLAVE ---
   getOne(id: string) {
-    // 1. Por defecto: URL Pública
     let url = `${this.apiUrl}/${id}`;
 
-    // 2. Si es SERVIDOR: ¡MARTILLAZO! 🔨
+    // Si estamos en el SERVIDOR (Coolify/Docker), usamos la red interna.
     if (isPlatformServer(this.platformId)) {
-      // Escribimos la dirección interna DIRECTAMENTE.
-      // Sin replace, sin variables. Solo la verdad.
-      // Confirmado por tu curl: http://backend-api:8080
-      url = `http://backend-api:8080/api/products/${id}`;
 
-      console.log(`[SSR FORCE] URL Interna Forzada: ${url}`);
+      // Nombre interno que confirmamos con tu prueba de CURL
+      const internalUrl = 'http://backend-api:8080';
+      //const ipUrl = 'http://10.0.1.12:8080';
+
+      // Reemplazamos la parte pública (https://...) por la interna
+      url = url.replace(environment.apiUrl, internalUrl);
+
+      console.log(`[SSR] Usando Autopista Interna: ${url}`);
     }
 
     return this.http.get<Product>(url);
   }
+  // -------------------------
 
+  // ... (El resto de métodos déjalos igual: getProductsPaged, etc.)
   getProductsPaged(filters: any, page: number, size: number, includeInactive: boolean = false): Observable<PagedResponse<Product>> {
     let params = new HttpParams().set('page', page.toString()).set('size', size.toString()).set('includeInactive', includeInactive.toString());
     if (filters.sku) params = params.append('sku', filters.sku);

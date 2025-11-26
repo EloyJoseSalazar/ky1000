@@ -14,7 +14,7 @@ export const productResolver: ResolveFn<Product | null> = (route: ActivatedRoute
 
   return productService.getOne(id).pipe(
     // ⏱️ CORTAMOS A LOS 1000ms (1 segundo)
-    timeout(1000),
+    timeout(2000),
 
     catchError((error) => {
       // Si entra aquí, es que saltó el timeout o falló la red.
