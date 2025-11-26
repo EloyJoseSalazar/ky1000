@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, inject, PLATFORM_ID, Inject } from '@angular/core'; // <--- IMPORTANTE: Inject, PLATFORM_ID
+import { Injectable, inject, PLATFORM_ID, Inject } from '@angular/core';
 import { Product } from '../models/product.model';
 import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../../environments/environmen';
@@ -15,7 +15,6 @@ export interface UpdateStatusRequest {
 })
 export class ProductService {
 
-  // Cambiamos la inyección para poder usar el Constructor clásico y el PlatformID
   private http: HttpClient;
   private apiUrl = `${environment.apiUrl}/api/products`;
   private products = new BehaviorSubject<Product[]>([]);
@@ -23,19 +22,34 @@ export class ProductService {
 
   constructor(
     http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object // <--- Inyectamos el ID de plataforma
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.http = http;
   }
 
+  // --- SOLUCIÓN DE PANTALLA NEGRA ---
   getOne(id: string) {
-    // Simplemente llamamos a la URL normal.
-    // Si falla en el servidor, el Resolver (Paso 2) lo atrapará.
-    return this.http.get<Product>(`${this.apiUrl}/${id}`);
-  }
-  // ------------------------------
+    let url = `${this.apiUrl}/${id}`;
 
-  // ... (El resto de tus métodos déjalos IGUAL, no cambian) ...
+    // Si estamos en el SERVIDOR (SSR), usamos la red interna de Docker.
+    // Esto evita que la petición salga a internet y se cuelgue.
+    if (isPlatformServer(this.platformId)) {
+
+      // 'backend-api' es el nombre que vimos en tu Coolify + puerto 8080
+      const internalUrl = 'http://backend-api:8080';
+
+      // Reemplazamos la parte pública de la URL por la interna
+      // Ejemplo: https://tiendap2p... -> http://backend-api:8080...
+      url = url.replace(environment.apiUrl, internalUrl);
+
+      console.log(`[SSR] Usando red interna (Rápida): ${url}`);
+    }
+
+    return this.http.get<Product>(url);
+  }
+  // ----------------------------------
+
+  // ... El resto de métodos se mantienen igual ...
 
   getProductsPaged(
     filters: any,
