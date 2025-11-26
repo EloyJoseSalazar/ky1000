@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { ResolveFn, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
-import { catchError, of, timeout } from 'rxjs';
+import { catchError, of, timeout } from 'rxjs'; // <--- Importar 'timeout'
 
 export const productResolver: ResolveFn<Product | null> = (
   route: ActivatedRouteSnapshot,
@@ -13,15 +13,15 @@ export const productResolver: ResolveFn<Product | null> = (
 
   if (!id) return of(null);
 
-  // Intentamos obtener el producto
   return productService.getOne(id).pipe(
-    // 🛡️ SEGURIDAD: Si la API tarda más de 3 segundos, cortamos para no colgar la página.
-    timeout(1500),
+    // 🛡️ SEGURIDAD:
+    // Esperamos máximo 2 segundos. Si tarda más, soltamos la página.
+    timeout(2000),
+
     catchError((error) => {
-      console.error('🔴 Error o Timeout en Resolver (SSR):', error);
-      // Retornamos null para que la página cargue vacía en vez de pantalla blanca
+      console.error('🔴 SSR Error o Timeout:', error);
+      // Retornamos null para que la página cargue vacía (carga cliente) en vez de colgarse
       return of(null);
     })
   );
 };
-
