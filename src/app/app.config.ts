@@ -1,4 +1,4 @@
-// src/app/app.config.ts (CORREGIDO)
+// src/app/app.config.ts
 
 import { ApplicationConfig } from '@angular/core';
 import { PreloadAllModules, provideRouter, withComponentInputBinding, withPreloading } from '@angular/router';
@@ -14,8 +14,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules),withRouterConfig({ onSameUrlNavigation: 'reload' })),
     provideClientHydration(), // Simplificado si no usas event replay
 
-    // --- AQUÍ ESTÁ EL CAMBIO CLAVE ---
-    // Una sola llamada a provideHttpClient con todas las características
     provideHttpClient(
       withFetch(),
       withInterceptors([

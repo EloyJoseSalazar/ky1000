@@ -4,7 +4,7 @@ import { Product } from '../models/product.model';
 import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../../environments/environmen';
 import { PagedResponse } from "@shared/models/paged-response.model";
-import { isPlatformServer } from '@angular/common'; // <--- IMPORTANTE
+import { isPlatformServer } from '@angular/common';
 
 export interface UpdateStatusRequest {
   isActive: boolean;
@@ -16,9 +16,7 @@ export interface UpdateStatusRequest {
 export class ProductService {
 
   private http: HttpClient;
-  // Esta variable tiene la URL pública (https://...)
-  private apiUrl = `${environment.apiUrl}/api/products`;
-
+  private apiUrl = `${environment.apiUrl}/api/products`; // URL Pública
   private products = new BehaviorSubject<Product[]>([]);
   public products$: Observable<Product[]> = this.products.asObservable();
 
@@ -29,26 +27,23 @@ export class ProductService {
     this.http = http;
   }
 
-  // --- CONFIGURACIÓN MAESTRA ---
+  // --- CONFIGURACIÓN FINAL ---
   getOne(id: string) {
     let url = `${this.apiUrl}/${id}`;
 
-    // Si estamos en el SERVIDOR (SSR), usamos la ruta que confirmaste con CURL.
+    // Si estamos en el SERVIDOR (SSR), usamos la red interna que confirmamos con CURL.
+    // Al tener 'withFetch', esto volará 🚀
     if (isPlatformServer(this.platformId)) {
-
-      // Nombre interno confirmado por ti:
       const internalUrl = 'http://backend-api:8080';
-
-      // Cambiamos la URL pública por la interna
-      // Angular llamará a: http://backend-api:8080/api/products/246
       url = url.replace(environment.apiUrl, internalUrl);
-
-      console.log(`[SSR] Usando red interna confirmada: ${url}`);
+      console.log(`[SSR] Usando red interna (backend-api): ${url}`);
     }
 
     return this.http.get<Product>(url);
   }
+  // ---------------------------
 
+  // ... (Mantén el resto de tus métodos igual) ...
 
   getProductsPaged(filters: any, page: number, size: number, includeInactive: boolean = false): Observable<PagedResponse<Product>> {
     let params = new HttpParams().set('page', page.toString()).set('size', size.toString()).set('includeInactive', includeInactive.toString());
@@ -96,6 +91,4 @@ export class ProductService {
     const body = { imageUrl: imageUrl };
     return this.http.delete<Product>(url, { body: body });
   }
-
-
 }
