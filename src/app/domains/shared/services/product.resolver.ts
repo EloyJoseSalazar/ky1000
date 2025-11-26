@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { ResolveFn, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
-import { catchError, of, timeout } from 'rxjs'; // <--- Importar 'timeout'
+import { catchError, of, timeout } from 'rxjs';
 
 export const productResolver: ResolveFn<Product | null> = (
   route: ActivatedRouteSnapshot,
@@ -14,13 +14,10 @@ export const productResolver: ResolveFn<Product | null> = (
   if (!id) return of(null);
 
   return productService.getOne(id).pipe(
-    // 🛡️ SEGURIDAD:
-    // Esperamos máximo 2 segundos. Si tarda más, soltamos la página.
+    // Como la red interna es rápida, 2 segundos es más que suficiente.
     timeout(2000),
-
     catchError((error) => {
-      console.error('🔴 SSR Error o Timeout:', error);
-      // Retornamos null para que la página cargue vacía (carga cliente) en vez de colgarse
+      console.error('🔴 Error SSR:', error);
       return of(null);
     })
   );

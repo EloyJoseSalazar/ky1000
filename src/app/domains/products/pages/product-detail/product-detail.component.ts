@@ -69,29 +69,20 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
   private destroyRef = inject(DestroyRef); // <-- Inyección de DestroyRef
 
   ngOnInit() {
-    // CAMBIO CLAVE: Escuchamos 'data' (del Resolver) en vez de 'params'
     this.route.data.pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(data => {
-      // 'productData' es el nombre que le dimos en app.routes.ts
       const product = data['productData'];
 
       if (product) {
-        // 1. Asignamos el producto que ya trajo el servidor
+        // ¡ÉXITO! Datos traídos por la red interna
         this.product.set(product);
-
-        // 2. Inicializamos la galería
         this.initializeComponent(product);
-
-        // 3. ¡IMPORTANTE! Esto inyecta la foto para WhatsApp
         this.updateMetaTags(product);
       } else {
-        // Fallback: Si el resolver falló (por timeout o error),
-        // intentamos buscarlo manualmente por ID como plan B
+        // Fallback por si acaso
         const idFromParams = this.route.snapshot.paramMap.get('id');
-        if (idFromParams) {
-          this.loadProduct(idFromParams);
-        }
+        if (idFromParams) this.loadProduct(idFromParams);
       }
     });
   }
