@@ -37,8 +37,8 @@ export class ProductService {
     if (isPlatformServer(this.platformId)) {
 
       // Nombre interno que confirmamos con tu prueba de CURL
-      const internalUrl = 'http://backend-api:8080';
-      //const ipUrl = 'http://10.0.1.12:8080';
+      //const internalUrl = 'http://backend-api:8080';
+      const internalUrl = 'http://10.0.1.12:8080';
 
       // Reemplazamos la parte pública (https://...) por la interna
       url = url.replace(environment.apiUrl, internalUrl);
