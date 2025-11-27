@@ -13,14 +13,14 @@ export const productResolver: ResolveFn<Product | null> = (route: ActivatedRoute
 
   if (!id) return of(null);
 
-  // 🕵️‍♂️ ESTRATEGIA NUCLEAR: FETCH NATIVO
+// 🕵️‍♂️ ESTRATEGIA NUCLEAR V2: NOMBRE DE RED
   if (isPlatformServer(platformId)) {
-    console.log(`[SSR NUCLEAR] Usando fetch nativo para ID: ${id}`);
+    console.log(`[SSR] Intentando fetch interno...`);
 
-    // Usamos la URL interna (backend-api)
+    // CAMBIO: Usamos el nombre 'backend-api' en lugar de la IP fija.
+    // Docker se encarga de encontrar la IP nueva automáticamente.
     const url = `http://backend-api:8080/api/products/${id}`;
 
-    // 1. Creamos el Observable del fetch (la petición real)
     const fetch$ = from(
       fetch(url)
         .then(response => {
@@ -28,24 +28,24 @@ export const productResolver: ResolveFn<Product | null> = (route: ActivatedRoute
           return response.json();
         })
         .then(data => {
-          console.log('✅ [SSR] Datos obtenidos con éxito vía fetch');
+          console.log('✅ [SSR] ¡ÉXITO! Producto encontrado vía backend-api');
           return data as Product;
         })
     );
 
-    // 2. AQUI ESTÁ EL CAMBIO DEL TIMER:
-    // Ponemos a competir (race) la petición 'fetch$' contra un 'timer' de 3 segundos.
+    // Damos 3 segundos de gracia (Spring Boot a veces es lento en la primera carga)
     return race(
       fetch$,
       timer(3000).pipe(map(() => {
-        console.warn('⚠️ [SSR] Timeout de 3s alcanzado. Soltando página.');
-        return null; // Si gana el timer, devolvemos null
+        console.warn('⚠️ [SSR] Timeout. Backend tardó mucho, soltamos página.');
+        return null;
       }))
     ).pipe(
-      take(1), // Tomamos el primero que termine
+      take(1),
       catchError(err => {
-        console.error('❌ [SSR] Falló fetch nativo o error general:', err);
-        return of(null); // Si falla algo, devolvemos null para no colgar
+        // IMPORTANTE: Este error saldrá en los logs de Coolify
+        console.error('❌ [SSR ERROR] Falló conexión interna:', err);
+        return of(null);
       })
     );
   }
