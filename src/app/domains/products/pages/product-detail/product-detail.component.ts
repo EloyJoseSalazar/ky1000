@@ -184,8 +184,8 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
       const url = window.location.href;
       const message = `${title}\n\n¡Échale un vistazo aquí! 👇\n${url}`;
       const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
-      window.open(whatsappUrl, '_blank');
+     //  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+     // window.open(whatsappUrl, '_blank');
     }
   }
 
