@@ -15,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(), // Simplificado si no usas event replay
 
     provideHttpClient(
-      withFetch(),
+   //   withFetch(),
       withInterceptors([
         authInterceptor
       ])

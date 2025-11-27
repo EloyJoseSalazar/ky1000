@@ -29,28 +29,23 @@ export class ProductService {
     this.http = http;
   }
 
-  // --- MODIFICACIÓN CLAVE ---
   getOne(id: string) {
+    // 1. URL por defecto (Pública)
     let url = `${this.apiUrl}/${id}`;
 
-    // Si estamos en el SERVIDOR (Coolify/Docker), usamos la red interna.
+    // 2. Si es SERVIDOR: Usamos la IP que nos dio el CURL.
     if (isPlatformServer(this.platformId)) {
+      // 🔨 HARDCODE PURO Y DURO:
+      // Escribimos la URL completa manual. Sin trucos.
+      // Así nos aseguramos de que sea EXACTAMENTE lo que funcionó en el curl.
+      url = `http://10.0.1.12:8080/api/products/${id}`;
 
-      // Nombre interno que confirmamos con tu prueba de CURL
-      //const internalUrl = 'http://backend-api:8080';
-      const internalUrl = 'http://10.0.1.12:8080';
-
-      // Reemplazamos la parte pública (https://...) por la interna
-      url = url.replace(environment.apiUrl, internalUrl);
-
-      console.log(`[SSR] Usando Autopista Interna: ${url}`);
+      console.log(`[SSR FINAL] Conectando a IP: ${url}`);
     }
 
     return this.http.get<Product>(url);
   }
-  // -------------------------
 
-  // ... (El resto de métodos déjalos igual: getProductsPaged, etc.)
   getProductsPaged(filters: any, page: number, size: number, includeInactive: boolean = false): Observable<PagedResponse<Product>> {
     let params = new HttpParams().set('page', page.toString()).set('size', size.toString()).set('includeInactive', includeInactive.toString());
     if (filters.sku) params = params.append('sku', filters.sku);
