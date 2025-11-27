@@ -4,20 +4,21 @@ import { Product } from '../models/product.model';
 import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../../environments/environmen';
 import { PagedResponse } from "@shared/models/paged-response.model";
-import { isPlatformServer } from '@angular/common'; // <--- IMPORTANTE
+import { isPlatformServer } from '@angular/common';
 
 export interface UpdateStatusRequest {
   isActive: boolean;
 }
 
-
 @Injectable({
-  providedIn: 'root'})
+  providedIn: 'root'
+})
 export class ProductService {
 
   private http: HttpClient;
-  // URL Pública (para los usuarios en su casa)
-  private apiUrl = `${environment.apiUrl}/api/products`;
+
+  // 1. Definimos la variable, pero su valor final se decide en el constructor
+  private apiUrl: string;
 
   private products = new BehaviorSubject<Product[]>([]);
   public products$: Observable<Product[]> = this.products.asObservable();
@@ -27,7 +28,19 @@ export class ProductService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.http = http;
+
+    // 2. LÓGICA MAESTRA: Decidimos la URL al iniciar el servicio
+    if (isPlatformServer(this.platformId)) {
+      // 🏢 Servidor (Docker): Usamos la red interna CONFIRMADA
+      console.log('[ProductService] Modo SSR: Usando backend-api interna');
+      this.apiUrl = 'http://backend-api:8080/api/products';
+    } else {
+      // 🏠 Cliente (Navegador): Usamos la URL pública del environment
+      this.apiUrl = `${environment.apiUrl}/api/products`;
+    }
   }
+
+  // --- MÉTODOS (Ya no necesitan lógica especial, usan this.apiUrl) ---
 
   getOne(id: string) {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
@@ -35,13 +48,17 @@ export class ProductService {
 
   getProductsPaged(filters: any, page: number, size: number, includeInactive: boolean = false): Observable<PagedResponse<Product>> {
     let params = new HttpParams().set('page', page.toString()).set('size', size.toString()).set('includeInactive', includeInactive.toString());
+
     if (filters.sku) params = params.append('sku', filters.sku);
     if (filters.title) params = params.append('title', filters.title);
     if (filters.categoryId) params = params.append('categoryId', filters.categoryId);
     if (filters.afiliadoCodigo) params = params.append('afiliadoCodigo', filters.afiliadoCodigo);
     if (filters.startDate) params = params.append('startDate', new Date(filters.startDate).toISOString());
+
     return this.http.get<PagedResponse<Product>>(`${this.apiUrl}/paged`, { params });
   }
+
+  // ... Copia el resto de tus métodos igual que siempre ...
 
   updateStatus(id: string, isActive: boolean): Observable<Product> {
     const url = `${this.apiUrl}/${id}/status`;
