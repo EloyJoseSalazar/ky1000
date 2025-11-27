@@ -1,6 +1,5 @@
-// src/app/components/banner/banner.component.ts
-import { Component, inject, OnDestroy, OnInit, signal, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit, signal, ElementRef, ViewChild, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common'; // <--- IMPORTANTE
 import { Router } from '@angular/router';
 import { BannerService } from '../../domains/shared/services/banner.service';
 import { Banner } from '../../domains/shared/models/banner.model';
@@ -19,6 +18,9 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   private bannerService = inject(BannerService);
   private router = inject(Router);
 
+  // INYECCIÓN MANUAL DE PLATFORM_ID (Necesaria para saber si es navegador)
+  private platformId = inject(PLATFORM_ID);
+
   banners = signal<Banner[]>([]);
   isLoading = signal<boolean>(true);
   currentIndex = signal<number>(0);
@@ -31,11 +33,18 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.startAutoScroll();
+    // 🛡️ SOLUCIÓN: Solo iniciamos el movimiento si estamos en el NAVEGADOR.
+    // El servidor se queda quieto.
+    if (isPlatformBrowser(this.platformId)) {
+      this.startAutoScroll();
+    }
   }
 
   ngOnDestroy(): void {
-    this.stopAutoScroll(); // Muy importante para evitar memory leaks
+    // También protegemos esto por buenas prácticas
+    if (isPlatformBrowser(this.platformId)) {
+      this.stopAutoScroll();
+    }
   }
 
   private loadBanners(): void {
@@ -49,7 +58,10 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private startAutoScroll(): void {
-    this.stopAutoScroll(); // Limpia cualquier intervalo anterior
+    // Doble chequeo de seguridad
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    this.stopAutoScroll();
     this.intervalId = setInterval(() => {
       this.scrollNext();
     }, this.SCROLL_INTERVAL);
@@ -62,12 +74,17 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   scrollNext(): void {
+    // Protección extra: Si por alguna razón se llama en el servidor, no hacemos nada
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    if (!this.slidesContainer) return; // Validación extra
+
     const container = this.slidesContainer.nativeElement;
     const slideWidth = container.clientWidth;
     let newIndex = this.currentIndex() + 1;
 
     if (newIndex >= this.banners().length) {
-      newIndex = 0; // Vuelve al inicio
+      newIndex = 0;
       container.scrollTo({ left: 0, behavior: 'smooth' });
     } else {
       container.scrollBy({ left: slideWidth, behavior: 'smooth' });
@@ -76,12 +93,15 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   scrollPrev(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (!this.slidesContainer) return;
+
     const container = this.slidesContainer.nativeElement;
     const slideWidth = container.clientWidth;
     let newIndex = this.currentIndex() - 1;
 
     if (newIndex < 0) {
-      newIndex = this.banners().length - 1; // Va al final
+      newIndex = this.banners().length - 1;
       container.scrollTo({ left: slideWidth * newIndex, behavior: 'smooth' });
     } else {
       container.scrollBy({ left: -slideWidth, behavior: 'smooth' });
@@ -89,39 +109,20 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentIndex.set(newIndex);
   }
 
-  // Reinicia el auto-scroll si el usuario navega manualmente
   manualScroll(direction: 'prev' | 'next'): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     this.stopAutoScroll();
     direction === 'prev' ? this.scrollPrev() : this.scrollNext();
     this.startAutoScroll();
   }
 
-  // Maneja el clic en un banner
   onBannerClick(banner: Banner): void {
     console.log('Banner clicked:', banner);
 
-
+    // Tu lógica de navegación...
     switch (banner.linkType) {
-/*
-      case 'CATEGORY':
-        // Asume que tienes una ruta /products que acepta un queryParam 'category'
-        this.router.navigate(['/products'], { queryParams: { category: banner.linkValue } });
-        break;
-      case 'PRODUCT':
-        // Asume que tu ruta de detalle es /product/:id
-        this.router.navigate(['/product', banner.linkValue]);
-        break;
-      case 'QUERY':
-        // Asume que la misma página de productos puede filtrar por búsqueda
-        this.router.navigate(['/products'], { queryParams: { search: banner.linkValue } });
-        break;
-      case 'EXTERNAL':
-        window.open(banner.linkValue, '_blank');
-        break;
-*/
+      // ...
     }
-
-
   }
-
 }
