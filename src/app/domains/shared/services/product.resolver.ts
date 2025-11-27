@@ -2,8 +2,9 @@ import { inject, PLATFORM_ID } from '@angular/core';
 import { ResolveFn, ActivatedRouteSnapshot } from '@angular/router';
 import { ProductService } from '@shared/services/product.service';
 import { Product } from '@shared/models/product.model';
-import { of, from } from 'rxjs';
+import { of, from, race, timer } from 'rxjs'; // <--- AGREGAR 'race' y 'timer'
 import { isPlatformServer } from '@angular/common';
+import { map, catchError, take } from 'rxjs/operators'; // <--- AGREGAR estos operadores
 
 export const productResolver: ResolveFn<Product | null> = (route: ActivatedRouteSnapshot) => {
   const productService = inject(ProductService);
@@ -16,11 +17,11 @@ export const productResolver: ResolveFn<Product | null> = (route: ActivatedRoute
   if (isPlatformServer(platformId)) {
     console.log(`[SSR NUCLEAR] Usando fetch nativo para ID: ${id}`);
 
-    // Usamos la IP DIRECTA que funcionó en tu curl + el puerto
-    const url = `http://10.0.1.12:8080/api/products/${id}`;
+    // Usamos la URL interna (backend-api)
+    const url = `http://backend-api:8080/api/products/${id}`;
 
-    // Convertimos la promesa de fetch en un Observable
-    return from(
+    // 1. Creamos el Observable del fetch (la petición real)
+    const fetch$ = from(
       fetch(url)
         .then(response => {
           if (!response.ok) throw new Error(`Fetch status: ${response.status}`);
@@ -30,10 +31,22 @@ export const productResolver: ResolveFn<Product | null> = (route: ActivatedRoute
           console.log('✅ [SSR] Datos obtenidos con éxito vía fetch');
           return data as Product;
         })
-        .catch(err => {
-          console.error('❌ [SSR] Falló fetch nativo:', err);
-          return null;
-        })
+    );
+
+    // 2. AQUI ESTÁ EL CAMBIO DEL TIMER:
+    // Ponemos a competir (race) la petición 'fetch$' contra un 'timer' de 3 segundos.
+    return race(
+      fetch$,
+      timer(3000).pipe(map(() => {
+        console.warn('⚠️ [SSR] Timeout de 3s alcanzado. Soltando página.');
+        return null; // Si gana el timer, devolvemos null
+      }))
+    ).pipe(
+      take(1), // Tomamos el primero que termine
+      catchError(err => {
+        console.error('❌ [SSR] Falló fetch nativo o error general:', err);
+        return of(null); // Si falla algo, devolvemos null para no colgar
+      })
     );
   }
 
