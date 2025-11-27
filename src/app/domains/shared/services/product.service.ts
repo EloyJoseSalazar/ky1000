@@ -10,9 +10,9 @@ export interface UpdateStatusRequest {
   isActive: boolean;
 }
 
+
 @Injectable({
-  providedIn: 'root'
-})
+  providedIn: 'root'})
 export class ProductService {
 
   private http: HttpClient;
@@ -30,20 +30,7 @@ export class ProductService {
   }
 
   getOne(id: string) {
-    // 1. URL por defecto (Pública)
-    let url = `${this.apiUrl}/${id}`;
-
-    // 2. Si es SERVIDOR: Usamos la IP que nos dio el CURL.
-    if (isPlatformServer(this.platformId)) {
-      // 🔨 HARDCODE PURO Y DURO:
-      // Escribimos la URL completa manual. Sin trucos.
-      // Así nos aseguramos de que sea EXACTAMENTE lo que funcionó en el curl.
-      url = `http://10.0.1.12:8080/api/products/${id}`;
-
-      console.log(`[SSR FINAL] Conectando a IP: ${url}`);
-    }
-
-    return this.http.get<Product>(url);
+    return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
   getProductsPaged(filters: any, page: number, size: number, includeInactive: boolean = false): Observable<PagedResponse<Product>> {
