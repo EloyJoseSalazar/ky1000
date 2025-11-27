@@ -36,6 +36,7 @@ const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
   standalone: true,
   imports: [CommonModule],
   templateUrl: './product-detail.component.html',
+  styleUrl: './product-detail.component.css'
 })
 export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   // --- PROPIEDADES EXISTENTES ---
