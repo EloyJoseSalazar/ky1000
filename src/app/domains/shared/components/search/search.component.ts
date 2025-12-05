@@ -1,4 +1,4 @@
-
+//app/domains/shared/components/search/search.component.ts
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 

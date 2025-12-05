@@ -1,8 +1,6 @@
-// src/app/pages/gestion-productos/gestion-productos.component.ts
-
 import { Component, OnInit, OnDestroy, inject, signal, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms'; // <-- AGREGADO FormsModule
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil, take } from 'rxjs';
 
@@ -12,19 +10,18 @@ import { CategoryService } from '@shared/services/category.service';
 import { AfiliadoService } from '@shared/services/afiliado.service';
 
 // Modelos
-import { Product } from '@shared/models/product.model';
+import { Product, InterestItem } from '@shared/models/product.model'; // <-- AGREGADO InterestItem
 import { Category } from '@shared/models/category.model';
 import { Afiliado } from '@shared/models/afiliado.model';
 
 // Componentes
 import { GestionImagenesProductoComponent } from '@shared/gestion-imagenes-producto/gestion-imagenes-producto.component';
-import { DragDropModule } from '@angular/cdk/drag-drop';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-gestion-productos',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, GestionImagenesProductoComponent, DragDropModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, GestionImagenesProductoComponent, DragDropModule], // <-- AGREGADO FormsModule
   templateUrl: './gestion-productos.component.html',
 })
 export class GestionProductosComponent implements OnInit, OnDestroy {
@@ -35,6 +32,7 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
   private productService = inject(ProductService);
   private categoryService = inject(CategoryService);
   private afiliadoService = inject(AfiliadoService);
+  private elementRef = inject(ElementRef);
 
   // Propiedades
   productForm: FormGroup;
@@ -44,11 +42,15 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
   mainImage = signal<string>('');
   isSearching = signal(false);
   private destroy$ = new Subject<void>();
-  private elementRef = inject(ElementRef); // <-- 2. INYECTAR ElementRef
 
   // Signals para los selects
   categories = signal<Category[]>([]);
   afiliados = signal<Afiliado[]>([]);
+
+  // NUEVO: Gestión de Items de Interés
+  currentInterestedItems = signal<InterestItem[]>([]);
+  newItemImageUrl = signal('');
+  newItemKeyword = signal('');
 
   constructor() {
     this.productForm = this.fb.group({
@@ -57,20 +59,16 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
       price: [0, [Validators.required, Validators.min(0)]],
       stock: [0, [Validators.required, Validators.min(0)]],
       description: ['', [Validators.required]],
-      // 👇 CAMBIO 1: Valor por defecto "1" para Categoría
       categoryId: [1, [Validators.required]],
-      // 👇 CAMBIO 2: Valor por defecto "1" (como string) para Afiliado
       afiliadoCodigo: ['1'],
       images: [[] as string[]]
     });
   }
 
   ngOnInit(): void {
-    // Cargar las listas para los selects
     this.loadCategories();
     this.loadAfiliados();
 
-    // Lógica para escuchar cambios en SKU (sin cambios)
     this.productForm.get('sku')!.valueChanges.pipe(
       debounceTime(500),
       distinctUntilChanged(),
@@ -92,10 +90,7 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Lógica para cargar producto desde la URL (sin cambios)
-    this.route.queryParams.pipe(
-      take(1)
-    ).subscribe(params => {
+    this.route.queryParams.pipe(take(1)).subscribe(params => {
       const skuFromUrl = params['sku'];
       if (skuFromUrl) {
         this.productForm.get('sku')?.setValue(skuFromUrl);
@@ -108,7 +103,6 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // Métodos para cargar selects (sin cambios)
   loadCategories(): void {
     this.categoryService.getAll().pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.categories.set(data);
@@ -121,12 +115,17 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
     });
   }
 
-
   private setupEditMode(product: Product): void {
     this.isEditMode = true;
     this.currentProductId = product.id;
     this.product.set(product);
 
+    // Cargar items de interés existentes
+    if (product.interestedItems) {
+      this.currentInterestedItems.set([...product.interestedItems]);
+    } else {
+      this.currentInterestedItems.set([]);
+    }
 
     const formValues = {
       sku: product.sku,
@@ -134,11 +133,10 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
       price: product.price,
       stock: product.stock,
       description: product.description,
-      categoryId: product.category.id_cate, // Extraemos el ID del objeto
-      afiliadoCodigo: product.afiliadoCodigo || null, // Asignamos el código o null
+      categoryId: product.category.id_cate,
+      afiliadoCodigo: product.afiliadoCodigo || null,
       images: product.images
     };
-
 
     this.productForm.reset(formValues);
 
@@ -153,14 +151,40 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
     this.product.set(null);
     this.mainImage.set('');
 
+    // Limpiar items de interés
+    this.currentInterestedItems.set([]);
+    this.newItemImageUrl.set('');
+    this.newItemKeyword.set('');
+
     this.productForm.reset({
       sku: keepsku,
       price: 0,
       stock: 0,
-      categoryId: 1, // Valor por defecto
-      afiliadoCodigo: '1', // Valor por defecto
+      categoryId: 1,
+      afiliadoCodigo: '1',
       images: []
     });
+  }
+
+  // NUEVO: Métodos para Items de Interés
+  addInterestItem(): void {
+    const url = this.newItemImageUrl();
+    const keyword = this.newItemKeyword();
+
+    if (url && keyword) {
+      if (this.currentInterestedItems().length >= 6) {
+        alert('Máximo 6 imágenes de interés permitidas.');
+        return;
+      }
+      this.currentInterestedItems.update(items => [...items, { imageUrl: url, searchKeyword: keyword }]);
+      // Limpiar inputs
+      this.newItemImageUrl.set('');
+      this.newItemKeyword.set('');
+    }
+  }
+
+  removeInterestItem(index: number): void {
+    this.currentInterestedItems.update(items => items.filter((_, i) => i !== index));
   }
 
   onSubmit(): void {
@@ -169,10 +193,15 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Combinamos los datos del formulario con los items de interés
     const formValue = this.productForm.getRawValue();
+    const fullPayload = {
+      ...formValue,
+      interestedItems: this.currentInterestedItems()
+    };
 
     if (this.isEditMode && this.currentProductId) {
-      this.productService.update(this.currentProductId.toString(), formValue).subscribe({
+      this.productService.update(this.currentProductId.toString(), fullPayload).subscribe({
         next: (updatedProduct) => {
           alert('¡Producto actualizado con éxito!');
           this.product.set(updatedProduct);
@@ -180,10 +209,9 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
         error: (err) => alert(`Error al actualizar: ${err.message}`)
       });
     } else {
-      this.productService.create(formValue).subscribe({
+      this.productService.create(fullPayload).subscribe({
         next: (newProduct) => {
           alert('¡Producto creado con éxito!');
-
           this.setupEditMode(newProduct);
         },
         error: (err) => alert(`Error al crear: ${err.message}`)
@@ -191,51 +219,32 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
   onDelete(): void {
-    if (this.isEditMode && this.currentProductId
-      && confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+    if (this.isEditMode && this.currentProductId && confirm('¿Estás seguro de eliminar este producto?')) {
       const idToDelete = this.currentProductId.toString();
-
       this.productService.delete(idToDelete).subscribe({
-        // ÉXITO NORMAL
         next: () => {
           alert('Producto eliminado con éxito');
-          // Limpia el formulario y se mantiene en la página
           this.resetToCreateMode();
         },
-
-        // --- INICIO DEL PARCHE MODIFICADO ---
         error: (err) => {
-          // Comprobamos si es el "error fantasma" 500
           if (err.status === 500) {
             alert('Producto eliminado con éxito (error 500 fantasma ignorado).');
-            // Limpia el formulario y se mantiene en la página
             this.resetToCreateMode();
           } else {
-            // Si es CUALQUIER OTRO error (404, 401, etc.), SÍ mostramos el error real.
             console.error('Error real en la eliminación:', err);
             alert(`Error al eliminar: ${err.message}`);
           }
         }
-        // --- FIN DEL PARCHE MODIFICADO ---
       });
     }
   }
 
   onNewProductClick(): void {
-    // 1. Llama a tu función de reseteo (sin argumentos para limpiar el SKU)
     this.resetToCreateMode();
-
-    // 2. Pone el foco en el campo SKU
-    // Usamos un pequeño timeout para asegurar que el DOM se actualice
-    // antes de intentar hacer focus.
     setTimeout(() => {
       const skuInput = this.elementRef.nativeElement.querySelector('#sku');
-      if (skuInput) {
-        skuInput.focus();
-      }
+      if (skuInput) skuInput.focus();
     }, 0);
   }
 
@@ -277,7 +286,12 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
 
     this.product.update(currentProduct => ({ ...currentProduct!, images: newImagesOrder }));
 
-    const fullProductToUpdate = { ...this.productForm.getRawValue(), images: newImagesOrder };
+    // Aquí también debemos asegurarnos de mantener los items de interés al actualizar el orden de imágenes principales
+    const fullProductToUpdate = {
+      ...this.productForm.getRawValue(),
+      images: newImagesOrder,
+      interestedItems: this.currentInterestedItems()
+    };
 
     this.productService.update(this.currentProductId.toString(), fullProductToUpdate).subscribe({
       next: (updatedProduct) => {
@@ -287,7 +301,7 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
         }
       },
       error: (err) => {
-        this.product.set(product); // Revertir en caso de error
+        this.product.set(product);
         alert('No se pudo guardar el nuevo orden.');
       }
     });
