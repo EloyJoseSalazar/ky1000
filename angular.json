@@ -51,7 +51,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/google108425f972455e1f.html"
+              "src/google108425f972455e1f.html",
+              "src/sitemap.xml"
             ],
             "styles": [
               "src/styles.css"
@@ -114,7 +115,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/google108425f972455e1f.html"
+              "src/google108425f972455e1f.html",
+              "src/sitemap.xml"
             ],
             "styles": [
               "src/styles.css"
