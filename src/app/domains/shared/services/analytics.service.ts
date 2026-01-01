@@ -22,7 +22,7 @@ export interface ProductStat {
 @Injectable({ providedIn: 'root' })
 export class AnalyticsService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://api.tudominio.com/api/analytics';
+  private apiUrl = 'https://www.tiendap2p.com/api/analytics';
 
   // Registrar visita (Usar en ngOnInit de tus componentes)
   trackView(eventType: 'HOME' | 'PRODUCT', productId?: number) {
