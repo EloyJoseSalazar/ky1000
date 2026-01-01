@@ -22,6 +22,11 @@ export class DashboardAnalyticsComponent {
   startControl = new FormControl(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16));
   endControl = new FormControl(new Date().toISOString().slice(0, 16));
 
+  ngOnInit() {
+    // Agrega esto para que cargue los datos apenas entras a la página
+    this.loadStats();
+  }
+
   loadStats() {
     const start = this.startControl.value || '';
     const end = this.endControl.value || '';
