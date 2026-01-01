@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environmen';
+'../search/search.component';
 
 export interface AnalyticsVisit {
   eventType: 'HOME' | 'PRODUCT';
@@ -9,24 +11,24 @@ export interface AnalyticsVisit {
 
 export interface ProductStat {
   productId: number;
-  sku: string;         // Nuevo campo
-  productTitle: string; // Nuevo campo
+  sku: string;
+  productTitle: string;
   totalViews: number;
-  // Opcional: Podrías cruzar esto con tu lista de productos para obtener el nombre
-  productName?: string;
-
-
-
 }
 
 @Injectable({ providedIn: 'root' })
 export class AnalyticsService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://www.tiendap2p.com/api/analytics';
 
-  // Registrar visita (Usar en ngOnInit de tus componentes)
+
+  private apiUrl = `${environment.apiUrl}/api/analytics`;
+
   trackView(eventType: 'HOME' | 'PRODUCT', productId?: number) {
-    this.http.post(`${this.apiUrl}/track`, { eventType, productId }).subscribe();
+    // Esto enviará a: .../api/analytics/track
+    this.http.post(`${this.apiUrl}/track`, { eventType, productId }).subscribe({
+      next: () => console.log('Visita registrada correctamente'),
+      error: (err) => console.error('Error registrando visita', err)
+    });
   }
 
   // Obtener reporte de visitas generales
