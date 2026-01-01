@@ -1,3 +1,5 @@
+//src/app/app.routes.ts
+
 import { Routes } from '@angular/router';
 import { LayoutComponent } from '@shared/components/layout/layout.component';
 import { NotFoundComponent } from '@info/pages/not-found/not-found.component';
@@ -52,6 +54,10 @@ export const routes: Routes = [
           {
             path: 'lista-productos',
             loadComponent: () => import('./pages/product-list/product-list.component').then(m => m.ProductListComponent)
+          },
+          {
+            path: 'analitica',
+            loadComponent: () => import('./pages/DashboardAnalyticsComponent/dashboard-analytics.component').then(m => m.DashboardAnalyticsComponent)
           },
           { path: '', redirectTo: 'lista-productos', pathMatch: 'full' },
         ]

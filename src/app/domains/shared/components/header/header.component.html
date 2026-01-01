@@ -79,6 +79,10 @@
                 <!-- 👇 ENLACE AÑADIDO PARA VISTA PC 👇 -->
                 <button (click)="navigateToListaProductos()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Listado de Productos</button>
 
+                <button (click)="navigateToAnalytics()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left border-t border-gray-100">
+                  📊 Analítica de Visitas
+                </button>
+
                 <button (click)="onLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Cerrar la Cuenta</button>
               </div>
             }
@@ -117,6 +121,7 @@
           <!-- 👇 ENLACE AÑADIDO PARA VISTA MÓVIL 👇 -->
           <li><button (click)="navigateToListaProductos(); toggleMenu()" class="block w-full text-left py-2">Listado de Productos</button></li>
           <!-- 👆 FIN DEL ENLACE AÑADIDO 👆 -->
+          <li><button (click)="navigateToAnalytics(); toggleMenu()" class="block w-full text-left py-2">📊 Analítica de Visitas</button></li>
           <li><button (click)="onLogout(); toggleMenu()" class="block w-full text-left py-2">Cerrar la Cuenta</button></li>
         }
         <li class="pt-2 mt-2 border-t"><span class="font-semibold text-gray-500">CATEGORÍAS</span></li>

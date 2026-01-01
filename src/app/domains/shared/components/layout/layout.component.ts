@@ -4,6 +4,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from '@shared/components/header/header.component';
+import { AnalyticsService } from '../../services/analytics.service';
 import { Title, Meta } from '@angular/platform-browser';
 import { filter } from 'rxjs';
 
@@ -20,11 +21,14 @@ import { filter } from 'rxjs';
   `
 })
 export class LayoutComponent implements OnInit {
+  private analyticsService = inject(AnalyticsService);
   private router = inject(Router);
   private titleService = inject(Title);
   private metaService = inject(Meta);
 
   ngOnInit() {
+    this.analyticsService.trackView('HOME');
+
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event) => {
@@ -34,7 +38,7 @@ export class LayoutComponent implements OnInit {
   }
 
   private setDefaultMetaTags(): void {
-    this.titleService.setTitle('TiendaP2P - !Productos Increíbles!!');
-    this.metaService.updateTag({ property: 'og:image', content: 'https://www.TiendaP2P.com/assets/logo.png' });
+    this.titleService.setTitle('Tienda OnLine  - !Productos Increíbles!!');
+    this.metaService.updateTag({ property: 'og:image', content: 'https://www.tiendap2p.com/assets/logo.png' });
   }
 }

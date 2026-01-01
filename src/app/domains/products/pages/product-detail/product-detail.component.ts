@@ -22,6 +22,7 @@ import { Title, Meta } from '@angular/platform-browser';
 import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
 import { ProductService } from '@shared/services/product.service';
+import { AnalyticsService } from '@shared/services/analytics.service';
 
 const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
 
@@ -54,6 +55,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
   transformStyle = computed(() => `translate3d(${this.currentX()}px, ${this.currentY()}px, 0) scale(${this.currentScale()})`);
 
   // --- INYECCIONES ---
+  private analyticsService = inject(AnalyticsService);
   private productService = inject(ProductService);
   private cartService = inject(CartService);
   private titleService = inject(Title);
@@ -122,6 +124,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   private initializeComponent(product: Product): void {
+    this.analyticsService.trackView('PRODUCT', Number(product.id));
     if (product.images.length > 0) {
       this.cover.set(product.images[0]);
       this.currentIndex.set(0);

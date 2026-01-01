@@ -1,3 +1,5 @@
+// src/app/domains/shared/components/header/header.component.ts
+
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
@@ -104,6 +106,13 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(['/ingresa/lista-productos']);
     this.showUserMenu.set(false); // También cierra el menú de usuario al navegar
   }
+
+  navigateToAnalytics() {
+    this.router.navigate(['/ingresa/analitica']);
+    this.showUserMenu.set(false); // Cierra el menú de usuario PC
+    this.showMenu.set(false);     // Cierra el menú móvil por si acaso
+  }
+
   navigateToCategory(categoryId: number) {
     this.router.navigate(
       ['/'],
