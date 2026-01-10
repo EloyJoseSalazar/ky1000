@@ -33,6 +33,8 @@ export class ProductListComponent implements OnInit {
   private currentPage = 0;
   private pageSize = 10;
   private currentFilters: any = {};
+  public currentSortCol: string = 'id';
+  public currentSortDir: string = 'desc';
 
   ngOnInit() {
     this.pagedResponse$ = this.refreshProducts$.pipe(
@@ -45,7 +47,9 @@ export class ProductListComponent implements OnInit {
           this.currentFilters,
           this.currentPage,
           this.pageSize,
-          true // <-- ¡AQUÍ!
+          true,
+    this.currentSortCol,
+      this.currentSortDir
         )
       )
     );
@@ -131,6 +135,46 @@ export class ProductListComponent implements OnInit {
         this.refreshProducts$.next();
       }
     });
+  }
+
+
+  // Función para el botón "Reporte"
+  descargarReporte() {
+    console.log('Generando reporte con filtros:', this.currentFilters);
+
+    // SOLUCIÓN: Usamos directamente 'this.currentFilters' porque
+    // ya contiene los datos limpios (sku, title, categoryId, etc.)
+    // que guardaste en el método 'handleFilters'.
+    this.productService.getReport(this.currentFilters, this.currentSortCol, this.currentSortDir
+    ).subscribe({
+      next: (blob: Blob) => {
+        // Truco para descargar el archivo en el navegador
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'reporte_productos.pdf';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Error descargando reporte', err);
+        alert('Hubo un error al generar el PDF. Revisa la consola.');
+      }
+    });
+  }
+
+  // Función para cambiar el orden al hacer clic en el encabezado
+  toggleSort(col: string) {
+    if (this.currentSortCol === col) {
+      // Si ya estábamos ordenando por esta columna, invertimos la dirección
+      this.currentSortDir = this.currentSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      // Si es una columna nueva, ordenamos ascendente por defecto
+      this.currentSortCol = col;
+      this.currentSortDir = 'asc';
+    }
+    // Recargamos la tabla
+    this.refreshProducts$.next();
   }
 
 }

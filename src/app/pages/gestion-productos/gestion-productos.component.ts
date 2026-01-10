@@ -56,6 +56,8 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
     this.productForm = this.fb.group({
       sku: ['', [Validators.required]],
       title: ['', [Validators.required, Validators.minLength(3)]],
+      precioCosto: [0, [Validators.required, Validators.min(0)]],
+      porcentajeUtilidad: [0, [Validators.required, Validators.min(0)]],
       price: [0, [Validators.required, Validators.min(0)]],
       stock: [0, [Validators.required, Validators.min(0)]],
       description: ['', [Validators.required]],
@@ -68,6 +70,7 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadCategories();
     this.loadAfiliados();
+    this.setupMathLogic();
 
     this.productForm.get('sku')!.valueChanges.pipe(
       debounceTime(500),
@@ -130,6 +133,8 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
     const formValues = {
       sku: product.sku,
       title: product.title,
+      precioCosto: product.precioCosto || 0,
+      porcentajeUtilidad: product.porcentajeUtilidad || 0,
       price: product.price,
       stock: product.stock,
       description: product.description,
@@ -158,6 +163,8 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
 
     this.productForm.reset({
       sku: keepsku,
+      precioCosto: 0,       // Resetear
+      porcentajeUtilidad: 0, // Resetear
       price: 0,
       stock: 0,
       categoryId: 1,
@@ -306,4 +313,44 @@ export class GestionProductosComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  private setupMathLogic(): void {
+    const costControl = this.productForm.get('precioCosto');
+    const utilControl = this.productForm.get('porcentajeUtilidad');
+    const priceControl = this.productForm.get('price');
+
+    if (!costControl || !utilControl || !priceControl) return;
+
+    // CASO A: Si cambia el Costo -> Recalcula el Precio (manteniendo el % de utilidad fijo)
+    costControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(costo => {
+      const utilidad = utilControl.value || 0;
+      if (costo != null) {
+        // Fórmula: Costo + (Costo * % / 100)
+        const nuevoPrecio = costo + (costo * (utilidad / 100));
+        // Usamos { emitEvent: false } para no disparar el evento del precio y evitar bucles
+        priceControl.setValue(Number(nuevoPrecio.toFixed(2)), { emitEvent: false });
+      }
+    });
+
+    // CASO B: Si cambia el Porcentaje -> Recalcula el Precio (basado en el costo actual)
+    utilControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(utilidad => {
+      const costo = costControl.value || 0;
+      if (utilidad != null) {
+        const nuevoPrecio = costo + (costo * (utilidad / 100));
+        priceControl.setValue(Number(nuevoPrecio.toFixed(2)), { emitEvent: false });
+      }
+    });
+
+    // CASO C: Si cambia el Precio Final -> Recalcula el Porcentaje (basado en el costo actual)
+    priceControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(precio => {
+      const costo = costControl.value || 0;
+      if (precio != null && costo > 0) {
+        // Fórmula: ((Precio - Costo) / Costo) * 100
+        const nuevaUtilidad = ((precio - costo) / costo) * 100;
+        utilControl.setValue(Number(nuevaUtilidad.toFixed(2)), { emitEvent: false });
+      }
+    });
+  }
+
+
 }

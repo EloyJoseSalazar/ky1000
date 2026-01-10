@@ -46,8 +46,14 @@ export class ProductService {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
-  getProductsPaged(filters: any, page: number, size: number, includeInactive: boolean = false): Observable<PagedResponse<Product>> {
-    let params = new HttpParams().set('page', page.toString()).set('size', size.toString()).set('includeInactive', includeInactive.toString());
+  getProductsPaged(filters: any, page: number, size: number, includeInactive: boolean = false,sortCol: string = 'id',sortDir: string = 'desc'): Observable<PagedResponse<Product>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('includeInactive', includeInactive.toString())
+      .set('sort', sortCol)
+      .set('dir', sortDir);
+
 
     if (filters.sku) params = params.append('sku', filters.sku);
     if (filters.title) params = params.append('title', filters.title);
@@ -95,5 +101,22 @@ export class ProductService {
     const url = `${this.apiUrl}/${productId}/imagenes`;
     const body = { imageUrl: imageUrl };
     return this.http.delete<Product>(url, { body: body });
+  }
+
+  getReport(filters: any,sortCol: string = 'id',sortDir: string = 'desc'): Observable<Blob> {
+    // Construye los HttpParams igual que en tu método de búsqueda
+    let params = new HttpParams()
+      .set('sort', sortCol)
+      .set('dir', sortDir);
+    if (filters.categoryId) params = params.set('categoryId', filters.categoryId);
+    if (filters.sku) params = params.set('sku', filters.sku);
+    if (filters.title) params = params.set('title', filters.title);
+    if (filters.afiliadoCodigo) params = params.set('afiliadoCodigo', filters.afiliadoCodigo);
+    // ... agrega el resto de filtros (afiliado, fechas, etc)
+
+    return this.http.get(`${this.apiUrl}/report`, {
+      params: params,
+      responseType: 'blob' // ¡Importante!
+    });
   }
 }

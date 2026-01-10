@@ -11,6 +11,8 @@ export interface Product {
   title: string;
   sku: string;
   description: string;
+  precioCosto: number;      // Mapea a precio_costo de la BD
+  porcentajeUtilidad: number; // Mapea a porc_precio de la BD
   price: number;
   stock: number;
   images: string[];
