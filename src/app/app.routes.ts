@@ -44,6 +44,11 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
           {
+            path: 'admin/moneda',
+            loadComponent: () => import('./pages/moneda/moneda.component').then(m => m.MonedaComponent),
+            // canActivate: [AuthGuard] // Asegúrate de protegerla si tienes guardias
+          },
+          {
             path: 'producto/nuevo',
             loadComponent: () => import('./pages/gestion-productos/gestion-productos.component').then(m => m.GestionProductosComponent)
           },
@@ -69,3 +74,4 @@ export const routes: Routes = [
     component: NotFoundComponent
   }
 ];
+

@@ -10,11 +10,12 @@ import { SearchComponent } from '../search/search.component';
 import { CategoryService } from '@shared/services/category.service';
 import { Category } from '@shared/models/category.model';
 import { Observable } from 'rxjs'; // Importar Observable
+import { CalculoPrecioPipe } from '@shared/pipes/calculo-precio.pipe';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLinkWithHref, RouterLinkActive, RouterLink, SearchComponent],
+  imports: [CommonModule, RouterLinkWithHref, RouterLinkActive, RouterLink, SearchComponent,CalculoPrecioPipe],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'] // <-- ¡Descomenta o añade esto!
 })

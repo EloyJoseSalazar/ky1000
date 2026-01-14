@@ -23,13 +23,14 @@ import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
 import { ProductService } from '@shared/services/product.service';
 import { AnalyticsService } from '@shared/services/analytics.service';
+import { CalculoPrecioPipe } from '@shared/pipes/calculo-precio.pipe';
 
 const PRODUCT_STATE_KEY = makeStateKey<Product>('productData');
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,CalculoPrecioPipe],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css'
 })

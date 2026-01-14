@@ -1,7 +1,6 @@
 <nav class="sticky top-0 z-40 bg-white shadow-md relative">
   <div class="w-full max-w-7xl mx-auto px-4">
 
-    <!-- VISTA MÓVIL -->
     <div class="block md:hidden">
       <div class="flex items-center justify-between h-16">
         <div class="flex-shrink-0">
@@ -20,12 +19,8 @@
       <div class="pb-3"><app-search /></div>
     </div>
 
-    <!-- =============================================== -->
-    <!--       VISTA PC - RECONSTRUIDA CON CSS GRID      -->
-    <!-- =============================================== -->
     <div class="hidden md:grid md:grid-cols-[auto_1fr_auto] md:items-center h-20 md:gap-x-6">
 
-      <!-- Columna 1: Logo y Navegación -->
       <div class="flex items-center space-x-6">
         <a routerLink="/" class="flex-shrink-0">
           <img src="/assets/logo3.png" class="h-10" alt="LoVendo"/>
@@ -51,14 +46,11 @@
         </div>
       </div>
 
-      <!-- Columna 2: Campo de Búsqueda -->
       <div class="w-full max-w-md mx-auto">
         <app-search />
       </div>
 
-      <!-- Columna 3: Ingresa y Carrito -->
       <div class="flex items-center justify-end space-x-4">
-        <!-- Lógica de autenticación: Botón "Ingresar" o menú de usuario -->
         <ng-container *ngIf="!(isAuthenticated$ | async); else userLoggedInMenu">
           <button (click)="onLoginClick()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
             Ingresar
@@ -75,8 +67,11 @@
 
             @if (showUserMenu()) {
               <div (mouseleave)="toggleUserMenu()" class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20">
+
+                <a routerLink="/ingresa/admin/moneda" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                  Moneda
+                </a>
                 <button (click)="navigateToGestionProductos()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Crear Producto</button>
-                <!-- 👇 ENLACE AÑADIDO PARA VISTA PC 👇 -->
                 <button (click)="navigateToListaProductos()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Listado de Productos</button>
 
                 <button (click)="navigateToAnalytics()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left border-t border-gray-100">
@@ -89,7 +84,6 @@
           </div>
         </ng-template>
 
-        <!-- Botón del carrito -->
         <button class="p-2 border rounded relative" (click)="toogleSideMenu()">
           <div class="absolute -top-2 -left-2 rounded h-5 w-5 bg-black text-white text-xs">{{ cart().length }}</div>
           <svg class="w-6 h-6" viewBox="0 0 24 24"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -98,29 +92,24 @@
     </div>
   </div>
 
-  <!-- ======================================================= -->
-  <!--           NUEVO: MENÚS OCULTOS (FINAL)                  -->
-  <!-- ======================================================= -->
-
-  <!-- 1. Menú Desplegable Móvil (Corregido) -->
   @if (showMenu()) {
-    <!-- Overlay para el menú principal móvil -->
     <div (click)="toggleMenu()" class="fixed inset-0 bg-black bg-opacity-25 z-40 md:hidden"></div>
 
-    <!-- Contenido del menú -->
     <div class="absolute top-full left-0 w-full bg-white shadow-lg border-t z-40 md:hidden">
       <ul class="px-4 py-4 space-y-2">
         <li><a routerLink="/" (click)="toggleMenu()" class="block">Inicio</a></li>
         <li><a routerLink="/contacto" (click)="toggleMenu()" class="block">Contacto</a></li>
         <li><a routerLink="/Ubicaciones" (click)="toggleMenu()" class="block">Locations</a></li>
-        <!-- Botones de auth para móvil -->
+
         @if (!(isAuthenticated$ | async)) {
           <li><button (click)="onLoginClick(); toggleMenu()" class="block w-full text-left py-2">Ingresar</button></li>
         } @else {
+
+          <li>
+            <a routerLink="/ingresa/admin/moneda" (click)="toggleMenu()" class="block w-full text-left py-2">Moneda</a>
+          </li>
           <li><button (click)="navigateToGestionProductos(); toggleMenu()" class="block w-full text-left py-2">Crear Producto</button></li>
-          <!-- 👇 ENLACE AÑADIDO PARA VISTA MÓVIL 👇 -->
           <li><button (click)="navigateToListaProductos(); toggleMenu()" class="block w-full text-left py-2">Listado de Productos</button></li>
-          <!-- 👆 FIN DEL ENLACE AÑADIDO 👆 -->
           <li><button (click)="navigateToAnalytics(); toggleMenu()" class="block w-full text-left py-2">📊 Analítica de Visitas</button></li>
           <li><button (click)="onLogout(); toggleMenu()" class="block w-full text-left py-2">Cerrar la Cuenta</button></li>
         }
@@ -139,7 +128,6 @@
     </div>
   }
 
-  <!-- 2. Side Menu del Carrito (Completo y Corregido) -->
   @if (!hideSideMenu()) {
     <div (click)="toogleSideMenu()" class="fixed inset-0 bg-black bg-opacity-50 z-50"></div>
   }
@@ -175,7 +163,10 @@
                 <span class="px-3 py-1">{{ item.quantity }}</span>
                 <button (click)="increaseQuantity(item.id)" class="px-3 py-1 text-lg font-semibold">+</button>
               </div>
-              <p class="font-semibold">{{ item.price * item.quantity | currency }}</p>
+
+              <p class="font-semibold text-blue-600">
+                {{ (item.price * item.quantity) | calculoPrecio }}
+              </p>
             </div>
           </div>
         } @empty {
@@ -186,7 +177,10 @@
       <div class="border-t pt-4">
         <div class="flex justify-between items-center">
           <p class="text-lg font-bold">Total:</p>
-          <p class="text-lg font-bold">{{ total() | currency }}</p>
+
+          <p class="text-lg font-bold text-blue-800">
+            {{ total() | calculoPrecio }}
+          </p>
         </div>
         <button class="w-full mt-4 bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800">Proceder al Pago</button>
       </div>
