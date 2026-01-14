@@ -1,15 +1,18 @@
+// src/app/domains/shared/services/moneda.service.ts
+
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Moneda } from '../models/moneda.model';
 import { tap } from 'rxjs';
+import { environment } from '../../../../environments/environmen';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MonedaService {
   private http = inject(HttpClient);
-  // URL pública (asegúrate de que coincida con tu backend)
-  private apiUrl = 'http://localhost:8080/api/monedas';
+  //private apiUrl = 'http://localhost:8080/api/monedas';
+  private apiUrl = `${environment.apiUrl}/api/monedas`;
 
   // SIGNAL: Aquí guardaremos las monedas para usarlas en toda la app
   monedas = signal<Moneda[]>([]);
