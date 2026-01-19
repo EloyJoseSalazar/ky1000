@@ -61,11 +61,18 @@
       <p class="text-black-950 text-sm font-thin mb-1">Sku: {{ product.sku }}</p>
 
       <p class="title-font font-medium text-3xl text-gray-900 mt-5 flex items-center">
+        <img
+          src="/assets/bcv1.jpg"
+          alt="Logo BCV"
+          class="h-16 w-auto ml-3 mr-3 object-contain"
+        >
         Precio a Tasa BCV
-        <span class="ml-4 font-bold text-blue-600">
-    {{ product.price | calculoPrecio }}
-  </span>
+
+        <span class="ml-3 font-bold text-blue-600">
+          {{ product.price | calculoPrecio }}
+        </span>
       </p>
+
       <h3 class="text-gray-900 text-lg title-font font-medium mb-4">Disponible: {{ product.stock }}</h3>
 
       <div class="flex items-center mt-6 space-x-4">

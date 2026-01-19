@@ -1,0 +1,62 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 50; /* Para que quede por encima del contenido */
+}
+
+.navbar-container {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03); /* Sombra muy sutil */
+  padding: 0 16px;
+}
+
+.navbar-content {
+  max-width: 1400px; /* Ajusta según tu diseño general */
+  margin: 0 auto;
+  height: 54px; /* Altura cómoda */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Estilo común para botones y links */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-family: 'Roboto', sans-serif; /* O la fuente que uses */
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  color: #555;
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Efecto Hover */
+  &:hover {
+    background-color: #f0f4ff;
+    color: #0056b3; /* Azul TiendaP2P */
+  }
+}
+
+/* Estilo específico para el botón Categorías */
+.category-btn {
+  border: 1px solid #eee; /* Un borde sutil para diferenciarlo */
+  color: #0056b3;
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+}

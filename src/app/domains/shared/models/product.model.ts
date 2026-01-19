@@ -1,3 +1,4 @@
+// src/app/domains/shared/models/product.model.ts
 import { Category } from "./category.model";
 
 // Nueva interfaz para los items de interés

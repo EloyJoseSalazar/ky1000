@@ -1,34 +1,34 @@
-// src/app/domains/shared/components/header/header.component.ts
-
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, Output, EventEmitter } from '@angular/core'; // <--- AGREGADO Output, EventEmitter
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
-import { RouterLinkWithHref, RouterLinkActive } from '@angular/router';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLinkWithHref, RouterLinkActive, RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { SearchComponent } from '../search/search.component';
 import { CategoryService } from '@shared/services/category.service';
 import { Category } from '@shared/models/category.model';
-import { Observable } from 'rxjs'; // Importar Observable
+import { Observable } from 'rxjs';
 import { CalculoPrecioPipe } from '@shared/pipes/calculo-precio.pipe';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLinkWithHref, RouterLinkActive, RouterLink, SearchComponent,CalculoPrecioPipe],
+  imports: [CommonModule, RouterLinkWithHref, RouterLinkActive, RouterLink, SearchComponent, CalculoPrecioPipe],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css'] // <-- ¡Descomenta o añade esto!
+  styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
+
+  // --- NUEVO: Evento para avisar al App Component que abra el Sidenav ---
+  @Output() toggleSidenav = new EventEmitter<void>();
+
   hideSideMenu = signal(true);
-  showMenu = signal(false); // Para el menú móvil
-  showCategoriesDropdown = signal(false); // Para el dropdown de categorías en PC
+  showMenu = signal(false);
+  showCategoriesDropdown = signal(false);
 
   // --- Propiedades para el Auth ---
   isAuthenticated$: Observable<boolean>;
   currentUser$: Observable<string | null>;
-  showUserMenu = signal(false); // Signal para controlar la visibilidad del submenú de usuario
-
+  showUserMenu = signal(false);
 
   private cartService = inject(CartService);
   cart = this.cartService.cart;
@@ -38,7 +38,6 @@ export class HeaderComponent implements OnInit {
   categories = signal<Category[]>([]);
 
   constructor(private authService: AuthService, private router: Router) {
-    // Inicializar los Observables del AuthService en el constructor
     this.isAuthenticated$ = this.authService.isAuthenticated$;
     this.currentUser$ = this.authService.currentUser$;
   }
@@ -46,9 +45,12 @@ export class HeaderComponent implements OnInit {
   ngOnInit() {
     this.categoryService.getAll().subscribe(data => {
       this.categories.set(data);
-      console.log("eliguiendo departamento ..")
     });
+  }
 
+  // --- NUEVO MÉTODO: Emite el evento al hacer clic en el botón de hamburguesa ---
+  onMenuClick() {
+    this.toggleSidenav.emit();
   }
 
   // --- Métodos de Auth ---
@@ -57,10 +59,8 @@ export class HeaderComponent implements OnInit {
   }
 
   navigateToGestionProductos(): void {
-    // CAMBIO AQUÍ: Navegamos a la ruta específica para crear un nuevo producto
-    this.router.navigate(['/ingresa/producto/nuevo']); // Ajusta la ruta a tu 'Crear Producto'
+    this.router.navigate(['/ingresa/producto/nuevo']);
     this.showUserMenu.set(false);
-
   }
 
   toggleUserMenu(): void {
@@ -69,13 +69,8 @@ export class HeaderComponent implements OnInit {
 
   onLogout(): void {
     this.authService.logout();
-    this.showUserMenu.set(false); // Oculta el menú después de cerrar sesión
+    this.showUserMenu.set(false);
   }
-
- // navigateToGestionProductos(): void {
-  //  this.router.navigate(['/gestion-productos']);
-   // this.showUserMenu.set(false); // Oculta el menú después de navegar
- // }
 
   // --- Métodos existentes ---
   toogleSideMenu() {
@@ -102,16 +97,15 @@ export class HeaderComponent implements OnInit {
     this.cartService.updateQuantity(productId, -1);
   }
 
-
   navigateToListaProductos() {
     this.router.navigate(['/ingresa/lista-productos']);
-    this.showUserMenu.set(false); // También cierra el menú de usuario al navegar
+    this.showUserMenu.set(false);
   }
 
   navigateToAnalytics() {
     this.router.navigate(['/ingresa/analitica']);
-    this.showUserMenu.set(false); // Cierra el menú de usuario PC
-    this.showMenu.set(false);     // Cierra el menú móvil por si acaso
+    this.showUserMenu.set(false);
+    this.showMenu.set(false);
   }
 
   navigateToCategory(categoryId: number) {
@@ -119,11 +113,9 @@ export class HeaderComponent implements OnInit {
       ['/'],
       {
         queryParams: { categoryId: categoryId },
-        // **Clave:** Forzar la navegación aunque la ruta sea la misma
         queryParamsHandling: 'merge'
       }
     );
     this.toggleCategoriesDropdown();
   }
-
 }

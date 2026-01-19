@@ -1,189 +1,183 @@
-<nav class="sticky top-0 z-40 bg-white shadow-md relative">
-  <div class="w-full max-w-7xl mx-auto px-4">
+<nav class="sticky top-0 z-40 bg-white shadow-md w-full">
+  <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
 
     <div class="block md:hidden">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex-shrink-0">
-          <button (click)="toggleMenu()" type="button" class="p-2"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-        </div>
-        <div class="flex-shrink-0">
-          <a routerLink="/" class="flex items-center space-x-2"><img src="/assets/logo3.png" class="h-10" alt="LoVendo"/><span class="font-bold text-xl"> </span></a>
-        </div>
-        <div class="flex-shrink-0">
-          <button class="p-2 border rounded relative" (click)="toogleSideMenu()">
-            <div class="absolute -top-2 -left-2 rounded h-5 w-5 bg-black text-white text-xs">{{ cart().length }}</div>
-            <svg class="w-6 h-6" viewBox="0 0 24 24"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          </button>
-        </div>
+      <div class="flex items-center justify-between h-16 gap-2">
+
+        <button (click)="toggleMenu()" type="button" class="p-1 text-gray-600">
+          <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <button (click)="onMenuClick()" class="flex items-center px-2 py-1 border border-blue-500 rounded text-blue-600 bg-blue-50">
+          <svg class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <span class="text-xs font-bold">Categorías</span>
+        </button>
+
+        <a routerLink="/" class="hidden sm:flex flex-col items-center text-gray-600">
+          <span class="material-icons text-xl">home</span>
+          <span class="text-[10px]">Inicio</span>
+        </a>
+
+        <a routerLink="/" class="flex-shrink-0">
+          <img src="/assets/logo3.png" class="h-8 w-auto" alt="Logo"/>
+        </a>
+
+        <button class="p-2 relative text-gray-700" (click)="toogleSideMenu()">
+          <div class="absolute top-0 right-0 rounded-full h-4 w-4 bg-black text-white text-[10px] flex items-center justify-center">
+            {{ cart().length }}
+          </div>
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </button>
       </div>
-      <div class="pb-3"><app-search /></div>
+      <div class="pb-2 px-1">
+        <app-search />
+      </div>
     </div>
+
 
     <div class="hidden md:grid md:grid-cols-[auto_1fr_auto] md:items-center h-20 md:gap-x-6">
 
-      <div class="flex items-center space-x-6">
-        <a routerLink="/" class="flex-shrink-0">
-          <img src="/assets/logo3.png" class="h-10" alt="LoVendo"/>
+      <div class="flex items-center gap-4">
+
+        <button (click)="toggleMenu()" class="p-2 rounded hover:bg-gray-100 text-gray-600" title="Menú">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <button (click)="onMenuClick()" class="flex items-center px-3 py-1.5 border border-blue-500 rounded-md text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer">
+          <svg class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <span class="font-bold text-sm">Categorías</span>
+        </button>
+
+        <a routerLink="/" class="flex flex-col items-center text-gray-500 hover:text-blue-600 transition-colors">
+          <span class="material-icons text-xl">home</span>
+          <span class="text-[10px] font-medium">Inicio</span>
         </a>
-        <div class="flex items-center space-x-6">
-          <a routerLink="/" routerLinkActive="underline" [routerLinkActiveOptions]="{exact: true}" class="hover:underline">Inicio</a>
-          <div class="relative">
-            <button (click)="toggleCategoriesDropdown()" class="hover:underline flex items-center">Categorías<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg></button>
-            @if (showCategoriesDropdown()) {
-              <div (mouseleave)="toggleCategoriesDropdown()" class="absolute mt-2 w-48 bg-white rounded-md shadow-lg z-20">
-                <a routerLink="/" (click)="toggleCategoriesDropdown()"
-                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Todas</a>
-                @for(category of categories(); track category.id_cate) {
-                  <a (click)="navigateToCategory(category.id_cate)"
-                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    {{ category.name }}
-                  </a>
-                }
-              </div>
-            }
-          </div>
-          <a routerLink="/contacto" routerLinkActive="underline" class="hover:underline">Contacto</a>
-        </div>
+
+        <a routerLink="/" class="flex-shrink-0 ml-2">
+          <img src="/assets/logo3.png" class="h-10 w-auto" alt="TiendaP2P"/>
+        </a>
+
       </div>
 
-      <div class="w-full max-w-md mx-auto">
+      <div class="w-full max-w-2xl mx-auto px-4">
         <app-search />
       </div>
 
       <div class="flex items-center justify-end space-x-4">
+
         <ng-container *ngIf="!(isAuthenticated$ | async); else userLoggedInMenu">
-          <button (click)="onLoginClick()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+          <button (click)="onLoginClick()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow transition-colors">
             Ingresar
           </button>
         </ng-container>
 
         <ng-template #userLoggedInMenu>
-          <div class="user-menu-container relative">
-            <button (click)="toggleUserMenu()" class="user-button flex items-center space-x-1">
-              <span>{{ (currentUser$ | async) || 'Usuario' }}</span>
-              <span *ngIf="!showUserMenu()">▼</span>
-              <span *ngIf="showUserMenu()">▲</span>
+          <div class="relative">
+            <button (click)="toggleUserMenu()" class="flex items-center space-x-1 font-medium hover:text-blue-600">
+              <span>{{ (currentUser$ | async) || 'Mi Cuenta' }}</span>
+              <span>▼</span>
             </button>
-
             @if (showUserMenu()) {
-              <div (mouseleave)="toggleUserMenu()" class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20">
-
-                <a routerLink="/ingresa/admin/moneda" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                  Moneda
-                </a>
-                <button (click)="navigateToGestionProductos()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Crear Producto</button>
-                <button (click)="navigateToListaProductos()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Listado de Productos</button>
-
-                <button (click)="navigateToAnalytics()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left border-t border-gray-100">
-                  📊 Analítica de Visitas
-                </button>
-
-                <button (click)="onLogout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Cerrar la Cuenta</button>
+              <div (mouseleave)="toggleUserMenu()" class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-xl border border-gray-100 z-50">
+                <div class="py-1">
+                  <a routerLink="/ingresa/admin/moneda" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">💰 Gestión Moneda</a>
+                  <button (click)="navigateToGestionProductos()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📝 Crear Producto</button>
+                  <button (click)="navigateToListaProductos()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📦 Listado Productos</button>
+                  <button (click)="navigateToAnalytics()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t">📊 Analítica</button>
+                  <button (click)="onLogout()" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">🚪 Cerrar Sesión</button>
+                </div>
               </div>
             }
           </div>
         </ng-template>
 
-        <button class="p-2 border rounded relative" (click)="toogleSideMenu()">
-          <div class="absolute -top-2 -left-2 rounded h-5 w-5 bg-black text-white text-xs">{{ cart().length }}</div>
-          <svg class="w-6 h-6" viewBox="0 0 24 24"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <button class="p-2 border rounded-full hover:shadow relative hover:bg-gray-50 transition-all" (click)="toogleSideMenu()">
+          <div class="absolute -top-1 -right-1 rounded-full h-5 w-5 bg-red-600 text-white text-xs flex items-center justify-center font-bold">{{ cart().length }}</div>
+          <svg class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
         </button>
       </div>
     </div>
+
   </div>
 
-  @if (showMenu()) {
-    <div (click)="toggleMenu()" class="fixed inset-0 bg-black bg-opacity-25 z-40 md:hidden"></div>
 
-    <div class="absolute top-full left-0 w-full bg-white shadow-lg border-t z-40 md:hidden">
-      <ul class="px-4 py-4 space-y-2">
-        <li><a routerLink="/" (click)="toggleMenu()" class="block">Inicio</a></li>
-        <li><a routerLink="/contacto" (click)="toggleMenu()" class="block">Contacto</a></li>
-        <li><a routerLink="/Ubicaciones" (click)="toggleMenu()" class="block">Locations</a></li>
+  @if (showMenu()) {
+    <div (click)="toggleMenu()" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+    <div class="absolute top-full left-0 w-full md:w-80 bg-white shadow-lg border-t z-50 max-h-[80vh] overflow-y-auto">
+      <ul class="flex flex-col py-2">
+        <li><a routerLink="/" (click)="toggleMenu()" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">🏠 Inicio</a></li>
+        <li><a routerLink="/contacto" (click)="toggleMenu()" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">📞 Contacto</a></li>
 
         @if (!(isAuthenticated$ | async)) {
-          <li><button (click)="onLoginClick(); toggleMenu()" class="block w-full text-left py-2">Ingresar</button></li>
-        } @else {
-
-          <li>
-            <a routerLink="/ingresa/admin/moneda" (click)="toggleMenu()" class="block w-full text-left py-2">Moneda</a>
+          <li class="p-4">
+            <button (click)="onLoginClick(); toggleMenu()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg text-center shadow">Ingresar</button>
           </li>
-          <li><button (click)="navigateToGestionProductos(); toggleMenu()" class="block w-full text-left py-2">Crear Producto</button></li>
-          <li><button (click)="navigateToListaProductos(); toggleMenu()" class="block w-full text-left py-2">Listado de Productos</button></li>
-          <li><button (click)="navigateToAnalytics(); toggleMenu()" class="block w-full text-left py-2">📊 Analítica de Visitas</button></li>
-          <li><button (click)="onLogout(); toggleMenu()" class="block w-full text-left py-2">Cerrar la Cuenta</button></li>
-        }
-        <li class="pt-2 mt-2 border-t"><span class="font-semibold text-gray-500">CATEGORÍAS</span></li>
-        <li><a routerLink="/" (click)="toggleMenu()" class="block pl-2">Todas</a></li>
-        @for(category of categories(); track category.id_cate) {
-          <li><a [routerLink]="['/']"
-                 [queryParams]="{categoryId: category.id_cate}"
-                 (click)="toggleMenu()"
-                 [queryParamsHandling]="'merge'"
-                 class="block pl-2">{{ category.name }}
-          </a>
+        } @else {
+          <li class="bg-blue-50 px-4 py-2 text-xs font-bold text-blue-800 uppercase tracking-wider mt-2">Panel Admin</li>
+          <li><a routerLink="/ingresa/admin/moneda" (click)="toggleMenu()" class="block px-4 py-3 hover:bg-blue-50">💰 Moneda</a></li>
+          <li><button (click)="navigateToGestionProductos(); toggleMenu()" class="block w-full text-left px-4 py-3 hover:bg-blue-50">📝 Crear Producto</button></li>
+          <li><button (click)="navigateToListaProductos(); toggleMenu()" class="block w-full text-left px-4 py-3 hover:bg-blue-50">📦 Listado Productos</button></li>
+          <li><button (click)="navigateToAnalytics(); toggleMenu()" class="block w-full text-left px-4 py-3 hover:bg-blue-50">📊 Analítica</button></li>
+          <li class="mt-2 border-t">
+            <button (click)="onLogout(); toggleMenu()" class="block w-full text-left px-4 py-3 text-red-600 font-bold hover:bg-red-50">Cerrar Sesión</button>
           </li>
         }
       </ul>
     </div>
   }
 
-  @if (!hideSideMenu()) {
-    <div (click)="toogleSideMenu()" class="fixed inset-0 bg-black bg-opacity-50 z-50"></div>
-  }
+  <div class="fixed top-0 right-0 z-[60] w-80 h-screen bg-white shadow-2xl transition-transform duration-300 ease-in-out border-l"
+       [class.translate-x-0]="!hideSideMenu()"
+       [class.translate-x-full]="hideSideMenu()">
 
-  <div
-    class="fixed top-0 right-0 z-50 w-80 h-screen p-4 overflow-y-auto transition-transform duration-300 ease-in-out bg-white border-l-4"
-    [class.translate-x-0]="!hideSideMenu()"
-    [class.translate-x-full]="hideSideMenu()">
-
-    <div class="flex justify-between items-center">
-      <p class="text-xl font-semibold">Mi Carrito de Compra</p>
-      <button (click)="toogleSideMenu()" class="p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-      </button>
+    <div class="flex justify-between items-center p-4 border-b bg-gray-50">
+      <h2 class="text-lg font-bold">Mi Carrito ({{ cart().length }})</h2>
+      <button (click)="toogleSideMenu()" class="p-2 rounded-full hover:bg-gray-200">✕</button>
     </div>
 
-    <div class="pt-4 flex flex-col h-full">
-      <div class="flex-grow">
-        @for (item of cart(); track item.id) {
-          <div class="flex flex-col border-b pb-2 mb-2">
-            <div class="flex justify-between items-start">
-              <div class="flex space-x-3 items-center">
-                <img class="w-16 h-16 object-cover rounded" [src]="item.images[0]" [alt]="item.title">
-                <h3 class="font-medium text-sm">{{ item.title }}</h3>
-              </div>
-              <button (click)="removeFromCart(item.id)" class="text-gray-400 hover:text-red-600 p-1">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            <div class="flex justify-between items-center mt-2">
-              <div class="flex items-center border rounded">
-                <button (click)="decreaseQuantity(item.id)" class="px-3 py-1 text-lg font-semibold">-</button>
-                <span class="px-3 py-1">{{ item.quantity }}</span>
-                <button (click)="increaseQuantity(item.id)" class="px-3 py-1 text-lg font-semibold">+</button>
-              </div>
-
-              <p class="font-semibold text-blue-600">
-                {{ (item.price * item.quantity) | calculoPrecio }}
-              </p>
+    <div class="p-4 overflow-y-auto h-[calc(100vh-140px)]">
+      @for (item of cart(); track item.id) {
+        <div class="flex gap-4 mb-4 border-b pb-4">
+          <img [src]="item.images[0]" class="w-16 h-16 object-cover rounded border">
+          <div class="flex-1">
+            <p class="text-sm font-medium line-clamp-2">{{ item.title }}</p>
+            <p class="text-blue-600 font-bold mt-1">{{ item.price | calculoPrecio }}</p>
+            <div class="flex items-center gap-2 mt-2">
+              <button (click)="decreaseQuantity(item.id)" class="px-2 border rounded">-</button>
+              <span>{{ item.quantity }}</span>
+              <button (click)="increaseQuantity(item.id)" class="px-2 border rounded">+</button>
+              <button (click)="removeFromCart(item.id)" class="ml-auto text-red-500 text-xs">Eliminar</button>
             </div>
           </div>
-        } @empty {
-          <p class="text-center text-gray-500 mt-10">Tu carrito está vacío.</p>
-        }
-      </div>
-
-      <div class="border-t pt-4">
-        <div class="flex justify-between items-center">
-          <p class="text-lg font-bold">Total:</p>
-
-          <p class="text-lg font-bold text-blue-800">
-            {{ total() | calculoPrecio }}
-          </p>
         </div>
-        <button class="w-full mt-4 bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800">Proceder al Pago</button>
+      } @empty {
+        <div class="text-center py-10 text-gray-500">Carrito vacío 🛒</div>
+      }
+    </div>
+
+    <div class="absolute bottom-0 w-full bg-white border-t p-4">
+      <div class="flex justify-between text-xl font-bold mb-3">
+        <span>Total:</span>
+        <span>{{ total() | calculoPrecio }}</span>
       </div>
+      <button class="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800">
+        Proceder al Pago
+      </button>
     </div>
   </div>
+
+  @if (!hideSideMenu()) {
+    <div (click)="toogleSideMenu()" class="fixed inset-0 bg-black bg-opacity-50 z-[55]"></div>
+  }
+
 </nav>

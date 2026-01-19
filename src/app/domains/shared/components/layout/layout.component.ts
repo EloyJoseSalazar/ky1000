@@ -1,5 +1,4 @@
 // E:\WebStorm\KY1001\src\app\domains\shared\components\layout\layout.component.ts
-// E:\WebStorm\KY1001\src\app\domains\shared\components\layout\layout.component.ts
 
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
@@ -12,9 +11,8 @@ import { filter } from 'rxjs';
   selector: 'app-layout',
   standalone: true,
   imports: [RouterOutlet, HeaderComponent], // No necesitas CommonModule ni RouterLink aquí
-  // 👇 VOLVEMOS AL TEMPLATE EN LÍNEA. NO MÁS BARRA LATERAL
-  template: `
-    <app-header />
+
+  template:`
     <main class="container mx-auto p-4">
       <router-outlet />
     </main>
