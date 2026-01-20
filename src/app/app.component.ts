@@ -54,6 +54,16 @@ export class AppComponent implements OnInit {
     // Usamos 'categoryId' que es lo que tu backend y lista esperan
     this.router.navigate(['/'], { queryParams: { categoryId: id } });
   }
+
+  irAOfertas() {
+    this.router.navigate(['/'], {
+      queryParams: {
+        isOffer: 'true', // <--- Buscamos solo lo que tenga el switch encendido
+        sortCol: 'price',
+        sortDir: 'asc'
+      }
+    });
+  }
 }
 
 

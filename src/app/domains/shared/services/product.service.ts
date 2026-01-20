@@ -1,3 +1,4 @@
+//src/app/domains/shared/services/product.service.ts
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, PLATFORM_ID, Inject } from '@angular/core';
 import { Product } from '../models/product.model';
@@ -85,9 +86,10 @@ export class ProductService {
     return this.http.post<Product>(this.apiUrl, productData);
   }
 
-  update(id: string, productData: Partial<Product>): Observable<Product> {
+  update(id: number | string, productData: Partial<Product>): Observable<Product> {
     return this.http.put<Product>(`${this.apiUrl}/${id}`, productData);
   }
+
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);

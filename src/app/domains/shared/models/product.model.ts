@@ -29,4 +29,5 @@ export interface Product {
 
   updatedAt: string;
   isactive: boolean;
+  isOffer: boolean;
 }

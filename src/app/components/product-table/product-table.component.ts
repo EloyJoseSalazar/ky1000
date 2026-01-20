@@ -17,6 +17,7 @@ export class ProductTableComponent {
   @Output() edit = new EventEmitter<string>();
   @Output() remove = new EventEmitter<number>();
   @Output() statusChange = new EventEmitter<{ id: number; isActive: boolean }>();
+  @Output() offerChange = new EventEmitter<Product>();
 
   defaultImage = '/assets/logo.png';
   public router = inject(Router);
@@ -33,6 +34,10 @@ export class ProductTableComponent {
   onStatusChange(event: Event, productId: number) {
     const checkbox = event.target as HTMLInputElement;
     this.statusChange.emit({ id: productId, isActive: checkbox.checked });
+  }
+
+  toggleOffer(product: Product) {
+    this.offerChange.emit(product);
   }
 
   handleImageError(event: Event) {

@@ -10,6 +10,7 @@ import { ProductService } from '@shared/services/product.service'; // Asegúrate
 import { ProductFiltersComponent } from '../../components/product-filters/product-filters.component';
 import { ProductTableComponent } from '../../components/product-table/product-table.component';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
+import { Product } from '@shared/models/product.model';
 
 @Component({
   selector: 'app-product-list',
@@ -175,6 +176,25 @@ export class ProductListComponent implements OnInit {
     }
     // Recargamos la tabla
     this.refreshProducts$.next();
+  }
+
+  toggleOffer(product: Product) {
+    // 1. Cambiamos el valor localmente (true <-> false)
+    product.isOffer = !product.isOffer;
+
+    // 2. Llamamos al Backend para guardar
+    this.productService.update(product.id, product).subscribe({
+      next: () => {
+        console.log(`Oferta actualizada para: ${product.title}`);
+        // Opcional: Mostrar una alerta o toast de éxito
+      },
+      error: (err) => {
+        console.error('Error al guardar oferta:', err);
+        // Si falla, revertimos el cambio visual
+        product.isOffer = !product.isOffer;
+        alert("Error al actualizar la oferta");
+      }
+    });
   }
 
 }

@@ -29,7 +29,8 @@
       [products]="response.content"
       (edit)="handleEdit($event)"
       (remove)="handleDelete($event)"
-      (statusChange)="handleStatusChange($event)">
+      (statusChange)="handleStatusChange($event)"
+      (offerChange)="toggleOffer($event)">
     </app-product-table>
 
     <app-pagination

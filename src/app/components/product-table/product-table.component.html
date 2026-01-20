@@ -3,6 +3,7 @@
     <thead>
     <tr>
       <th>Estado</th>
+      <th>Oferta</th>
       <th>Imagen</th>
       <th>SKU</th>
       <th>Título</th>
@@ -23,6 +24,15 @@
             type="checkbox"
             [checked]="product.isactive"
             (change)="onStatusChange($event, product.id)">
+          <span class="slider round"></span>
+        </label>
+      </td>
+
+      <td>
+        <label class="switch">
+          <input type="checkbox"
+                 [checked]="product.isOffer"
+                 (change)="toggleOffer(product)">
           <span class="slider round"></span>
         </label>
       </td>
