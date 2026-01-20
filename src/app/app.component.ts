@@ -35,8 +35,6 @@ export class AppComponent implements OnInit {
     this.monedaService.loadRates();
     this.cargarCategorias();
 
-    // 2. Cargar Categorías (Para el nuevo menú lateral)
-    this.cargarCategorias();
   }
 
   cargarCategorias() {

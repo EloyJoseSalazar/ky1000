@@ -60,7 +60,9 @@ export class ProductService {
     if (filters.title) params = params.append('title', filters.title);
     if (filters.categoryId) params = params.append('categoryId', filters.categoryId);
     if (filters.afiliadoCodigo) params = params.append('afiliadoCodigo', filters.afiliadoCodigo);
+    if (filters.isOffer) params = params.append('isOffer', filters.isOffer);
     if (filters.startDate) params = params.append('startDate', new Date(filters.startDate).toISOString());
+
 
     return this.http.get<PagedResponse<Product>>(`${this.apiUrl}/paged`, { params });
   }

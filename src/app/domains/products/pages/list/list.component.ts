@@ -1,10 +1,6 @@
-// src/app/domains/products/pages/list/list.component.ts
-
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Importa Router para la navegación
 import { ActivatedRoute, Router } from '@angular/router';
-// Importa operadores de RxJS
 import { Observable, switchMap, map, startWith } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 
@@ -13,27 +9,18 @@ import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
 import { ProductService } from '@shared/services/product.service';
 import { BannerComponent } from "../../../../components/banner/banner.component";
-
-// Importa tu componente de paginación
 import { PaginationComponent } from '../../../../components/pagination/pagination.component';
-// Importa el modelo de respuesta paginada
 import { PagedResponse } from '@shared/models/paged-response.model';
-
-// --- NUEVO: IMPORTAR EL PIPE DE CÁLCULO ---
-// Ajusta la ruta si tu alias '@shared' no apunta a 'src/app/domains/shared'
-// Si no funciona @shared, usa: '../../../../shared/pipes/calculo-precio.pipe'
-import { CalculoPrecioPipe } from '@shared/pipes/calculo-precio.pipe';
+// import { CalculoPrecioPipe } from '@shared/pipes/calculo-precio.pipe'; // Descomentar si lo usas en el HTML
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  // 1. Agregamos CalculoPrecioPipe a los imports para poder usarlo en el HTML
   imports: [
     CommonModule,
     BannerComponent,
     ProductComponent,
     PaginationComponent,
-    CalculoPrecioPipe // <--- AQUÍ LO AGREGAMOS
   ],
   templateUrl: './list.component.html'
 })
@@ -56,11 +43,13 @@ export class ListComponent implements OnInit {
     const paramMap$ = this.route.queryParamMap;
 
     // --- Lógica para mostrar/ocultar el banner ---
+    // Ocultamos el banner si hay alguna búsqueda (categoría, texto u oferta)
     this.showBanner$ = paramMap$.pipe(
       map(params => {
         const categoryId = params.get('categoryId');
         const query = params.get('q');
-        return !(categoryId || query);
+        const isOffer = params.get('isOffer'); // También ocultamos banner si estamos en ofertas
+        return !(categoryId || query || isOffer);
       }),
       startWith(true)
     );
@@ -68,21 +57,30 @@ export class ListComponent implements OnInit {
     // --- Lógica de carga paginada ---
     this.pagedResponse$ = paramMap$.pipe(
       switchMap(params => {
+        // 1. EXTRAEMOS LOS PARÁMETROS DE LA URL
         const categoryId = params.get('categoryId');
         const query = params.get('q');
+        const isOffer = params.get('isOffer'); // <--- ¡AQUÍ ESTÁ LA CLAVE!
         const page = Number(params.get('page') || '0');
         const size = 20;
 
-        console.log(`Router activado. Page: ${page}, Category: ${categoryId}, Query: ${query}`);
+        console.log(`Router activado. Page: ${page}, Category: ${categoryId}, Query: ${query}, Offer: ${isOffer}`);
 
+        // 2. CONSTRUIMOS EL OBJETO FILTROS
         const filters: { [key: string]: string | undefined } = {};
+
         if (categoryId) {
           filters['categoryId'] = categoryId;
         }
         if (query) {
           filters['title'] = query;
         }
+        // Agregamos el filtro de oferta si existe en la URL
+        if (isOffer) {
+          filters['isOffer'] = isOffer; // <--- SE LO PASAMOS AL SERVICIO
+        }
 
+        // 3. LLAMAMOS AL SERVICIO CON LOS FILTROS
         return this.productService.getProductsPaged(filters, page, size);
       }),
       shareReplay(1)
