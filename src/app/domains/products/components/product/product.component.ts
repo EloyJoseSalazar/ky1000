@@ -1,3 +1,5 @@
+//src/app/domains/products/components/product/product.component.ts
+
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Product } from '@shared/models/product.model';
