@@ -98,6 +98,30 @@
       <ul class="flex flex-col py-2">
         <li><a routerLink="/" (click)="toggleMenu()" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">🏠 Inicio</a></li>
         <li><a routerLink="/contacto" (click)="toggleMenu()" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">📞 Contacto</a></li>
+
+        @if (!(isAuthenticated$ | async)) {
+          <li class="p-4">
+            <button (click)="onLoginClick(); toggleMenu()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg text-center shadow hover:bg-blue-700 transition-colors">
+              Ingresar / Registrarse
+            </button>
+          </li>
+        } @else {
+          <li class="bg-blue-50 px-4 py-2 text-xs font-bold text-blue-800 uppercase tracking-wider mt-2">Panel Admin</li>
+
+          <li><a routerLink="/ingresa/admin/moneda" (click)="toggleMenu()" class="block px-4 py-3 hover:bg-blue-50">💰 Gestión Moneda</a></li>
+
+          <li><button (click)="navigateToGestionProductos(); toggleMenu()" class="block w-full text-left px-4 py-3 hover:bg-blue-50">📝 Crear Producto</button></li>
+
+          <li><button (click)="navigateToListaProductos(); toggleMenu()" class="block w-full text-left px-4 py-3 hover:bg-blue-50">📦 Listado Productos</button></li>
+
+          <li><button (click)="navigateToAnalytics(); toggleMenu()" class="block w-full text-left px-4 py-3 hover:bg-blue-50">📊 Analítica</button></li>
+
+          <li class="mt-2 border-t">
+            <button (click)="onLogout(); toggleMenu()" class="block w-full text-left px-4 py-3 text-red-600 font-bold hover:bg-red-50">
+              🚪 Cerrar Sesión
+            </button>
+          </li>
+        }
       </ul>
     </div>
   }
