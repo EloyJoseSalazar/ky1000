@@ -1,0 +1,26 @@
+
+<!--  Forma parte de la Pagina de inicio  donde se muestra las publicaciones -->
+@if (showBanner$ | async) {
+  <app-banner></app-banner>
+}
+
+<div class="flex mt-5 flex-col md:flex-row md:space-x-4">
+  <div class="grid grid-cols-2 gap-4 md:gap-8 w-full md:grid-cols-5">
+    @for (product of (products$ | async); track product.id) {
+      <app-product
+        [product]="product"
+        (addToCart)="addToCart($event)"
+      />
+    }
+  </div>
+</div>
+
+<footer class="mt-8 flex justify-center">
+  @if ((totalPages$ | async)! > 1) {
+    <app-pagination
+      [currentPage]="(currentPage$ | async)!"
+      [totalPages]="(totalPages$ | async)!"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  }
+</footer>

@@ -1,0 +1,60 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+  <h1 class="text-2xl font-bold mb-4">Panel de Analíticas</h1>
+
+  <div class="flex gap-4 mb-6 bg-white p-4 rounded shadow">
+    <div>
+      <label>Desde:</label>
+      <input type="datetime-local" [formControl]="startControl" class="border p-2 rounded">
+    </div>
+    <div>
+      <label>Hasta:</label>
+      <input type="datetime-local" [formControl]="endControl" class="border p-2 rounded">
+    </div>
+    <button (click)="loadStats()" class="bg-blue-600 text-white px-4 py-2 rounded">
+      Filtrar
+    </button>
+  </div>
+
+  <div class="mb-6">
+    <div class="bg-white p-6 rounded shadow border-l-4 border-blue-500">
+      <h3 class="text-gray-500 text-sm">Visitas a la Página (Home)</h3>
+      <p class="text-3xl font-bold">{{ totalVisits() }}</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded shadow overflow-hidden">
+    <h3 class="p-4 font-bold border-b text-gray-700">Productos Más Populares</h3>
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-gray-100 text-sm uppercase text-gray-600">
+      <tr>
+        <th class="p-3 border-b">SKU</th>
+        <th class="p-3 border-b">Producto</th>
+        <th class="p-3 border-b text-right">Vistas</th>
+      </tr>
+      </thead>
+      <tbody class="text-gray-700">
+        @for (stat of productStats(); track stat.productId) {
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-3 font-mono text-sm text-gray-500">
+              {{ stat.sku }}
+            </td>
+            <td class="p-3">
+              <div class="font-medium text-gray-900">{{ stat.productTitle }}</div>
+              <div class="text-xs text-gray-400">ID: {{ stat.productId }}</div>
+            </td>
+            <td class="p-3 text-right font-bold text-blue-600">
+              {{ stat.totalViews }}
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="3" class="p-8 text-center text-gray-500 italic">
+              No se encontraron datos en este rango de fechas.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+</div>

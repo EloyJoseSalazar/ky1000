@@ -1,0 +1,79 @@
+<div class="container mt-4">
+  <h3 class="font-semibold text-lg">Gestionar Imágenes</h3>
+
+  <!--
+    ZONA INTERACTIVA ÚNICA
+    - Se han combinado los textos de PC y Móvil DENTRO de este div.
+    - Se ha corregido la posición del (click)="triggerFileInput()".
+  -->
+  <div
+    class="mt-4 p-6 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-gray-400 transition-colors"
+    [class.border-blue-500]="isDragging()"
+    (paste)="onPaste($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="triggerFileInput()">
+
+    <!-- Texto para PC -->
+    <p class="text-gray-500 hidden md:block">
+      Arrastra y suelta imágenes aquí, o haz clic y presiona
+      <kbd class="font-mono bg-gray-200 p-1 rounded">Ctrl</kbd> + <kbd class="font-mono bg-gray-200 p-1 rounded">V</kbd> para pegar.
+    </p>
+
+    <!-- Texto para MÓVIL -->
+    <p class="text-gray-500 md:hidden">
+      <span class="font-bold">Toca aquí</span> para seleccionar imágenes de tu galería.
+    </p>
+  </div>
+
+
+  <form [formGroup]="imagenesForm" (ngSubmit)="onSubmit()">
+    <!--
+      INPUT DE ARCHIVOS AHORA OCULTO
+      - La clase `hidden` lo hace invisible.
+      - Lo activaremos mediante código.
+    -->
+    <input
+      #fileInput
+      type="file"
+      id="imagenes"
+      class="hidden"
+      multiple
+      accept="image/*"
+      (change)="onFileSelected($event)"
+      formControlName="imagenesInput"
+    >
+
+    <!-- Sección de Vistas Previas (Mejorada) -->
+    @if (previews.length > 0) {
+      <div class="mt-6">
+        <h4 class="font-semibold">Vistas Previas ({{ previews.length }} / 5):</h4>
+        <div class="flex flex-wrap gap-4 mt-2">
+          @for (preview of previews; track preview) {
+            <div class="w-32 h-32 border rounded-md overflow-hidden">
+              <img [src]="preview" class="w-full h-full object-cover" alt="Vista previa">
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- Botones de Acción -->
+    <div class="flex items-center space-x-4 mt-6">
+      <button type="submit" class="bg-black text-white font-semibold py-2 px-6 rounded-md hover:bg-gray-800 disabled:bg-gray-400" [disabled]="archivosSeleccionados.length === 0">
+        Guardar Imágenes
+      </button>
+
+      @if (archivosSeleccionados.length > 0) {
+        <button type="button" (click)="clearSelection()" class="text-red-600 hover:underline">
+          Limpiar selección
+        </button>
+      }
+
+    </div>
+
+  </form>
+</div>
+

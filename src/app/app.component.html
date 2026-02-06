@@ -1,0 +1,46 @@
+ <!--  src/app/app.component.html -->
+<app-header (toggleSidenav)="sidenav.toggle()"></app-header>
+
+<mat-sidenav-container class="main-layout" autosize>
+
+  <mat-sidenav #sidenav mode="over" class="sidebar-panel">
+
+    <div class="sidebar-header">
+      <img src="assets/logo3.png" alt="TiendaP2P" class="sidebar-logo" style="height: 30px;">
+      <button class="close-btn" (click)="sidenav.close()">✕</button>
+    </div>
+
+    <ul class="category-list">
+
+      <li class="cat-item highlight" (click)="irAOfertas(); sidenav.close()"> <span class="cat-icon">🔥</span>
+        <span>Ofertas de la Semana</span>
+      </li>
+
+      @for (cat of categorias(); track $index) {
+
+        <li class="cat-item" (click)="irACategoria(cat.id_cate); sidenav.close()">
+
+          @if (cat.image) {
+            <img [src]="cat.image"
+                 alt="{{ cat.name }}"
+                 class="cat-img"
+                 style="width: 25px; height: 25px; object-fit: contain; margin-right: 10px;"
+                 (error)="cat.image = ''"> }
+
+          @if (!cat.image) {
+            <span class="material-icons cat-placeholder">category</span>
+          }
+
+          <span class="cat-name">{{ cat.name }}</span>
+          <span class="chevron">›</span>
+        </li>
+
+      }
+    </ul>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

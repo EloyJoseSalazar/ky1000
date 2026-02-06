@@ -1,0 +1,11 @@
+.linea-whatsapp {
+  display: flex; /* Habilita Flexbox */
+  gap: 6px; /* Añade espacio entre los botones (alternativa a margin) */
+ /* align-items: center; /* Alinea verticalmente los elementos */
+  /* Si quieres centrar los botones, puedes usar: */
+  /* justify-content: center; */
+}
+
+.text1 {
+margin: 0px 15px;
+}

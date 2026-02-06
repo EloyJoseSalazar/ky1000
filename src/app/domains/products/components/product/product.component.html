@@ -1,0 +1,43 @@
+<div class="group border rounded-lg shadow-sm overflow-hidden flex flex-col h-full">
+
+  <div class="relative overflow-hidden aspect-[4/5] md:aspect-square">
+    <a [routerLink]="['/product', product.id]">
+      <img
+        [src]="product.images[0]"
+        [alt]="product.title"
+        class="w-full h-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+      >
+    </a>
+    @if (product.isOffer) {
+      <span class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md z-10">
+        ¡OFERTA!
+      </span>
+    }
+
+  </div>
+
+  <div class="p-4 flex flex-col flex-grow">
+
+    <div class="flex-grow">
+      <a [routerLink]="['/product', product.id]">
+
+        <h2 class="text-md font-semibold text-gray-800 h-12 line-clamp-2 hover:text-red-500">
+          {{ product.title }}
+        </h2>
+
+        <div class="flex justify-between items-center ">
+         <span class="font-bold text-gray-900">
+
+           <span class="text-2xl">
+             {{ product.price | calculoPrecio }}
+           </span>
+
+         </span>
+        </div>
+
+      </a>
+    </div>
+
+  </div>
+
+</div>

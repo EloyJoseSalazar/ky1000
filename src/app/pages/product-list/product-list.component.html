@@ -1,0 +1,47 @@
+<!-- <p>Listado de Productos admin!</p> -->
+
+<th scope="col" (click)="toggleSort('title')" style="cursor: pointer;">
+ Ordenar por Titulo
+  <i *ngIf="currentSortCol === 'title'" class="fas" [ngClass]="currentSortDir === 'asc' ? 'fa-sort-up' : 'fa-sort-down'"></i>
+  <i *ngIf="currentSortCol !== 'title'" class="fas fa-sort" style="color: #ccc;"></i>
+</th>
+<button class="btn btn-danger ms-2" (click)="descargarReporte()">
+  <i class="fas fa-file-pdf"></i> Exportar a PDF
+</button>
+
+<div class="page-container">
+  <header class="page-header">
+    <h1>Listado de Productos</h1>
+    <button class="navigateToGestionProductos" (click)="router.navigate(['/ingresa/producto/nuevo'])">
+      + Agregar Producto
+    </button>
+
+  </header>
+
+  <app-product-filters
+    (filtersApplied)=" handleFilters($event)">
+
+  </app-product-filters>
+
+  <ng-container *ngIf="pagedResponse$ | async as response">
+
+    <app-product-table
+      [products]="response.content"
+      (edit)="handleEdit($event)"
+      (remove)="handleDelete($event)"
+      (statusChange)="handleStatusChange($event)"
+      (offerChange)="toggleOffer($event)">
+    </app-product-table>
+
+    <app-pagination
+      [currentPage]="response.page "
+      [totalPages]="response.totalPages"
+      (pageChange)="handlePageChange($event)">
+    </app-pagination>
+
+  </ng-container>
+
+  <ng-template #loading>
+    <p>Cargando productos...</p>
+  </ng-template>
+</div>

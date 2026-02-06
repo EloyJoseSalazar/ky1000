@@ -1,0 +1,80 @@
+<div class="table-container">
+  <table>
+    <thead>
+    <tr>
+      <th>Estado</th>
+      <th>Oferta</th>
+      <th>Imagen</th>
+      <th>SKU</th>
+      <th>Título</th>
+      <th>Categoría</th>
+      <th>Afiliado</th> <!-- <-- 1. NUEVO ENCABEZADO -->
+      <th>Precio</th>
+      <th>Existencia</th>
+      <th colspan="2">Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let product of products">
+
+      <!-- 1. Estado -->
+      <td>
+        <label class="switch">
+          <input
+            type="checkbox"
+            [checked]="product.isactive"
+            (change)="onStatusChange($event, product.id)">
+          <span class="slider round"></span>
+        </label>
+      </td>
+
+      <td>
+        <label class="switch">
+          <input type="checkbox"
+                 [checked]="product.isOffer"
+                 (change)="toggleOffer(product)">
+          <span class="slider round"></span>
+        </label>
+      </td>
+
+      <!-- 2. Imagen -->
+      <td>
+        <img
+          [src]="product.images[0] || defaultImage"
+          [alt]="product.title"
+          class="product-thumbnail"
+          (error)="handleImageError($event)">
+      </td>
+
+      <!-- 3. SKU -->
+      <td>{{ product.sku }}</td>
+      <!-- 4. Título -->
+      <td>{{ product.title }}</td>
+      <!-- 5. Categoría -->
+      <td>{{ product.category.name }}</td>
+
+      <!-- 6. *** NUEVA COLUMNA DE AFILIADO *** -->
+      <td>{{ product.nombreAfiliado || 'N/A' }}</td>
+
+      <!-- 7. Precio -->
+      <td>{{ product.price | currency:'USD':'symbol':'1.2-2' }}</td>
+      <!-- 8. Existencia -->
+      <td>{{ product.stock }}</td>
+
+      <!-- 9. Modificar -->
+      <td>
+        <button (click)="onEdit(product.sku)" class="action-btn edit-btn" title="Modificar">✏️</button>
+      </td>
+
+      <!-- 10. Eliminar -->
+      <td>
+        <button (click)="onDelete(product.id)" class="action-btn delete-btn" title="Eliminar">🗑️</button>
+      </td>
+    </tr>
+    <!-- Fila de "No resultados" -->
+    <tr *ngIf="products.length === 0">
+      <td colspan="10" class="no-results">No se encontraron productos.</td> <!-- 3. Colspan ahora es 10 -->
+    </tr>
+    </tbody>
+  </table>
+</div>

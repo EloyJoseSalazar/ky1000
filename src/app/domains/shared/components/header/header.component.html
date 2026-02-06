@@ -1,0 +1,110 @@
+<nav class="sticky top-0 z-40 bg-white shadow-md w-full">
+  <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+
+    <div class="block md:hidden">
+      <div class="flex items-center justify-between h-16 gap-2">
+        <button (click)="toggleMenu()" type="button" class="p-1 text-gray-600">
+          <span class="material-icons">menu</span>
+        </button>
+
+        <button (click)="onMenuClick()" class="flex items-center px-2 py-1 border border-blue-500 rounded text-blue-600 bg-blue-50">
+          <span class="text-xs font-bold">Categorías</span>
+        </button>
+
+        <a routerLink="/" class="hidden sm:flex flex-col items-center text-gray-600">
+          <span class="material-icons text-xl">home</span>
+          <span class="text-[10px]">Inicio</span>
+        </a>
+
+        <a routerLink="/" class="flex-shrink-0">
+          <img src="/assets/logo3.png" class="h-8 w-auto" alt="Logo"/>
+        </a>
+
+        <button class="p-2 relative text-gray-700" (click)="toogleSideMenu()">
+          <div class="absolute top-0 right-0 rounded-full h-4 w-4 bg-black text-white text-[10px] flex items-center justify-center">
+            {{ cart().length }}
+          </div>
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </button>
+      </div>
+      <div class="pb-2 px-1">
+        <app-search />
+      </div>
+    </div>
+
+
+    <div class="hidden md:grid md:grid-cols-[auto_1fr_auto] md:items-center h-20 md:gap-x-6">
+      <div class="flex items-center gap-4">
+        <button (click)="onMenuClick()" class="flex items-center px-3 py-1.5 border border-blue-500 rounded-md text-blue-600 bg-blue-50 hover:bg-blue-100 cursor-pointer">
+          <span class="font-bold text-sm">Categorías</span>
+        </button>
+
+        <a routerLink="/" class="flex flex-col items-center text-gray-500 hover:text-blue-600 transition-colors">
+          <span class="material-icons text-xl">home</span>
+          <span class="text-[10px] font-medium">Inicio</span>
+        </a>
+
+        <a routerLink="/" class="flex-shrink-0 ml-2">
+          <img src="/assets/logo3.png" class="h-10 w-auto" alt="TiendaP2P"/>
+        </a>
+      </div>
+
+      <div class="w-full max-w-2xl mx-auto px-4">
+        <app-search />
+      </div>
+
+      <div class="flex items-center justify-end space-x-4">
+        <ng-container *ngIf="!(isAuthenticated$ | async); else userLoggedInMenu">
+          <button (click)="onLoginClick()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow transition-colors">
+            Ingresar
+          </button>
+        </ng-container>
+
+        <ng-template #userLoggedInMenu>
+          <div class="relative">
+            <button (click)="toggleUserMenu()" class="flex items-center space-x-1 font-medium hover:text-blue-600">
+              <span>{{ (currentUser$ | async) || 'Mi Cuenta' }}</span>
+              <span>▼</span>
+            </button>
+            @if (showUserMenu()) {
+              <div (mouseleave)="toggleUserMenu()" class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-xl border border-gray-100 z-50">
+                <div class="py-1">
+                  <a routerLink="/ingresa/admin/moneda" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">💰 Gestión Moneda</a>
+                  <button (click)="navigateToGestionProductos()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📝 Crear Producto</button>
+                  <button (click)="navigateToListaProductos()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📦 Listado Productos</button>
+                  <button (click)="navigateToAnalytics()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t">📊 Analítica</button>
+                  <button (click)="onLogout()" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">🚪 Cerrar Sesión</button>
+                </div>
+              </div>
+            }
+          </div>
+        </ng-template>
+
+        <button class="p-2 border rounded-full hover:shadow relative hover:bg-gray-50 transition-all" (click)="toogleSideMenu()">
+          <div class="absolute -top-1 -right-1 rounded-full h-5 w-5 bg-red-600 text-white text-xs flex items-center justify-center font-bold">{{ cart().length }}</div>
+          <svg class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (showMenu()) {
+    <div (click)="toggleMenu()" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+    <div class="absolute top-full left-0 w-full md:w-80 bg-white shadow-lg border-t z-50 max-h-[80vh] overflow-y-auto">
+      <ul class="flex flex-col py-2">
+        <li><a routerLink="/" (click)="toggleMenu()" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">🏠 Inicio</a></li>
+        <li><a routerLink="/contacto" (click)="toggleMenu()" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100">📞 Contacto</a></li>
+      </ul>
+    </div>
+  }
+
+  <app-cart
+    [isOpen]="!hideSideMenu()"
+    (close)="toogleSideMenu()">
+  </app-cart>
+
+</nav>

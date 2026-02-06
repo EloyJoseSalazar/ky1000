@@ -1,0 +1,4 @@
+/* src/app/domains/shared/components/cart/cart.component.css */
+.input-style {
+  @apply mt-1 w-full border rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all;
+}
