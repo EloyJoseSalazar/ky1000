@@ -6,7 +6,7 @@ import { CartItem } from '../models/cart-item.model'; // <-- IMPORTANTE: Importa
   providedIn: 'root'
 })
 export class CartService {
-
+  sidebarOpen = signal(false);
   // 1. El estado del carrito ahora guarda un array de CartItem
   cart = signal<CartItem[]>([]);
 
@@ -17,6 +17,16 @@ export class CartService {
   });
 
   constructor() { }
+
+  // Método para abrir el sidebar
+  openSidebar() {
+    this.sidebarOpen.set(true);
+  }
+
+  // Método para cerrar (opcional, si lo necesitas)
+  closeSidebar() {
+    this.sidebarOpen.set(false);
+  }
 
   // 3. 'addToCart' ahora es más inteligente: o añade un nuevo ítem o incrementa la cantidad
   addToCart(product: Product) {
@@ -34,6 +44,7 @@ export class CartService {
         return [...state, { ...product, quantity: 1 }];
       }
     });
+    this.openSidebar();
   }
 
   // 4. NUEVO MÉTODO: Para eliminar un ítem completamente del carrito

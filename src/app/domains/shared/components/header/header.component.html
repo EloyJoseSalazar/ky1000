@@ -20,15 +20,23 @@
           <img src="/assets/logo3.png" class="h-8 w-auto" alt="Logo"/>
         </a>
 
-        <button class="p-2 relative text-gray-700" (click)="toogleSideMenu()">
-          <div class="absolute top-0 right-0 rounded-full h-4 w-4 bg-black text-white text-[10px] flex items-center justify-center">
-            {{ cart().length }}
-          </div>
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button
+          class="p-2 relative transition-all duration-300"
+          [ngClass]="cart().length > 0 ? 'text-red-600 cart-alive' : 'text-gray-700 cart-empty'"
+          (click)="toogleSideMenu()">
+
+          @if (cart().length > 0) {
+            <div class="absolute top-0 right-0 rounded-full h-5 w-5 bg-red-600 text-white text-xs flex items-center justify-center font-bold border-2 border-white z-10">
+              {{ cart().length }}
+            </div>
+          }
+
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
         </button>
       </div>
+
       <div class="pb-2 px-1">
         <app-search />
       </div>
@@ -56,6 +64,7 @@
       </div>
 
       <div class="flex items-center justify-end space-x-4">
+
         <ng-container *ngIf="!(isAuthenticated$ | async); else userLoggedInMenu">
           <button (click)="onLoginClick()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow transition-colors">
             Ingresar
@@ -82,12 +91,22 @@
           </div>
         </ng-template>
 
-        <button class="p-2 border rounded-full hover:shadow relative hover:bg-gray-50 transition-all" (click)="toogleSideMenu()">
-          <div class="absolute -top-1 -right-1 rounded-full h-5 w-5 bg-red-600 text-white text-xs flex items-center justify-center font-bold">{{ cart().length }}</div>
-          <svg class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button
+          class="p-2 relative transition-all duration-300 hover:bg-gray-50 rounded-full"
+          [ngClass]="cart().length > 0 ? 'text-red-600 cart-alive' : 'text-gray-700 cart-empty'"
+          (click)="toogleSideMenu()">
+
+          @if (cart().length > 0) {
+            <div class="absolute -top-1 -right-1 rounded-full h-6 w-6 bg-red-600 text-white text-xs flex items-center justify-center font-bold border-2 border-white z-10 shadow-sm">
+              {{ cart().length }}
+            </div>
+          }
+
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
         </button>
+
       </div>
     </div>
   </div>
@@ -107,15 +126,10 @@
           </li>
         } @else {
           <li class="bg-blue-50 px-4 py-2 text-xs font-bold text-blue-800 uppercase tracking-wider mt-2">Panel Admin</li>
-
           <li><a routerLink="/ingresa/admin/moneda" (click)="toggleMenu()" class="block px-4 py-3 hover:bg-blue-50">💰 Gestión Moneda</a></li>
-
           <li><button (click)="navigateToGestionProductos(); toggleMenu()" class="block w-full text-left px-4 py-3 hover:bg-blue-50">📝 Crear Producto</button></li>
-
           <li><button (click)="navigateToListaProductos(); toggleMenu()" class="block w-full text-left px-4 py-3 hover:bg-blue-50">📦 Listado Productos</button></li>
-
           <li><button (click)="navigateToAnalytics(); toggleMenu()" class="block w-full text-left px-4 py-3 hover:bg-blue-50">📊 Analítica</button></li>
-
           <li class="mt-2 border-t">
             <button (click)="onLogout(); toggleMenu()" class="block w-full text-left px-4 py-3 text-red-600 font-bold hover:bg-red-50">
               🚪 Cerrar Sesión
@@ -127,8 +141,8 @@
   }
 
   <app-cart
-    [isOpen]="!hideSideMenu()"
-    (close)="toogleSideMenu()">
+    [isOpen]="cartService.sidebarOpen()"
+    (close)="cartService.closeSidebar()">
   </app-cart>
 
 </nav>

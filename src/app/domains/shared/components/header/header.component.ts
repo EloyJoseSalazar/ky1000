@@ -36,7 +36,7 @@ export class HeaderComponent implements OnInit {
   currentUser$: Observable<string | null>;
   showUserMenu = signal(false);
 
-  private cartService = inject(CartService);
+  public cartService = inject(CartService);
   cart = this.cartService.cart; // Solo para mostrar el contador (badge)
 
   private categoryService = inject(CategoryService);
@@ -56,8 +56,19 @@ export class HeaderComponent implements OnInit {
   // --- MÉTODOS SIMPLIFICADOS ---
 
   // Este método ahora solo cambia el estado para que el hijo (CartComponent) sepa qué hacer
+
+  /*
   toogleSideMenu() {
     this.hideSideMenu.update(prevState => !prevState);
+     }
+ */
+  toogleSideMenu() {
+    // Invierte el valor actual del servicio
+    if (this.cartService.sidebarOpen()) {
+      this.cartService.closeSidebar();
+    } else {
+      this.cartService.openSidebar();
+    }
   }
 
   onMenuClick() {

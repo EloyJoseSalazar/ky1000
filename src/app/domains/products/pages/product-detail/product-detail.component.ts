@@ -1,3 +1,4 @@
+//src/app/domains/products/pages/product-detail/product-detail.component.html
 import {
   Component,
   Input,
@@ -218,6 +219,10 @@ export class ProductDetailComponent implements OnInit, OnDestroy, AfterViewInit 
   addToCart(): void {
     const product = this.product();
     if (product) this.cartService.addToCart(product);
+  }
+
+  openCart() {
+    this.cartService.openSidebar(); // Abre el sidebar directamente
   }
 
   // --- HammerJS Config ---

@@ -70,3 +70,29 @@
 .dropdown-menu button:hover {
   background-color: #f3f4f6; /* Fondo al pasar el ratón */
 }
+
+
+/* Animación de balanceo para darle vida al Carrito */
+@keyframes swing-cart {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(10deg); }
+  40% { transform: rotate(-8deg); }
+  60% { transform: rotate(5deg); }
+  80% { transform: rotate(-3deg); }
+}
+
+.cart-alive {
+  /* Se mueve durante 2 segundos, espera un poco y repite infinitamente */
+  animation: swing-cart 2.5s ease-in-out infinite;
+  transform-origin: top center; /* El movimiento sale desde arriba, como colgado */
+}
+
+.cart-empty {
+  /* Sin animación si está vacío */
+  transform: scale(1);
+  transition: transform 0.2s;
+}
+
+.cart-empty:hover {
+  transform: scale(1.1); /* Pequeño zoom al pasar el mouse */
+}

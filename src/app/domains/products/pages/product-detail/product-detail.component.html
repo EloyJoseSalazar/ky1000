@@ -57,10 +57,10 @@
 
       <h3 class="text-gray-900 text-lg title-font font-normal mb-1">Contactar al Vendedor: <a href="tel:04249028378" class="text-blue-600 hover:underline">04249028378</a></h3>
       <h2 class="text-sm title-font text-gray-500 tracking-widest">{{ product.category?.name | uppercase }}</h2>
-      <h1 class="text-gray-900 text-3xl title-font font-medium mb-1">{{ product.title }}</h1>
+      <h1 class="text-gray-900 text-2xl title-font font-medium mb-1">{{ product.title }}</h1>
       <p class="text-black-950 text-sm font-thin mb-1">Sku: {{ product.sku }}</p>
 
-      <p class="title-font font-medium text-3xl text-gray-900 mt-5 flex items-center">
+      <p class="title-font font-medium text-2xl text-gray-900 mt-5 flex items-center">
         <img
           src="/assets/bcv1.jpg"
           alt="Logo BCV"
@@ -74,13 +74,27 @@
       </p>
 
       <h3 class="text-gray-900 text-lg title-font font-medium mb-4">Disponible: {{ product.stock }}</h3>
+      <div class="flex flex-wrap items-center mt-6 gap-3 sm:gap-4">
 
-      <div class="flex items-center mt-6 space-x-4">
         <button
           (click)="addToCart()"
-          class="flex text-white bg-red-500 border-0 py-3 px-8 focus:outline-none hover:bg-red-600 rounded text-lg active:bg-red-700 transition-colors">
-          Agregar al Carrito
+          class="flex-1 sm:flex-none flex items-center justify-center gap-2 text-white bg-red-500 border-0 py-2 px-3 sm:py-3 sm:px-6 focus:outline-none hover:bg-red-600 rounded-lg text-sm sm:text-lg font-medium shadow-md transition-all active:scale-95 whitespace-nowrap">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v6m3-3H9" />
+          </svg>
+          <span>Agregar</span>
         </button>
+
+        <button
+          (click)="openCart()"
+          class="flex-1 sm:flex-none flex items-center justify-center gap-2 text-white bg-gray-800 border-0 py-2 px-3 sm:py-3 sm:px-6 focus:outline-none hover:bg-black rounded-lg text-sm sm:text-lg font-medium shadow-md transition-all active:scale-95 whitespace-nowrap">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+          <span>Ir al Carrito</span>
+        </button>
+
       </div>
 
       <p class="leading-relaxed mt-6 text-gray-700 whitespace-pre-line">{{ product.description }}</p>
