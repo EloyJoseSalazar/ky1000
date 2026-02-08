@@ -150,7 +150,8 @@ He realizado un nuevo pedido.
 📄 *N° Recibo:* ${res.receiptNumber}
 💰 *Total:* US$ ${res.totalToPay}
 
-🔗 *Ver Recibo PDF:* ${res.pdfUrl}
+👇 *AQUÍ ESTÁ MI COMPROBANTE:*
+🔗 ${res.pdfUrl}
 
 Quedo atento a su confirmación.`;
 
